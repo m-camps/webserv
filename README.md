@@ -27,11 +27,10 @@ Bottom 2 links middle mouse click for jumping to middle of page
 
 #### Classes that might be needed
 
-Server
-Socket?
-CGI?
-Request
+- Server
 
-  
-  
-  
+- Socket?
+
+- CGI?
+
+- Request
