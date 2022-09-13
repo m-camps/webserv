@@ -10,8 +10,6 @@ Webserver written in C++98
 
 [HTTP Made Really Easy](https://www.jmarshall.com/easy/http/)
 
-Bottom 2 links middle mouse click for jumping to middle of page
-
 [Structure of HTTP transactions](https://www.jmarshall.com/easy/http/#:~:text=Table%20of%20Contents-,Structure%20of%20HTTP%20Transactions,-Like%20most%20network)
 
 [Sample HTTP Exchange](https://www.jmarshall.com/easy/http/#:~:text=Table%20of%20Contents-,Sample%20HTTP%20Exchange,After%20sending%20the%20response%2C%20the%20server%20closes%20the%20socket.,-To%20familiarize%20yourself)
