@@ -19,10 +19,9 @@ Bottom 2 links middle mouse click for jumping to middle of page
 - CGI (commen gateway interface)  [link](https://en.wikipedia.org/wiki/Common_Gateway_Interface)
 
   
-
 #### Classes that might be needed
 Server
-Socket?
+Socket
 CGI?
 Request
 
