@@ -12,35 +12,45 @@
 
 NAME = webserv
 
-SRC = src/main.cpp
-	
+SRC = $(shell find . -type f -name "*.cpp")
+
 OBJ = ${SRC:%.cpp=%.o}
 
 CONFIG = config.conf
 
-FLAGS = -Wall -Werror -Wextra
-GCC = c++
+CFLAGS = -Wall -Werror -Wextra -pedantic
+GCC	= c++
 EXTRA = -std=c++98
-DEBUG = -fsanitize=address
+SHELL := /bin/bash
+
+ifdef DEBUG
+	CFLAGS += -g
+else ifdef FSAN
+	CFLAGS += -fsanitize=address
+else
+	CFLAGS += -Ofast
+endif
 
 %.o:%.cpp %.hpp
-	$(GCC) -c -o $@ $< $(FLAGS) $(EXTRA)
+	$(GCC) -c -o $@ $< $(CFLAGS) $(EXTRA)
 	
 $(NAME): $(OBJ)
-	$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA)
+	$(GCC) $(OBJ) -o $(NAME) $(CFLAGS) $(EXTRA)
 
 all: $(NAME)
-	@echo "$(GREEN)Compilation Complete $(COL_END)"
+	@printf "$(GREEN)Compilation Complete $(COL_END)"
 
 test: all
-	@echo "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
+	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
 	./$(NAME) $(CONFIG)
 
-debug: 
-	@$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) $(DEBUG)
-	@echo "$(GREEN)Debug Compilation Complete $(COL_END)"
-	@echo "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
-	./$(NAME) $(CONFIG)
+debug:
+	make DEBUG=1
+	@printf "$(GREEN)Debug Compilation Complete $(COL_END)"
+	@printf "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
+
+rebug: fclean
+	make debug
 
 clean:
 	rm -rf $(OBJ)
@@ -50,9 +60,23 @@ fclean: clean
 
 re: fclean all
 
+fsan:
+	make FSAN=1
+
+resan: fclean
+	make fsan
+
+run: all
+	./$(NAME)
+
+rerun: fclean all
+	./$(NAME)
+
 # Colors
-RED=\033[1;31m
-GREEN=\033[1;32m
+RED=\x1b[1;31m
+GREEN=\x1b[32;01m
 PURPLE=\033[1;35m
 YELLOW=\033[1;33m
-COL_END=\033[0m
+COL_END=\x1b[0m
+
+.PHONY:	all clean fclean re
