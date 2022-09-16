@@ -6,13 +6,17 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/09/13 17:11:15 by mcamps        ########   odam.nl          #
+#    Updated: 2022/09/16 17:19:24 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 
 SRC = src/main.cpp
+
+CLIENT = client/main.cpp
+
+INC = src/Config.hpp
 	
 OBJ = ${SRC:%.cpp=%.o}
 
@@ -23,11 +27,11 @@ GCC = c++
 EXTRA = -std=c++98
 DEBUG = -fsanitize=address
 
-%.o:%.cpp %.hpp
-	$(GCC) -c -o $@ $< $(FLAGS) $(EXTRA)
+%.o, %.hpp: %.cpp %.hpp
+	$(GCC) -c -o $@ $< $(FLAGS) $(EXTRA) 
 	
 $(NAME): $(OBJ)
-	$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA)
+	$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) -I src/Config.hpp
 
 all: $(NAME)
 	@echo "$(GREEN)Compilation Complete $(COL_END)"
@@ -42,6 +46,10 @@ debug:
 	@echo "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
 	./$(NAME) $(CONFIG)
 
+client:
+	$(GCC) client/main.cpp -o not_server $(FLAGS) $(EXTRA)
+	./not_server
+	
 clean:
 	rm -rf $(OBJ)
 
@@ -49,6 +57,8 @@ fclean: clean
 	rm -rf $(NAME)
 
 re: fclean all
+
+.PHONY: all test clean client $(NAME)
 
 # Colors
 RED=\033[1;31m
