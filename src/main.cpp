@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/09/16 17:25:44 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/09/16 18:06:34 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <poll.h>
+#include <fcntl.h>
 
 #include "Config.hpp"
 
@@ -47,9 +48,15 @@ int	main(int argc, char **argv)
 	struct sockaddr_in caddr;
 	socklen_t clen = sizeof(caddr);
 	
-	int newSocket = accept(socketfd, (struct sockaddr *) &caddr, &clen);
+	int socket[2];
+	for (int i = 0; i < 2; i++)
+	{
+		socket[i] = accept(socketfd, (struct sockaddr *) &caddr, &clen);
+		std::cout << "Client connected: " << i << std::endl;
+		fcntl(socket[i], F_SETFL, O_NONBLOCK);
+	}
 
-	print("Port= ", saddr.sin_port);
+	print("Port= ", ntohs(saddr.sin_port));
 	print("SocketFD= ",socketfd);
 
 	// send(socketfd, "Hello world!\n",13, 0);
@@ -64,11 +71,20 @@ int	main(int argc, char **argv)
 	// poll(pollfd,1, 1000);
 
 	ret = 0;
-	while(1){
-		ret = read(newSocket, str, sizeof(str));
-		std::cout << str << std::endl;
-		memset(str, '\0', 100);
-	};
-	std::cout << str << std::endl;
+	memset(str, '\0', 100);
+	while(true)
+	{
+		for (int i = 0; i < 2; i++)
+		{
+			ret = read(socket[i], str, sizeof(str));
+			if (ret > 0)
+				std::cout << ret << "\n";
+			if (str[0] != '\0')
+			{
+				std::cout << str << std::endl;
+				memset(str, '\0', 100);
+			}
+		}
+	}
 	return (0);
 }

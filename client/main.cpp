@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/16 15:31:38 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/09/16 17:26:10 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/09/16 18:04:05 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,11 @@ int main(void)
 	saddr.sin_port = htons(80);
 
 	connect(socketfd, (struct sockaddr *) &saddr, sizeof(saddr));
-
-	std::string str = "Hello World";
-	
-	std::cout << "Sending message " << str.c_str() << " with length " << str.length() << std::endl;
+	std::cout << "Connected to server" << std::endl;
 
 	while(1){
 		std::string msg;
 		std::cin >> msg;
 		write(socketfd, msg.c_str(), msg.length());
 	}
-	write(socketfd, str.c_str(), str.length());
 }
