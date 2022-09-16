@@ -10,18 +10,21 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = webserv
+NAME := webserv
 
-SRC = $(shell find . -type f -name "*.cpp")
+SRCDIR := src
+BUILDDIR := build
 
-OBJ = ${SRC:%.cpp=%.o}
+SRC := $(shell find $(SRCDIR) -type f -name "*.cpp")
+OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
-CONFIG = config.conf
+CONFIG := config.conf
 
-CFLAGS = -Wall -Werror -Wextra -pedantic
-GCC	= c++
-EXTRA = -std=c++98
+CFLAGS := -Wall -Werror -Wextra -pedantic
+CC	:= c++
+EXTRA := -std=c++98
 SHELL := /bin/bash
+INC := -I include
 
 ifdef DEBUG
 	CFLAGS += -g
@@ -31,19 +34,17 @@ else
 	CFLAGS += -Ofast
 endif
 
-%.o:%.cpp %.hpp
-	$(GCC) -c -o $@ $< $(CFLAGS) $(EXTRA)
-	
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(BUILDDIR)
+	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
+
 $(NAME): $(OBJ)
-	$(GCC) $(OBJ) -o $(NAME) $(CFLAGS) $(EXTRA)
+	$(CC) $^ -o $(NAME)
 
 all: $(NAME)
-	@printf "$(GREEN)Compilation Complete $(COL_END)"
+	@printf "$(GREEN)Compilation Complete$(COL_END)"
 
-test: all
-	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
-	./$(NAME) $(CONFIG)
-
+# For LLDB or any other debugger
 debug:
 	make DEBUG=1
 	@printf "$(GREEN)Debug Compilation Complete $(COL_END)"
@@ -60,17 +61,21 @@ fclean: clean
 
 re: fclean all
 
+#For segfaults
 fsan:
 	make FSAN=1
 
 resan: fclean
 	make fsan
 
+#Make & run executable
 run: all
-	./$(NAME)
+	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
+	./$(NAME) $(CONFIG)
 
 rerun: fclean all
-	./$(NAME)
+	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
+	./$(NAME) $(CONFIG)
 
 # Colors
 RED=\x1b[1;31m

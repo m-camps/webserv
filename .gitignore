@@ -1,4 +1,5 @@
 webserv
+build/*
 .idea
 
 # Prerequisites
