@@ -36,10 +36,10 @@ endif
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(BUILDDIR)
-	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJ)
-	$(CC) $^ -o $(NAME)
+	$(CC) $(CFLAGS) $^ -o $(NAME)
 
 all: $(NAME)
 	@printf "$(GREEN)Compilation Complete$(COL_END)"
