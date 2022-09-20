@@ -1,6 +1,7 @@
 ## Config Options
 
 Context Server:
+```
 - servername			name ...;
 - listen				port;
 - error_page			error_page(s) page_uri;
@@ -10,17 +11,20 @@ Context Server:
 - index					default_file;
 - return				statuscode uri;
 - location 				uri (no regexp) { ... };
+```
 
 Context Location:
+```
 - autoindex				[on/off];
 - root					path;
 - allow_methods			method;
 - index					default_file;
 - cgi_file_extension	file_extenstion; (without .)
 - cgi_name				name;
-
+```
 ## Example
 
+Server
 ```
 server {
 	servername			fred.com;
