@@ -10,7 +10,7 @@ Context Server:
 - allow_methods			method(s);
 - index					default_file;
 - return				statuscode uri;
-- location 				uri (no regexp) { ... };
+- location				uri (no regexp) { ... };
 ```
 
 Context Location:
