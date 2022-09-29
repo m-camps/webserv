@@ -6,53 +6,50 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/09/13 17:11:15 by mcamps        ########   odam.nl          #
+#    Updated: 2022/09/16 17:19:24 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
-NAME := webserv
+NAME = webserv
 
-SRCDIR := src
-BUILDDIR := build
+SRC = src/main.cpp src/Server.cpp src/Parse.cpp
 
-SRC := $(shell find $(SRCDIR) -type f -name "*.cpp")
-OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
+CLIENT = client/main.cpp
 
-CONFIG := config.conf
+INC = src/Config.hpp inc/Server.hpp inc/Parse.hpp
+	
+OBJ = ${SRC:%.cpp=%.o}
 
-CFLAGS := -Wall -Werror -Wextra -pedantic
-CC	:= c++
-EXTRA := -std=c++98
-SHELL := /bin/bash
-INC := -I include
+CONFIG = config.conf
 
-ifdef DEBUG
-	CFLAGS += -g
-else ifdef FSAN
-	CFLAGS += -fsanitize=address
-else
-	CFLAGS += -Ofast
-endif
+FLAGS = -Wall -Werror -Wextra
+GCC = c++
+EXTRA = -std=c++98
+DEBUG = -fsanitize=address
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR)
-	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
-
+%.o, %.hpp: %.cpp %.hpp
+	$(GCC) -c -o $@ $< $(FLAGS) $(EXTRA) 
+	
 $(NAME): $(OBJ)
-	$(CC) $^ -o $(NAME)
+	$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) -I src/Config.hpp
 
 all: $(NAME)
-	@printf "$(GREEN)Compilation Complete$(COL_END)"
+	@echo "$(GREEN)Compilation Complete $(COL_END)"
 
-# For LLDB or any other debugger
-debug:
-	make DEBUG=1
-	@printf "$(GREEN)Debug Compilation Complete $(COL_END)"
-	@printf "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
+test: all
+	@echo "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
+	./$(NAME) $(CONFIG)
 
-rebug: fclean
-	make debug
+debug: 
+	@$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) $(DEBUG)
+	@echo "$(GREEN)Debug Compilation Complete $(COL_END)"
+	@echo "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
+	./$(NAME) $(CONFIG)
 
+client:
+	$(GCC) client/main.cpp -o not_server $(FLAGS) $(EXTRA)
+	./not_server
+	
 clean:
 	rm -rf $(OBJ)
 
@@ -61,27 +58,11 @@ fclean: clean
 
 re: fclean all
 
-#For segfaults
-fsan:
-	make FSAN=1
-
-resan: fclean
-	make fsan
-
-#Make & run executable
-run: all
-	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
-	./$(NAME) $(CONFIG)
-
-rerun: fclean all
-	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
-	./$(NAME) $(CONFIG)
+.PHONY: all test clean client $(NAME)
 
 # Colors
-RED=\x1b[1;31m
-GREEN=\x1b[32;01m
+RED=\033[1;31m
+GREEN=\033[1;32m
 PURPLE=\033[1;35m
 YELLOW=\033[1;33m
-COL_END=\x1b[0m
-
-.PHONY:	all clean fclean re
+COL_END=\033[0m

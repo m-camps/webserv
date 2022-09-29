@@ -1,0 +1,2 @@
+http://www.wijata.com/cgi/cgispec.html#4.0   //cgi
+https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4 //http messages
