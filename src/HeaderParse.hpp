@@ -22,12 +22,11 @@ public:
     HeaderParse& operator=(const HeaderParse& ref);
 
     // Functions
+    void MapTheHeader(const std::string&);
+    std::string AppendRequest(const std::string& Request)
 
 private:
-    const std::string _HTTPMethod;
-    const std::string _Host;
-    const std::string _Useragent;
-    const std::string _connection;
+    std::map<std::string, std::string> _dictHeader;
 };
 
 
