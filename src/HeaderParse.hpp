@@ -23,7 +23,7 @@ public:
 
     // Functions
     void MapTheHeader(const std::string&);
-    std::string AppendRequest(const std::string& Request)
+    std::string AppendRequest(const std::string& Request);
 
 private:
     std::map<std::string, std::string> _dictHeader;
