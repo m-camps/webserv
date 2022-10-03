@@ -2,24 +2,23 @@
 // Created by Xander Voorvaart on 9/30/22.
 //
 
-#ifndef WEBSERV_HEADERPARSE_HPP
-#define WEBSERV_HEADERPARSE_HPP
+#ifndef WEBSERV_EXCHANGE_HPP
+#define WEBSERV_EXCHANGE_HPP
 
 #include <iostream>
-#include <vector>
 #include <map>
 #include <sstream>
 
-class HeaderParse
+class Exchange
 {
 public:
     // Ctor & Dtor
-    HeaderParse(const std::string&);
-    HeaderParse(const HeaderParse&);
-    ~HeaderParse(void);
+    explicit Exchange(const std::string&);
+    Exchange(const Exchange&);
+    ~Exchange(void);
 
     // Operators
-    HeaderParse& operator=(const HeaderParse& ref);
+    Exchange& operator=(const Exchange& ref);
 
     // Functions
     void MapTheHeader(const std::string&);
@@ -30,4 +29,4 @@ private:
 };
 
 
-#endif //WEBSERV_HEADERPARSE_HPP
+#endif //WEBSERV_EXCHANGE_HPP

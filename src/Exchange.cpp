@@ -2,14 +2,14 @@
 // Created by Xander Voorvaart on 9/30/22.
 //
 
-#include "HeaderParse.hpp"
+#include "Exchange.hpp"
 
 ////////////// Ctor & Dtor //////////////
 
 /**
  * @param Request will be the header & the body in one string
  */
-HeaderParse::HeaderParse(const std::string& Request)
+Exchange::Exchange(const std::string& Request)
 {
     const std::string Header = AppendRequest(Request);
 
@@ -17,18 +17,18 @@ HeaderParse::HeaderParse(const std::string& Request)
 }
 
 // Deep copy?
-HeaderParse::HeaderParse(const HeaderParse& ref)
+Exchange::Exchange(const Exchange& ref)
     : _dictHeader(ref._dictHeader)
 {
 }
 
-HeaderParse::~HeaderParse(void)
+Exchange::~Exchange(void)
 {
 }
 
 ////////////// Operators //////////////
 
-HeaderParse &HeaderParse::operator=(const HeaderParse& ref)
+Exchange &Exchange::operator=(const Exchange& ref)
 {
     if (this != &ref)
         this->_dictHeader = ref._dictHeader;
@@ -41,7 +41,7 @@ HeaderParse &HeaderParse::operator=(const HeaderParse& ref)
  * I look for the "\\r\\n\\r\\n" seperator by using std::find.
  * Which I will then append to the Header string.
  */
-std::string HeaderParse::AppendRequest(const std::string& Request)
+std::string Exchange::AppendRequest(const std::string& Request)
 {
     std::string Header;
 
@@ -70,7 +70,7 @@ std::string HeaderParse::AppendRequest(const std::string& Request)
  * Connection <-- To check connection \n
  * User-Agent <-- Information of the user \n
  */
-void HeaderParse::MapTheHeader(const std::string& Header)
+void Exchange::MapTheHeader(const std::string& Header)
 {
     std::string line;
     std::istringstream issHeader(Header);

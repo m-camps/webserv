@@ -16,7 +16,7 @@
 #include <unistd.h> // Write & Read
 #include <fcntl.h>
 
-#include "HeaderParse.hpp"
+#include "Exchange.hpp"
 
 const int32_t SUCCES = 0;
 const int32_t ERROR = 1;
@@ -99,7 +99,7 @@ int32_t	main(int argc, char *argv[])
 		char buffer[30000] = {0};
 		if (read( ListenSocket , buffer, 30000) < 0)
 			std::exit(EXIT_FAILURE);
-        HeaderParse Base(buffer);
+        Exchange Base(buffer);
 
 		if (write(ListenSocket , &hello , hello.size() + 1) < 0)
 			std::exit(EXIT_FAILURE);
