@@ -6,6 +6,9 @@
 #define WEBSERV_HEADERPARSE_HPP
 
 #include <iostream>
+#include <vector>
+#include <map>
+#include <sstream>
 
 class HeaderParse
 {
@@ -21,7 +24,7 @@ public:
     // Functions
 
 private:
-    const std::string _Get;
+    const std::string _HTTPMethod;
     const std::string _Host;
     const std::string _Useragent;
     const std::string _connection;

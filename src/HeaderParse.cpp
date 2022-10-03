@@ -4,22 +4,46 @@
 
 #include "HeaderParse.hpp"
 
-const std::string ParseGet(const std::string& FullHeader)
+std::map<std::string, std::string> MapTheHeader(const std::string& Header)
 {
-    std::string _get;
-
-    if (FullHeader.compare(0, 3, "GET") == 0)
-        _get = FullHeader.substr(5, 20);
-    return (_get);
+    return ();
 }
 
-HeaderParse::HeaderParse(const std::string& FullHeader)
-    : _Get(ParseGet(FullHeader))
+// 1. Append data
+// 2. Check if data has \r\n\r\n
+//  - Yes: Split the buffer at that point.
+//  - No: Back to step 1.
+// 3. For Part A of split buffer, getline it into a dictonary
+// 4. Make sure the data var only has the body left.
+
+/**
+ * I look for the "\\r\\n\\r\\n" seperator by using find.
+ * Which I will then append to the Header string.
+ */
+std::string AppendRequest(const std::string& Request)
 {
-    std::cout << FullHeader
-                << std::endl
-                << FullHeader
-                << std::endl;
+    std::string Header;
+
+    std::size_t found = Request.find("\r\n\r\n");
+    if (found == std::string::npos)
+        std::cerr << "Error" << std::endl;
+    Header.append(Request, 0, found);
+    return (Header);
+}
+
+////////////// Ctor & Dtor //////////////
+
+/**
+ *
+ * @param Request will be the header & the body in one string
+ */
+HeaderParse::HeaderParse(const std::string& Request)
+{
+    const std::string Header = AppendRequest(Request);;
+
+    std::cout << Header << std::endl;
+//    SeperatedHeader = SeperateHeader(Header);
+
 }
 
 HeaderParse::HeaderParse(const HeaderParse& ref)
@@ -32,6 +56,7 @@ HeaderParse::~HeaderParse(void)
 }
 
 ////////////// Operators //////////////
+
 HeaderParse &HeaderParse::operator=(const HeaderParse& ref)
 {
     if (this != &ref)
@@ -40,4 +65,4 @@ HeaderParse &HeaderParse::operator=(const HeaderParse& ref)
     return (*this);
 }
 
-// Functions
+////////////// Functions //////////////

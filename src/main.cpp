@@ -99,7 +99,6 @@ int32_t	main(int argc, char *argv[])
 		char buffer[30000] = {0};
 		if (read( ListenSocket , buffer, 30000) < 0)
 			std::exit(EXIT_FAILURE);
-		std::cout << buffer << '\n';
         HeaderParse Base(buffer);
 
 		if (write(ListenSocket , &hello , hello.size() + 1) < 0)
