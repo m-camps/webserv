@@ -14,6 +14,9 @@
 #include <sys/socket.h> // socket(), bind()
 #include <netinet/in.h> // INADDR_ANY
 #include <unistd.h> // Write & Read
+#include <fcntl.h>
+
+#include "HeaderParse.hpp"
 
 const int32_t SUCCES = 0;
 const int32_t ERROR = 1;
@@ -33,9 +36,9 @@ struct sockaddr_in GetSockaddr(void)
 	struct sockaddr_in address = {};
 
 	address.sin_family = AF_INET;
-	address.sin_port = 8080;
+	address.sin_port = htons(8080); // <- Converts from host byte order to network byte order.
 	address.sin_addr.s_addr = INADDR_ANY;
-	memset(address.sin_zero, '\0', sizeof(address.sin_zero));
+	memset(address.sin_zero, 0, sizeof(address.sin_zero));
 	return (address);
 }
 
@@ -51,7 +54,7 @@ struct sockaddr_in GetSockaddr(void)
  * @param address The address of the socket_fd
  * @param socket_fd
  */
-void SetupSocket(struct sockaddr_in *address, int32_t *socket_fd)
+void SetupSocket(struct sockaddr_in *address, const int32_t *socket_fd)
 {
 	if (bind(*socket_fd, (const struct sockaddr *)address, sizeof(*address)) < 0)
 	{
@@ -91,11 +94,13 @@ int32_t	main(int argc, char *argv[])
 			std::perror("In Accept: " );
 			return (ERROR);
 		}
+        fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
 
 		char buffer[30000] = {0};
 		if (read( ListenSocket , buffer, 30000) < 0)
 			std::exit(EXIT_FAILURE);
 		std::cout << buffer << '\n';
+        HeaderParse Base(buffer);
 
 		if (write(ListenSocket , &hello , hello.size() + 1) < 0)
 			std::exit(EXIT_FAILURE);
