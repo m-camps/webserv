@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/09/13 16:59:55 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/04 12:24:32 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 #include <fcntl.h>
 
 #include "Exchange/Exchange.hpp"
+#include "../inc/Server.hpp"
+#include "../inc/Parse.hpp"
 
 const int32_t SUCCES = 0;
 const int32_t ERROR = 1;
@@ -31,12 +33,12 @@ int32_t GetSocket(void)
 }
 
 
-struct sockaddr_in GetSockaddr(void)
+struct sockaddr_in GetSockaddr(Server& server)
 {
 	struct sockaddr_in address = {};
 
 	address.sin_family = AF_INET;
-	address.sin_port = htons(8080); // <- Converts from host byte order to network byte order.
+	address.sin_port = htons(std::stol(server.getPort().back())); // <- Converts from host byte order to network byte order.
 	address.sin_addr.s_addr = INADDR_ANY;
 	memset(address.sin_zero, 0, sizeof(address.sin_zero));
 	return (address);
@@ -71,17 +73,17 @@ void SetupSocket(struct sockaddr_in *address, const int32_t *socket_fd)
 
 int32_t	main(int argc, char *argv[])
 {
-	(void) argc;
-	(void) argv;
+	if (argc != 2)
+		std::exit(EXIT_FAILURE);
 
-	struct sockaddr_in address = GetSockaddr();
+	Server server;
+	startParse(server, argv[1]);
+	struct sockaddr_in address = GetSockaddr(server);
 	int32_t socket_fd = GetSocket();
 	int32_t addrlen = sizeof(address);
 
 	SetupSocket(&address, &socket_fd);
 
-//	if (argc != 2)
-//		std::exit(EXIT_FAILURE);
 
 	std::string hello = "Hello World";
     int32_t ListenSocket = 0;

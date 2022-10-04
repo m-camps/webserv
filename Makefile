@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/09/13 17:11:15 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/04 12:31:48 by xvoorvaa      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ CFLAGS := -Wall -Werror -Wextra -pedantic
 CC	:= c++
 EXTRA := -std=c++98
 SHELL := /bin/bash
-INC := -I include
+INC := -Iinc -Isrc
 
 ifdef DEBUG
 	CFLAGS += -g
@@ -35,7 +35,7 @@ else
 endif
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(BUILDDIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJ)
@@ -54,7 +54,7 @@ rebug: fclean
 	make debug
 
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(BUILDDIR)
 
 fclean: clean
 	rm -rf $(NAME)
