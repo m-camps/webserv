@@ -84,17 +84,18 @@ int32_t	main(int argc, char *argv[])
 //		std::exit(EXIT_FAILURE);
 
 	std::string hello = "Hello World";
+    int32_t ListenSocket = 0;
 
+    fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
 	while (true) {
 		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n" << '\n';
-		int32_t ListenSocket = accept(socket_fd, reinterpret_cast<sockaddr *>(&address),
+		ListenSocket = accept(socket_fd, reinterpret_cast<sockaddr *>(&address),
 		                            reinterpret_cast<socklen_t *>(&addrlen));
 		if (ListenSocket < 0)
 		{
 			std::perror("In Accept: " );
 			return (ERROR);
 		}
-        fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
 
 		char buffer[30000] = {0};
 		if (read( ListenSocket , buffer, 30000) < 0)

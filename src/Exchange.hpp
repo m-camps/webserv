@@ -12,6 +12,8 @@
 class Exchange
 {
 public:
+    typedef std::map<std::string, std::string> map;
+
     // Ctor & Dtor
     explicit Exchange(const std::string&);
     Exchange(const Exchange&);
@@ -21,11 +23,13 @@ public:
     Exchange& operator=(const Exchange& ref);
 
     // Functions
-    void MapTheHeader(const std::string&);
-    std::string AppendRequest(const std::string& Request);
-
+    void PrintHeaderMap(void) const;
+    const map& getHeader(void) const;
 private:
-    std::map<std::string, std::string> _dictHeader;
+    map _dictHeader;
+
+    void MapTheHeader(const std::string&);
+    std::string AppendRequest(const std::string& Request) const;
 };
 
 
