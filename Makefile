@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/09/16 17:19:24 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/04 09:44:31 by bmajor        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,11 +27,11 @@ GCC = c++
 EXTRA = -std=c++98
 DEBUG = -fsanitize=address
 
-%.o, %.hpp: %.cpp %.hpp
-	$(GCC) -c -o $@ $< $(FLAGS) $(EXTRA) 
+%.o: %.cpp
+	$(GCC) -g -c -o $@ $< $(FLAGS) $(EXTRA) 
 	
 $(NAME): $(OBJ)
-	$(GCC) $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) -I src/Config.hpp
+	$(GCC) -g  $(OBJ) -o $(NAME) $(FLAGS) $(EXTRA) -I src/Config.hpp
 
 all: $(NAME)
 	@echo "$(GREEN)Compilation Complete $(COL_END)"

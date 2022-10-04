@@ -25,6 +25,8 @@ class Parse
 		void    processFile(std::ifstream& configStream, Parse& parseInstance, Server& server);
 		void    selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
 		bool    isDirective(std::string& currentWord);
+		bool	isLocationDirective(std::string& currentWord);
+		void    selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
 
 	private:
 		/*** 
@@ -43,7 +45,15 @@ void    parseListen(Server& server, std::string& currentLine);
 void    parseServerName(Server& server, std::string& currentLine);
 void    parseRoot(Server& server, std::string& currentLine);
 void    parseIndex(Server& server, std::string& currentLine);
+void    parseAutoIndex(Server& server, std::string& currentLine);
 void    parseClientBodySize(Server& server, std::string& currentLine);
 void    parseLocation(Server& server, std::string& currentLine);
+void	parseCgiName(Server& server, std::string& currentLine);
+void	parseCgiFileExtension(Server& server, std::string& currentLine);
+bool    isLocationDirective(std::string& currentWord);
+void    parseAllowMethods(Server& server, std::string& currentLine);
+void    proceedToLocationParser(Server& server, std::ifstream& configStream);
+
+
 
 #endif

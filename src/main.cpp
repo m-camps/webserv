@@ -27,6 +27,7 @@ void	print(std::string type,int print)
 
 int main(int argc, char **argv)
 {
+		int new_socket = 1;
 	if (argc > 2)
 	{
 		exit(1);
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
 
 	//set address to appropriate stuff
 	address.sin_family = AF_INET; //adress of family, we used when setting up
-	address.sin_port = htons(PORT); //transport address
+	address.sin_port = htons(PORT); //transport address insteadof port serer.getport.setport
 	address.sin_addr.s_addr = htonl(INADDR_ANY); //any adress of any interface
 
 	//should load inet_pton(AF_INET, "given server_ip/name", &(address.sin_addr.s_addr))
@@ -81,22 +82,23 @@ int main(int argc, char **argv)
 	{
 		std::cout << "fail to listen not create socket" << std::endl;
 	}
-	int new_socket;
 
 	while(1)
     {
         printf("\n+++++++ Waiting for new connection ++++++++\n\n");
+		fcntl(new_socket, F_SETFL, O_NONBLOCK); //is this too late to set it to nonblocking?
+
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0) //accept blocks the socket until a connection is present
         {
             perror("In accept failed\n");
             exit(EXIT_FAILURE);
         }
-		fcntl(new_socket, F_SETFL, O_NONBLOCK); //is this too late to set it to nonblocking?
-        char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!"; //minimal http header for sending back, send header back to clinet
+       // char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!"; //minimal http header for sending back, send header back to clinet
         char buffer[30000] = {0};
         size_t valread = read( new_socket , buffer, 30000); //read the clients msg
+		(void)valread;
         printf("%s\n",buffer ); //print it
-       	write(new_socket , hello , strlen(hello)); //send back a hello from server
+       	//write(new_socket , hello , strlen(hello)); //send back a hello from server
        	printf("------------------Hello message sent-------------------\n");
         close(new_socket);
     }
