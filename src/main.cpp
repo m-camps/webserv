@@ -22,13 +22,18 @@
 
 const int32_t SUCCES = 0;
 const int32_t ERROR = 1;
+const int32_t BUFFERSIZE = 30000;
 
 int32_t GetSocket(void)
 {
+    int32_t reuse = 1;
 	int32_t socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (socket_fd < 0) {
+
+	if (socket_fd < 0)
 		std::exit(EXIT_FAILURE);
-	}
+
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
+        std::perror("In setsockopt");
 	return (socket_fd);
 }
 
@@ -84,13 +89,13 @@ int32_t	main(int argc, char *argv[])
 
 	SetupSocket(&address, &socket_fd);
 
-	std::string hello = "Hello World";
     int32_t ListenSocket = 0;
 
     fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
+    char buffer[30000] = {0};
 
 	while (true) {
-		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n" << '\n';
+		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n" << std::endl;
 		ListenSocket = accept(socket_fd, reinterpret_cast<sockaddr *>(&address),
 									reinterpret_cast<socklen_t *>(&addrlen));
 		if (ListenSocket < 0)
@@ -99,13 +104,8 @@ int32_t	main(int argc, char *argv[])
 			return (ERROR);
 		}
 
-		char buffer[30000] = {0};
-		if (read( ListenSocket , buffer, 30000) < 0)
-			std::exit(EXIT_FAILURE);
-        Exchange Base(buffer, server);
-
-		if (write(ListenSocket , &hello , hello.size() + 1) < 0)
-			std::exit(EXIT_FAILURE);
+        recv(ListenSocket, buffer, BUFFERSIZE, 0);
+        Exchange Base(buffer, server, ListenSocket);
 
 		close(ListenSocket);
 	}
