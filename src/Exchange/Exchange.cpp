@@ -9,16 +9,19 @@
 /**
  * @param Request will be the header & the body in one string
  */
-Exchange::Exchange(const std::string& Request)
+Exchange::Exchange(const std::string& Request, const Server& new_server)
+    : _server(new_server)
 {
     const std::string Header = AppendRequest(Request);
 
     MapTheHeader(Header);
-    PrintHeaderMap();
+//    PrintHeaderMap();
+
+    RespondToClient();
 }
 
 Exchange::Exchange(const Exchange& ref)
-    : _dictHeader(ref._dictHeader)
+    : _server(ref._server), _dictHeader(ref._dictHeader)
 {
 }
 
@@ -31,7 +34,10 @@ Exchange::~Exchange(void)
 Exchange &Exchange::operator=(const Exchange& ref)
 {
     if (this != &ref)
-        this->_dictHeader = ref._dictHeader;
+    {
+        _dictHeader = ref._dictHeader;
+        _server = ref._server;
+    }
     return (*this);
 }
 
@@ -46,11 +52,11 @@ std::string Exchange::AppendRequest(const std::string& Request) const
     std::string Header;
 
     std::size_t found = Request.find("\r\n\r\n");
-//    if (found == std::string::npos)
-//    {
-//        std::cerr << "No separator found" << std::endl;
+    if (found == std::string::npos)
+    {
+        std::cerr << "No separator found" << std::endl;
 //        std::exit(EXIT_FAILURE);
-//    }
+    }
     Header.append(Request, 0, found);
     return (Header);
 }
@@ -101,9 +107,9 @@ void Exchange::PrintHeaderMap(void) const
     for ( ; it != _dictHeader.end(); it++)
         std::cout <<
             std::endl <<
-            "Key: "<< it->first <<
-            std::endl <<
-            "Value: " << it->second <<
+            "Key: " << "'" << it->first << "'" <<
+            "\n" <<
+            "Value: " << "'" << it->second << "'" <<
             std::endl;
 }
 
@@ -112,4 +118,26 @@ void Exchange::PrintHeaderMap(void) const
 const Exchange::map& Exchange::getHeader(void) const
 {
     return (_dictHeader);
+}
+
+//////////// Responder ////////////
+
+bool Exchange::CheckConnectionStatus(void)
+{
+    const std::string ConnectionValue = _dictHeader.at("Connection");
+
+    std::cout << ConnectionValue << std::endl;
+    if (ConnectionValue == "keep-alive")
+    {
+        std::cout << "Client is connected" << "\n";
+        return (true);
+    }
+    std::cerr << "Client disconnected" << std::endl;
+    return (false);
+}
+
+void Exchange::RespondToClient(void)
+{
+    if (!CheckConnectionStatus())
+        std::exit(EXIT_FAILURE);
 }

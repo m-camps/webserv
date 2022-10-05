@@ -58,3 +58,4 @@ You can test it yourself by doing the following:
 - [Struct used in lecture](https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html)
 - [Socket/Client applications](https://www.bogotobogo.com/cplusplus/sockets_server_client.php)
 - [Web Server Concepts and Examples](https://www.youtube.com/watch?v=9J1nJOivdyw)
+- [Mozilla HTTP Requests & Responders](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)

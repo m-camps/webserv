@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/04 12:24:32 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/04 12:47:39 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,15 +84,15 @@ int32_t	main(int argc, char *argv[])
 
 	SetupSocket(&address, &socket_fd);
 
-
 	std::string hello = "Hello World";
     int32_t ListenSocket = 0;
 
     fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
+
 	while (true) {
 		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n" << '\n';
 		ListenSocket = accept(socket_fd, reinterpret_cast<sockaddr *>(&address),
-		                            reinterpret_cast<socklen_t *>(&addrlen));
+									reinterpret_cast<socklen_t *>(&addrlen));
 		if (ListenSocket < 0)
 		{
 			std::perror("In Accept: " );
@@ -102,7 +102,7 @@ int32_t	main(int argc, char *argv[])
 		char buffer[30000] = {0};
 		if (read( ListenSocket , buffer, 30000) < 0)
 			std::exit(EXIT_FAILURE);
-        Exchange Base(buffer);
+        Exchange Base(buffer, server);
 
 		if (write(ListenSocket , &hello , hello.size() + 1) < 0)
 			std::exit(EXIT_FAILURE);
