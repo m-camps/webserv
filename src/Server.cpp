@@ -282,6 +282,72 @@ void	setLocationAutoindex(Server& server, std::string& AutiondexToSet)
 
 
 /* REST */
+
+
+int32_t	Server::getSocketFd(void) {return _socket_fd;}
+ 
+void	Server::setup()
+{
+	getSocketAddr(); 
+	createSocket();
+	setupSocket();
+	fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
+	std::cout << "Server configured at: " << _name.at(0) << ":" << _port.at(0) << "\n";
+}
+
+void	Server::setupSocket()
+{
+	if (bind(_socket_fd, (const struct sockaddr *)_address_in, sizeof(*_address_in)) < 0)
+	{
+		std::perror("In Bind: ");
+		std::exit(ERROR);
+	}
+
+	if (listen(_socket_fd, 4) < 0)
+	{
+		std::perror("In listen: "); 
+		std::exit(ERROR);
+	}
+}
+
+void	Server::createSocket(void)
+{
+	int32_t socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	if (socket_fd < 0) {
+		std::exit(EXIT_FAILURE);
+	}
+	int reuse = 1;
+	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
+   		std::perror("setsockopt(SO_REUSEADDR) failed");
+	_socket_fd = socket_fd;
+}
+
+void	Server::getSocketAddr()
+{
+	struct sockaddr_in *address = new sockaddr_in();
+
+	address->sin_family = AF_INET;
+	address->sin_port = htons(std::stol(_port.back())); // <- Converts from host byte order to network byte order.
+	address->sin_addr.s_addr = INADDR_ANY;
+	memset(address->sin_zero, 0, sizeof(address->sin_zero));
+	_address_in = address;
+}
+
+void	Server::changePort(std::string newPort)
+{
+    _port.clear();
+	_port.push_back(newPort);
+}
+
+int		Server::acceptConnection()
+{
+	// socklen_t			client_addrlen = sizeof(struct sockaddr_in);
+	// struct  sockaddr_in	*client_sockaddr;
+
+	// int	clientFd = accept(_socket_fd, reinterpret_cast<sockaddr *>(&client_sockaddr), reinterpret_cast<socklen_t *>(client_addrlen));
+	return (0);
+}
+
 void	Server::printServerAttributes(Server& server)
 {
     (void)server;

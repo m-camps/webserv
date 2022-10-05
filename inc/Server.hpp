@@ -14,6 +14,8 @@
 #define TOTAL_METHODS 3
 #define TOTAL_ACCEPTED_SOCKETS 4
 
+#define ERROR 1
+
 typedef struct	location //this could also be a class...
 {
 	std::vector<std::string>		_root; //default = "/"
@@ -71,6 +73,12 @@ class Server
 		/* rest */
 		void	printServerAttributes(Server& server);
 
+		// mcamps Functions
+		void	setup();
+		void	changePort(std::string newPort);
+		int32_t	getSocketFd(void);
+		int		acceptConnection();
+
 	private:
 		std::vector<std::string>				_port; //listen
 		std::vector<std::string>				_name; //can be searching for multiple names
@@ -86,6 +94,15 @@ class Server
 
 		//vector of locations?
 		//std::map<std::string, struct location>	locations<location_path, location>;
+
+		// mcamps variables
+		struct sockaddr_in	*_address_in;
+		int					_socket_fd;
+
+		// mcamps functions
+		void	getSocketAddr();
+		void	createSocket();
+		void	setupSocket();
 };
 
 void	setLocationIndex(Server& server, std::string& LocationIndexToAdd);

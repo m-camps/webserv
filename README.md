@@ -20,6 +20,7 @@ Webserver written in C++98
 [Struct used in lecture](https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html)
 
 [Socket/Client applications](https://www.bogotobogo.com/cplusplus/sockets_server_client.php)
+[Very clear Poll() guide](https://beej.us/guide/bgnet/html/#poll)
 
 
 ### Features

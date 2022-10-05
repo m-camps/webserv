@@ -73,6 +73,36 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 		//what to return then? exit(1) ?
 	}
 }
+/***
+ * Parse the configFile into individual Server Blocks // Server Block type vector<std::string>
+ * 
+ * @return value right now is a vector of Server blocks. In the future should just return a std::vector<Server>
+ * instantiated by calling Server(std::vector<std::string>)
+***/
+std::vector<std::vector<std::string> >	Parse::parseNetwork(std::string file)
+{
+	std::vector<std::vector<std::string> >	configs;
+	std::vector<std::string>				server;
+	std::string								currentLine;
+	std::ifstream							configStream;
+
+	openFile(configStream, file);
+	server.clear();
+	while(!configStream.eof())
+	{
+		getline(configStream, currentLine);
+		if (configStream.good())
+		{
+			server.push_back(currentLine);
+			if (currentLine == "}")
+			{
+				configs.push_back(server);
+				server.clear();
+			}
+		}
+	}
+	return(configs);
+}
 
 void    proceedToLocationParser(Server& server, std::ifstream& configStream, Parse& parseInstance)
 {	

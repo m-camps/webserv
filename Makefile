@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/05 11:14:09 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/05 13:17:36 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -80,6 +80,12 @@ run: all
 rerun: fclean all
 	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
 	./$(NAME) $(CONFIG)
+
+
+# My test function (max)
+test: all
+	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)"
+	./$(NAME) conf/basic.conf
 
 # Colors
 RED=\x1b[1;31m

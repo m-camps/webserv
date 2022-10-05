@@ -2,9 +2,11 @@
 #define PARSE_H
 
 #include <iostream>
+#include <vector>
 #include "Server.hpp"
 
 #define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
+#define DEBUG false
 
 typedef void 	selectParsingFunction(Server& server, std::string& currentLine);
 typedef struct selectParsing
@@ -20,6 +22,8 @@ class Parse
 		Parse(const Parse& src);
 		Parse& operator=(const Parse& rhs);
 		~Parse();
+
+		std::vector<std::vector<std::string> >	parseNetwork(std::string file);
 
 		void 	openFile(std::ifstream& configStream, std::string configName);
 		void    processFile(std::ifstream& configStream, Parse& parseInstance, Server& server);
