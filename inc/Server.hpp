@@ -78,6 +78,7 @@ class Server
 		void	changePort(std::string newPort);
 		int32_t	getSocketFd(void);
 		int		acceptConnection();
+		bool	isClientFdInServer(int fd);
 
 	private:
 		std::vector<std::string>				_port; //listen

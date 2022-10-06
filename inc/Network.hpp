@@ -6,13 +6,14 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/06 15:40:37 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/06 17:26:33 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "Server.hpp"
 #include "Parse.hpp"
+#include "../src/Exchange/Exchange.hpp"
 #include <poll.h>
 #include <iostream>
 #include <fstream>
@@ -47,4 +48,5 @@ class Network
 		/* Helper methods */
 		bool		isSocketFd(int fd);
 		Server* 	getServerBySocketFd(int fd);
+		Server*		getServerByClientFd(int fd);
 };

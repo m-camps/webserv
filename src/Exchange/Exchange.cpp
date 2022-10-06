@@ -13,7 +13,7 @@ Exchange::Exchange(const std::string& Request, const Server& new_server, int32_t
     : _server(new_server), _ListenSocket(new_socket)
 {
     const std::string Header = AppendRequest(Request);
-
+	std::cout << Request << "\n";
     HeaderToMap(Header);
     RespondToClient();
 }
@@ -155,9 +155,10 @@ std::string Exchange::readFile(const std::string& RequestedFile)
     std::string FileContent;
 
     File.open(RequestedFile);
+	std::cout << RequestedFile << "\n\n";
     if (!File.is_open())
     {
-        std::cerr << "404 Error" << std::endl;gs
+        std::cerr << "404 Error" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
@@ -181,7 +182,7 @@ std::string Exchange::insertBody(std::vector<std::string>& ServerRoot)
     if (found == std::string::npos)
     {
         std::cerr << "Path not found -> send 404" << std::endl;
-        std::exit(EXIT_FAILURE);
+        return ("");
     }
     RequestedFile = HTTPMethod.substr(found, 11);
     ServerRoot.back() += RequestedFile;

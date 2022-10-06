@@ -346,6 +346,14 @@ int		Server::acceptConnection()
 	return (clientFd);
 }
 
+bool	Server::isClientFdInServer(int fd)
+{
+	if (std::find(_server_fds.begin(), _server_fds.end(), fd) != _server_fds.end())
+		return true;
+	else
+		return false;
+}
+
 void	Server::printServerAttributes(Server& server)
 {
     (void)server;

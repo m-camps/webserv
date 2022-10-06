@@ -6,13 +6,12 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/06 17:18:49 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/06 17:57:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
-#define BUFF 100
-
+#define BUFF 10000
 /* Default constructor */
 Network::Network() : _max_fd(5) {}
 
@@ -56,7 +55,7 @@ void Network::setup(std::string file)
 void Network::run()
 {
 	char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::string response;
+	std::string request;
 
 	while (true)
 	{
@@ -84,18 +83,18 @@ void Network::run()
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
 					if (ret <= 0)
 					{
-						response.clear();
+						request.clear();
 						if (ret == 0)
 							std::cout << "Connection closed\n";
-						else	
+						else
 							perror("In recv: ");
 						
 						close(cur.fd);
 						delFromPollFds(i);
 					}
+					request.append(buff);
 					if (ret != BUFF)
-						std::cout << response <<  "\n";
-					response.append(buff);
+						Exchange exchange(request, *getServerByClientFd(cur.fd), cur.fd);
 					*buff = '\0';
 				}
 			}
@@ -175,6 +174,17 @@ Server*	Network::getServerBySocketFd(int fd)
 	for (int i = 0; i < (int)_servers.size(); i++)
 	{
 		if (_servers.at(i).getSocketFd() == fd)
+			return &_servers.at(i);
+	}
+	return NULL;
+}
+
+
+Server*	Network::getServerByClientFd(int fd)
+{
+	for (int i = 0; i < (int)_servers.size(); i++)
+	{
+		if (_servers.at(i).isClientFdInServer(fd))
 			return &_servers.at(i);
 	}
 	return NULL;
