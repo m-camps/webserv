@@ -5,7 +5,7 @@ Server::Server(): _clientBodySize("10")
 {
     this->_name.push_back("localhost");
     this->_port.push_back("8080");
-    this->_root.push_back("/");
+    this->_root.push_back("data/www");
     this->_index.push_back("index.html");
     this->_methods->push_back("GET");
     this->_methods->push_back("POST");
@@ -13,7 +13,6 @@ Server::Server(): _clientBodySize("10")
     this->_addressLen = sizeof(this->_address);
     memset((char *)&this->_locations, 0, sizeof(this->_locations));
 	memset((char *)&this->_address, 0, this->_addressLen);
-    //std::cout << "Constructor of Server is called." << std::endl;
     return;
 }
 
@@ -39,7 +38,6 @@ Server& Server::operator=(const Server& rhs)
 
 Server::~Server()
 {
-    //std::cout << "Destructor of Server is called." << std::endl;
     return;
 }
 
@@ -172,7 +170,7 @@ void	Server::setMethods(Server& server, std::string& methodToAdd)
     }
     else
     {
-        std::cout << "incorrent method, did not add." << std::endl;
+//        std::cout << "incorrent method, did not add." << std::endl;
     }
     //t_location current = server.getLocations().back(); //push_back(methodToAdd);
     return ;
@@ -208,7 +206,6 @@ void	setCgiName(Server& server, std::string& cgiName)
 {
     cgiName.erase(remove(cgiName.begin(), cgiName.end(), ';'), cgiName.end());
     server.getLocationCgiName() = cgiName;
-    std::cout <<  server.getLocationCgiName() << " IS CGI NAME NOW!!!!!" << std::endl;
     return ;
 }
 
@@ -217,7 +214,6 @@ void	setCgiFileExtension(Server& server, std::string& cgiFileExtension)
 {
     cgiFileExtension.erase(remove(cgiFileExtension.begin(), cgiFileExtension.end(), ';'), cgiFileExtension.end());
     server.getLocationCgiName() = cgiFileExtension;
-    std::cout <<  server.getLocationCgiName() << " IS CGI_FILE EXTENSION NOW NAME NOW!!!!!" << std::endl;
     return ;
 }
 
@@ -237,7 +233,6 @@ void	setLocationRoot(Server& server, std::string& locationRootToAdd)
         it = myvector.begin();
         it = myvector.insert(it, rootToAdd);
         //
-        std::cout <<  server.getLocationRoot().back() << " IS LOCATION ROOT NOW!!!!!" << std::endl;
 		spaceSeparatedWord = strtok (NULL, " ");
 	}
 }
@@ -258,8 +253,6 @@ void	setLocationAllowMethod(Server& server, std::string& locationAllowedMethods)
         std::vector<std::string>& myvector = server.getLocationAllowMethods();
         it = myvector.begin();
         it = myvector.insert(it, methodToAdd);
-        // std::cout <<  server.getLocationAllowMethods().back() << " IS LOCATION ALLOWED METHOD NOW!!!!!" << std::endl;
-        //std::cout <<  server.getLocationAllowMethods().back() << " IS LOCATION METHOD NOW!!!!!" << std::endl;
 		spaceSeparatedWord = strtok (NULL, " ");
 	}
 }
@@ -269,14 +262,12 @@ void	setLocationAutoindex(Server& server, std::string& AutiondexToSet)
     AutiondexToSet.erase(remove(AutiondexToSet.begin(), AutiondexToSet.end(), ';'), AutiondexToSet.end());
     if (AutiondexToSet == "off")
     {
-        //std::cout << AutiondexToSet << " IS AUTOINDEX , setting it off" << std::endl;
         server.getLocationAutoIndex() = false;
     }
     else
     {
         server.getLocationAutoIndex() = true;
     }
-    //std::cout <<  server.getLocationAutoIndex() << " IS LOCATION AUTOINDEX!!!!!" << std::endl;
     return ;
 }
 
@@ -376,7 +367,7 @@ void	Server::printServerAttributes(Server& server)
         std::cout << server.getRoot().at(i) << " ";
     }
     std::cout << " are the root names." << std::endl;
-    
+
      for(int i=0; i < server.getIndex().size(); i++) //print indexes
     {
         std::cout << server.getIndex().at(i) << " ";
