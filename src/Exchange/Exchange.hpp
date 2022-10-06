@@ -5,9 +5,12 @@
 #ifndef WEBSERV_EXCHANGE_HPP
 #define WEBSERV_EXCHANGE_HPP
 
-#include <iostream>
 #include <map>
-#include <sstream>
+#include <iostream> // std::cout
+#include <fstream> // std::istream
+#include <sstream> // issstringstream()
+
+#include "../../inc/Server.hpp" // Server class
 
 class Exchange
 {
@@ -15,7 +18,7 @@ public:
     typedef std::map<std::string, std::string> map;
 
     // Ctor & Dtor
-    explicit Exchange(const std::string&);
+    explicit Exchange(const std::string&, const Server&, int32_t);
     Exchange(const Exchange&);
     ~Exchange(void);
 
@@ -23,14 +26,22 @@ public:
     Exchange& operator=(const Exchange& ref);
 
     // Functions
-    void PrintHeaderMap(void) const;
     const map& getHeader(void) const;
 private:
+    Server _server;
     map _dictHeader;
+    const int32_t _ListenSocket;
 
-    void MapTheHeader(const std::string&);
+    void HeaderToMap(const std::string&);
     std::string AppendRequest(const std::string& Request) const;
+
+    std::size_t getBodySize(std::string&);
+    std::string readFile(const std::string&);
+    std::string insertBody(std::vector<std::string>&);
+    void RespondToClient(void);
+    bool CheckConnectionStatus(void);
 };
 
+std::ostream& operator<<(std::ostream&, const Exchange&);
 
 #endif //WEBSERV_EXCHANGE_HPP
