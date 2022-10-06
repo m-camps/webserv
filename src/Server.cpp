@@ -303,7 +303,7 @@ void	Server::setupSocket()
 		std::exit(ERROR);
 	}
 
-	if (listen(_socket_fd, 4) < 0)
+	if (listen(_socket_fd, 5) < 0)
 	{
 		std::perror("In listen: "); 
 		std::exit(ERROR);
@@ -341,11 +341,17 @@ void	Server::changePort(std::string newPort)
 
 int		Server::acceptConnection()
 {
-	// socklen_t			client_addrlen = sizeof(struct sockaddr_in);
-	// struct  sockaddr_in	*client_sockaddr;
+	struct  sockaddr_in			client_addr;
+	socklen_t					client_addrlen = sizeof(client_addr);
+	
 
-	// int	clientFd = accept(_socket_fd, reinterpret_cast<sockaddr *>(&client_sockaddr), reinterpret_cast<socklen_t *>(client_addrlen));
-	return (0);
+	int	clientFd = accept(_socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
+	if (clientFd != -1)
+	{
+		std::cout << "Server: ["<<_name.back() << ":" << _port.back() <<   "]\n";
+		std::cout << "Accepted connection from adress: " << client_addr.sin_addr.s_addr <<  "\n";
+	}
+	return (clientFd);
 }
 
 void	Server::printServerAttributes(Server& server)

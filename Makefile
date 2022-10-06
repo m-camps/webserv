@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/05 13:17:36 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/06 15:36:20 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,7 +42,7 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $(NAME)
 
 all: $(NAME)
-	@printf "$(GREEN)Compilation Complete$(COL_END)"
+	@printf "$(GREEN)Compilation Complete$(COL_END)\n"
 
 # For LLDB or any other debugger
 debug:
@@ -84,8 +84,8 @@ rerun: fclean all
 
 # My test function (max)
 test: all
-	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)"
-	./$(NAME) conf/basic.conf
+	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)\n"
+	@./$(NAME) conf/basic.conf
 
 # Colors
 RED=\x1b[1;31m

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/05 17:24:05 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/06 15:40:37 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 #include <iostream>
 #include <fstream>
 
-#define	MAX_FD 5
-
 class Network
 {
 	public:
@@ -28,19 +26,25 @@ class Network
 		void run();
 
 	private:
+		std::vector<Server> 					_servers; 			// All the servers
+		std::vector<std::vector<std::string> > 	_serverConfigs; 	// Vector that holds the server configs (can be deleted later on)
+		struct pollfd*							_fds; 				// Struct used for the FD's poll monitors
+		int										_total_fd;			// Total active fd's
+		int										_max_fd; 			// Max total fd's
+
+		/* Orthodox canonical class BS */
 		Network(const Network &obj);
 		Network &operator=(const Network &obj);
 
+		/* Setup methods */
 		void	createFds();
 
-		std::vector<Server> 					_servers; // All the servers
-		struct pollfd*							_fds; //Struct used for the FD's poll monitors
-		std::vector<std::vector<std::string> > 	_serverConfigs; // Vector that holds the server configs
-		int										_total_fd;
-		int										_max_fd;
-
+		/* _fds manipulation */
+		void			addToPollFds(int fd);
+		void			delFromPollFds(int i);
+		struct pollfd 	createNewPollfd(int fd);
+		
 		/* Helper methods */
 		bool		isSocketFd(int fd);
 		Server* 	getServerBySocketFd(int fd);
-		void		addToPollFds(int fd);
 };
