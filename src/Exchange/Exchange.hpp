@@ -7,6 +7,7 @@
 
 #include <map>
 #include <iostream> // std::cout
+#include <fstream> // std::istream
 #include <sstream> // issstringstream()
 
 #include "../../inc/Server.hpp" // Server class
@@ -34,6 +35,8 @@ private:
     void HeaderToMap(const std::string&);
     std::string AppendRequest(const std::string& Request) const;
 
+    std::size_t getBodySize(std::string&);
+    std::string readFile(const std::string&);
     std::string insertBody(std::vector<std::string>&);
     void RespondToClient(void);
     bool CheckConnectionStatus(void);

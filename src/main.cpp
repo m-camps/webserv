@@ -80,9 +80,11 @@ int32_t	main(int argc, char *argv[])
 {
 	if (argc != 2)
 		std::exit(EXIT_FAILURE);
+    (void) argv;
+
 
 	Server server;
-	startParse(server, argv[1]);
+//	startParse(server, argv[1]);
 	struct sockaddr_in address = GetSockaddr(server);
 	int32_t socket_fd = GetSocket();
 	int32_t addrlen = sizeof(address);

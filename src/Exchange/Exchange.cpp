@@ -144,22 +144,49 @@ bool Exchange::CheckConnectionStatus(void)
     return (false);
 }
 
+/*
+ * /data/www/ does not work...
+ * data/www/ does... lol
+*/
+std::string Exchange::readFile(const std::string& RequestedFile)
+{
+    std::ifstream File;
+    std::string line;
+    std::string FileContent;
+
+    File.open(RequestedFile);
+    if (!File.is_open())
+    {
+        std::cerr << "404 Error" << std::endl;gs
+        std::exit(EXIT_FAILURE);
+    }
+
+    while (std::getline(File, line))
+        FileContent += line;
+
+    return (FileContent);
+}
+
+std::size_t Exchange::getBodySize(std::string& Body)
+{
+    return (Body.length());
+}
+
 std::string Exchange::insertBody(std::vector<std::string>& ServerRoot)
 {
-    std::cout << ServerRoot.back() << std::endl;
-    std::string test = "<!DOCTYPE html>\n"
-                       "<html lang=\"en\">\n"
-                       "<head>\n"
-                       "<meta charset=\"UTF-8\">\n"
-                       "<title>Index</title>\n"
-                       "</head>\n"
-                       "<body>\n"
-                       "<h1>This is the default index yo!</h1>\n"
-                       "</body>\n"
-                       "</html>";
+    std::string RequestedFile;
+    std::string HTTPMethod = _dictHeader.find("HTTPMethod")->second;
+    std::size_t found = HTTPMethod.find('/');
 
-//    std::cout << test.length() << std::endl;
-    return (test);
+    if (found == std::string::npos)
+    {
+        std::cerr << "Path not found -> send 404" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    RequestedFile = HTTPMethod.substr(found, 11);
+    ServerRoot.back() += RequestedFile;
+
+    return (readFile(ServerRoot.back()));
 }
 
 void Exchange::RespondToClient(void)
@@ -167,7 +194,7 @@ void Exchange::RespondToClient(void)
     std::string response =
             "HTTP/1.1 200 OK\r\n"
             "Content-Type: text/html\r\n"
-            "Content-Length: 155\r\n"
+            "Content-Length: 160\r\n"
             "Keep - Alive: timeout=1, max=1\r\n"
             "Accept-Ranges: bytes\r\n"
             "Connection: close\r\n"

@@ -5,7 +5,7 @@ Server::Server(): _clientBodySize("10")
 {
     this->_name.push_back("localhost");
     this->_port.push_back("8080");
-    this->_root.push_back("/");
+    this->_root.push_back("data/www");
     this->_index.push_back("index.html");
     this->_methods->push_back("GET");
     this->_methods->push_back("POST");
