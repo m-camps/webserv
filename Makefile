@@ -18,7 +18,7 @@ BUILDDIR := build
 SRC := $(shell find $(SRCDIR) -type f -name "*.cpp")
 OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
-CONFIG := data/conf/basic.conf
+CONFIG := config.conf
 
 CFLAGS := -Wall -Werror -Wextra -pedantic
 CC	:= c++

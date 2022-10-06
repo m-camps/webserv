@@ -13,6 +13,9 @@
  ***/
 Parse::Parse()
 {
+	//this->_dispatchTable._name = "";
+	//this->_dispatchTable._pointerToParsingFunction = nullptr;
+	//std::cout << "Constructor of Parse is called" << std::endl;
 	return ;
 }
 
@@ -27,12 +30,15 @@ Parse& Parse::operator=(const Parse& rhs)
 {
 	if (this != &rhs)
 	{
+	   // this->_dispatchTable._name = rhs._dispatchTable._name;
+	   // this->_dispatchTable._pointerToParsingFunction = rhs._dispatchTable._pointerToParsingFunction;
 	}
 	return *this;
 }
 
 Parse::~Parse()
 {
+	//std::cout << "Destructor of Parse is called" << std::endl;
 	return ;
 }
 
@@ -64,7 +70,7 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 	else
 	{
 		std::cout << "Failed to open config file." << std::endl;
-		std::exit(EXIT_FAILURE);
+		//what to return then? exit(1) ?
 	}
 }
 /***
@@ -119,8 +125,12 @@ void    proceedToLocationParser(Server& server, std::ifstream& configStream, Par
 			while (iss.good())
 			{
 				iss >> currentWord;
+				//std::cout << currentWord << " ";
 				if (isLocationDirective(currentWord) == true)
 				{
+					//call the parser
+					std::cout << "INSIDE PARSE LOCATION with currentword " << currentWord << std::endl;
+
 					parseInstance.selectLocationParserFunction(currentLine, currentWord, parseInstance, server);
 				}
 				else if (currentWord == "}")
@@ -128,6 +138,7 @@ void    proceedToLocationParser(Server& server, std::ifstream& configStream, Par
 					return ;
 				}
 			}
+			std::cout << std::endl;
 		}
 	}
 	return ;
@@ -151,6 +162,7 @@ void    Parse::selectLocationParserFunction(std::string& currentLine, std::strin
 		{
 			size_t      posInLine = currentWord.length();
 			std::string restOfLine = currentLine.substr(posInLine + 2);
+			std::cout << restOfLine << " IS THE REST OF LINE PASSED TO PARSER" << std::endl;
 			myDispatch[i]._pointerToParsingFunction(server, restOfLine);
 		}
 	}
@@ -211,6 +223,7 @@ bool    Parse::isDirective(std::string& currentWord)
 bool    isLocationDirective(std::string& currentWord)
 {
 	//what happens if the word is empty? wouldnt == overload return true?
+	std::cout << currentWord << " is the word which we check for location directive" << std::endl;
 	return (currentWord == "root" || currentWord == "index" ||
 			currentWord == "allow_methods" || currentWord == "autoindex" ||
 			currentWord == "cgi_name" || currentWord == "cgi_file_extension");
@@ -352,6 +365,7 @@ void    parseAllowMethods(Server& server, std::string& currentLine)
 		std::string methodToAdd(spaceSeparatedWord);
 		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
 		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
+		std::cout << methodToAdd << " is WORD IN ALLOW METHODS" << std::endl;
 
 		server.setMethods(server, methodToAdd);
 		spaceSeparatedWord = strtok (NULL, " ");
@@ -379,6 +393,7 @@ void    parseAutoIndex(Server& server, std::string& currentLine)
 
 void	parseCgiName(Server& server, std::string& currentLine)
 {
+	std::cout << currentLine << " is line inside cgi name" << std::endl;
 	currentLine.erase(std::remove_if(currentLine.begin(), currentLine.end(), ::isspace), currentLine.end());
 	currentLine.erase(remove(currentLine.begin(), currentLine.end(), ';'), currentLine.end());
 	server.getLocations().back()._cgi_name = currentLine;
