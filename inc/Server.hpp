@@ -98,6 +98,7 @@ class Server
 		// mcamps variables
 		struct sockaddr_in	*_address_in;
 		int					_socket_fd;
+		std::vector<int>	_server_fds;
 
 		// mcamps functions
 		void	getSocketAddr();

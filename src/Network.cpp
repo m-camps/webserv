@@ -6,11 +6,12 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/06 15:55:10 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/06 17:18:49 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
+#define BUFF 100
 
 /* Default constructor */
 Network::Network() : _max_fd(5) {}
@@ -54,7 +55,8 @@ void Network::setup(std::string file)
 /* Poll() loop of the network */
 void Network::run()
 {
-	char buff[256]; //  test buffer (can change later or keep it here)
+	char buff[BUFF]; //  test buffer (can change later or keep it here)
+	std::string response;
 
 	while (true)
 	{
@@ -75,13 +77,14 @@ void Network::run()
 					int newFd = server->acceptConnection();
 					addToPollFds(newFd);
 				}
-				else // Else normal connection // xander this is where the exchange starts fd = cur.fd
+				else // Else normal connection 
+				// xander this is where the exchange starts fd = cur.fd
 				// RIGHT NOW DOESNT WORK AS INTENDED
 				{
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
-	
 					if (ret <= 0)
 					{
+						response.clear();
 						if (ret == 0)
 							std::cout << "Connection closed\n";
 						else	
@@ -90,8 +93,9 @@ void Network::run()
 						close(cur.fd);
 						delFromPollFds(i);
 					}
-					std::cout << buff;
-					std::cout << "\nret = " << ret << "\n";
+					if (ret != BUFF)
+						std::cout << response <<  "\n";
+					response.append(buff);
 					*buff = '\0';
 				}
 			}

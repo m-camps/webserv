@@ -288,7 +288,7 @@ int32_t	Server::getSocketFd(void) {return _socket_fd;}
  
 void	Server::setup()
 {
-	getSocketAddr(); 
+	getSocketAddr();
 	createSocket();
 	setupSocket();
 	fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
@@ -305,7 +305,7 @@ void	Server::setupSocket()
 
 	if (listen(_socket_fd, 5) < 0)
 	{
-		std::perror("In listen: "); 
+		std::perror("In listen: ");
 		std::exit(ERROR);
 	}
 }
@@ -351,6 +351,7 @@ int		Server::acceptConnection()
 		std::cout << "Server: ["<<_name.back() << ":" << _port.back() <<   "]\n";
 		std::cout << "Accepted connection from adress: " << client_addr.sin_addr.s_addr <<  "\n";
 	}
+	_server_fds.push_back(clientFd);
 	return (clientFd);
 }
 
