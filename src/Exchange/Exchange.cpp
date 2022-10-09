@@ -4,6 +4,8 @@
 
 #include "Exchange.hpp"
 
+typedef std::map<std::string, std::string> map;
+
 ////////////// Ctor & Dtor //////////////
 
 /**
@@ -79,6 +81,31 @@ std::string Exchange::AppendRequest(const std::string& Request) const
     return (Header);
 }
 
+/**
+ * splitMethod splits the HTTPMethod to the following std::map
+ * 
+ * HTTPMethod <- The request
+ * Path <- Path of the page being requested
+ * HTTPVersion <- Speaks for itself
+ */
+void Exchange::splitMethod(std::string line)
+{
+    std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
+    std::vector<int>::iterator it = AllSpaceLocations.begin();
+
+    try
+    {
+        _dictHeader["HTTPMethod"] = line.substr(0, *it);
+        _dictHeader["Path"] = line.substr(*it + 1, *++it - 4);
+        _dictHeader["HTTPVersion"] = line.substr(*it + 1, line.length());
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        std::exit(EXIT_FAILURE);
+    }
+}
+
 /*
  * This is gonna be a long one...
  *
@@ -92,7 +119,6 @@ std::string Exchange::AppendRequest(const std::string& Request) const
  * GET / HTTP/1.1
  *
  * The following keywords are important:
- * HTTPMethod <-- Here you can find obviously the method and the address that is requested
  * Host <-- What is the hostname
  * Connection <-- To check connection
  * User-Agent <-- Information of the user
@@ -107,7 +133,7 @@ void Exchange::HeaderToMap(const std::string& Header)
         std::size_t found = line.find(':');
         if (found == std::string::npos)
         {
-            _dictHeader["HTTPMethod"] = line.substr(0, line.size() - 1);
+            splitMethod(line.substr(0, line.size() - 1));
             continue ;
         }
         _dictHeader[line.substr(0, found)] =
@@ -157,7 +183,7 @@ std::string Exchange::readFile(const std::string& RequestedFile)
     File.open(RequestedFile);
     if (!File.is_open())
     {
-        std::cerr << "404 Error" << std::endl;gs
+        std::cerr << "404 Error" << std::endl;
         std::exit(EXIT_FAILURE);
     }
 
@@ -167,26 +193,25 @@ std::string Exchange::readFile(const std::string& RequestedFile)
     return (FileContent);
 }
 
-std::size_t Exchange::getBodySize(std::string& Body)
+std::size_t Exchange::getBodySize(std::string& Body) const
 {
     return (Body.length());
 }
 
+const std::string Exchange::getFavicon(void)
+{
+    return (readFile("data/www/favicon.html"));
+}
+
 std::string Exchange::insertBody(std::vector<std::string>& ServerRoot)
 {
-    std::string RequestedFile;
-    std::string HTTPMethod = _dictHeader.find("HTTPMethod")->second;
-    std::size_t found = HTTPMethod.find('/');
+    std::string relativePath = ServerRoot.back() + _dictHeader.find("Path")->second;
+    const std::string FileContent = readFile(relativePath);
 
-    if (found == std::string::npos)
-    {
-        std::cerr << "Path not found -> send 404" << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    RequestedFile = HTTPMethod.substr(found, 11);
-    ServerRoot.back() += RequestedFile;
+    if ("favicon.ico" == _dictHeader.find("Path")->second)
+        return (getFavicon());
 
-    return (readFile(ServerRoot.back()));
+    return (FileContent);
 }
 
 void Exchange::RespondToClient(void)

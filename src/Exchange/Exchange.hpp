@@ -11,6 +11,7 @@
 #include <sstream> // issstringstream()
 
 #include "../../inc/Server.hpp" // Server class
+#include "../../inc/Utilities.hpp"
 
 class Exchange
 {
@@ -27,15 +28,19 @@ public:
 
     // Functions
     const map& getHeader(void) const;
+
 private:
     Server _server;
     map _dictHeader;
     const int32_t _ListenSocket;
 
     void HeaderToMap(const std::string&);
+    void splitMethod(std::string line);
     std::string AppendRequest(const std::string& Request) const;
 
-    std::size_t getBodySize(std::string&);
+    std::size_t getBodySize(std::string&) const;
+    const std::string getFavicon(void);
+
     std::string readFile(const std::string&);
     std::string insertBody(std::vector<std::string>&);
     void RespondToClient(void);

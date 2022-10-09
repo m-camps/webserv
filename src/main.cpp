@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/04 12:47:39 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/09 14:31:57 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,10 @@ void SetupSocket(struct sockaddr_in *address, const int32_t *socket_fd)
 int32_t	main(int argc, char *argv[])
 {
 	if (argc != 2)
+	{
+		std::cerr << "Need a config file" << std::endl;
 		std::exit(EXIT_FAILURE);
+	}
     (void) argv;
 
 
