@@ -16,7 +16,7 @@
 #include <unistd.h> // Write & Read
 #include <fcntl.h>
 
-#include "Exchange/Exchange.hpp"
+#include "Exchange/Request.hpp"
 #include "../inc/Server.hpp"
 #include "../inc/Parse.hpp"
 
@@ -85,9 +85,7 @@ int32_t	main(int argc, char *argv[])
 	}
     (void) argv;
 
-
 	Server server;
-//	startParse(server, argv[1]);
 	struct sockaddr_in address = GetSockaddr(server);
 	int32_t socket_fd = GetSocket();
 	int32_t addrlen = sizeof(address);
@@ -110,7 +108,7 @@ int32_t	main(int argc, char *argv[])
 		}
 
         recv(ListenSocket, buffer, BUFFERSIZE, 0);
-        Exchange Base(buffer, server, ListenSocket);
+        Request Base(buffer, server, ListenSocket);
 
 		close(ListenSocket);
 	}
