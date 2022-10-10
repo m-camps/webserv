@@ -108,7 +108,8 @@ int32_t	main(int argc, char *argv[])
 		}
 
         recv(ListenSocket, buffer, BUFFERSIZE, 0);
-        Request Base(buffer, server, ListenSocket);
+        Exchange Exchanger(server, ListenSocket);
+        Request Base(buffer, Exchanger);
 
 		close(ListenSocket);
 	}

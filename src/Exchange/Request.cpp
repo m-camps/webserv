@@ -11,17 +11,17 @@ typedef std::map<std::string, std::string> map;
 /**
  * @param Request will be the header & the body in one string
  */
-Request::Request(const std::string& Request, const Server& new_server, int32_t new_socket)
-		: _server(new_server), _SocketFD(new_socket)
+Request::Request(const std::string Request, Exchange NewExchanger)
+		: _Exchanger(NewExchanger)
 {
 	const std::string Header = AppendRequest(Request);
 
 	HeaderToMap(Header);
-	Respond Responder(_server, _dictHeader, _SocketFD);
+	Respond Responder(_Exchanger);
 }
 
 Request::Request(const Request& ref)
-		: _server(ref._server), _dictHeader(ref._dictHeader), _SocketFD(ref._SocketFD)
+		: _Exchanger(ref._Exchanger)
 {
 }
 
@@ -35,30 +35,9 @@ Request &Request::operator=(const Request& ref)
 {
 	if (this != &ref)
 	{
-		_dictHeader = ref._dictHeader;
-		_server = ref._server;
+		_Exchanger = ref._Exchanger;
 	}
 	return (*this);
-}
-
-/*
- * Prints only the std::map::_dictHeader
- */
-std::ostream& operator<<(std::ostream& out, const Request& ref)
-{
-	std::map<std::string, std::string> Header = ref.getHeader();
-	std::map<std::string, std::string>::iterator it = Header.begin();
-
-	for ( ; it != Header.end(); it++)
-	{
-		out <<
-		    std::endl <<
-		    "Key: " << it->first <<
-		    "\n" <<
-		    "Value: " << it->second <<
-		    std::endl;
-	}
-	return (out);
 }
 
 ////////////// Functions //////////////
@@ -95,9 +74,9 @@ void Request::splitMethod(std::string line)
 
 	try
 	{
-		_dictHeader["HTTPMethod"] = line.substr(0, *it);
-		_dictHeader["Path"] = line.substr(*it + 1, *++it - 4);
-		_dictHeader["HTTPVersion"] = line.substr(*it + 1, line.length());
+        _Exchanger.addHashMapNode("HTTPMethod", line.substr(0, *it));
+        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - 4));
+        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length()));
 	}
 	catch(const std::exception& e)
 	{
@@ -136,14 +115,7 @@ void Request::HeaderToMap(const std::string& Header)
 			splitMethod(line.substr(0, line.size() - 1));
 			continue ;
 		}
-		_dictHeader[line.substr(0, found)] =
-				line.substr(found + 2, (line.size() - found - 3));
+		_Exchanger.addHashMapNode(line.substr(0, found),
+                                  line.substr(found + 2, (line.size() - found - 3)));
 	}
-}
-
-////////////// Geter //////////////
-
-const Request::map& Request::getHeader(void) const
-{
-	return (_dictHeader);
 }

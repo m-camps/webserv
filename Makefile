@@ -20,11 +20,11 @@ OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
 CONFIG := data/conf/basic.conf
 
-CFLAGS := -Wall -Werror -Wextra -pedantic
+INC := -Iinc -Isrc
+CFLAGS := -Wall -Werror -Wextra -pedantic $(INC)
 CC	:= c++
 EXTRA := -std=c++98
 SHELL := /bin/bash
-INC := -Iinc -Isrc
 
 ifdef DEBUG
 	CFLAGS += -g

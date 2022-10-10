@@ -9,35 +9,37 @@
 #include <fstream>
 #include <map>
 
+#include "Exchange.hpp" // Exchange Class
 #include "../../inc/Server.hpp" // Server class
 #include "../../inc/Utilities.hpp" // findCharLocation
 
+typedef std::map<std::string, std::string> HashMap;
 
 class Respond
 {
 public:
-	typedef std::map<std::string, std::string> HashMap;
-
-	Respond(Server, HashMap, const int32_t);
+	Respond(Exchange&);
 	Respond(const Respond&);
 	~Respond(void);
 
-	void operator=(const Respond&);
+	Respond& operator=(const Respond&);
 private:
 	Respond(void);
 
-	Server _server;
-	HashMap _dictHeader;
-	int32_t _statusCode;
-	const int32_t _SocketFD;
+    Exchange _Exchanger;
 
 	std::size_t getBodySize(std::string&) const;
 	const std::string getFavicon(void);
 
 	std::string readFile(const std::string&);
-	std::string insertBody(std::vector<std::string>&);
+	void insertBody(std::vector<std::string>&);
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
+
+    // Private Seters
+    std::string setStatus(void);
+    std::string setContentType(void);
+    std::string setContentLength(std::size_t);
 };
 
 

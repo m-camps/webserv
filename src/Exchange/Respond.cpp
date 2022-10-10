@@ -6,14 +6,14 @@
 
 ////////////// Ctor & Dtor //////////////
 
-Respond::Respond(Server NewServer, HashMap NewDictHeader, const int32_t ListenSocket)
-	: _server(NewServer), _dictHeader(NewDictHeader), _SocketFD(ListenSocket)
+Respond::Respond(Exchange& ExchangeRef)
+	: _Exchanger(ExchangeRef)
 {
 	RespondToClient();
 }
 
 Respond::Respond(const Respond& ref)
-		: _server(ref._server), _dictHeader(ref._dictHeader), _SocketFD(ref._SocketFD)
+		: _Exchanger(ref._Exchanger)
 {
 }
 
@@ -21,13 +21,25 @@ Respond::~Respond(void)
 {
 }
 
+//////////// Operator ////////////
+
+Respond& Respond::operator=(const Respond& ref)
+{
+    if (this != &ref)
+    {
+    }
+    return (*this);
+}
+
 //////////// Responder ////////////
 
 bool Respond::CheckConnectionStatus(void)
 {
+    HashMap tempMap = _Exchanger.getHashMap();
+
 	try
 	{
-		HashMap::iterator ConnectionValue = _dictHeader.find("Connection");
+		HashMap::iterator ConnectionValue = tempMap.find("Connection");
 
 		if (ConnectionValue->second == "keep-alive")
 		{
@@ -53,10 +65,11 @@ std::string Respond::readFile(const std::string& RespondedFile)
 	std::string line;
 	std::string FileContent;
 
+    std::cout << RespondedFile << std::endl;
 	File.open(RespondedFile);
 	if (!File.is_open())
 	{
-		std::cerr << "404 Error" << std::endl;
+		_Exchanger.setStatusCode(404);
 		std::exit(EXIT_FAILURE);
 	}
 
@@ -66,36 +79,49 @@ std::string Respond::readFile(const std::string& RespondedFile)
 	return (FileContent);
 }
 
-std::string Respond::insertBody(std::vector<std::string>& ServerRoot)
+void Respond::insertBody(std::vector<std::string>& ServerRoot)
 {
-	std::string relativePath = ServerRoot.back() + _dictHeader.find("Path")->second;
-	const std::string FileContent = readFile(relativePath);
+    std::string FileContent;
+    std::string relativePath;
+    HashMap tempMap = _Exchanger.getHashMap();
 
-	if ("favicon.ico" == _dictHeader.find("Path")->second)
-		return (getFavicon());
-
-	return (FileContent);
+    if ("/favicon.ico" == tempMap.find("Path")->second)
+        FileContent = readFile(getFavicon());
+    else
+    {
+        if ("/" == tempMap.find("Path")->second)
+        {
+            tempMap["Path"] = "/index.html";
+            _Exchanger.setHashMap(tempMap);
+        }
+	    relativePath = ServerRoot.back() + tempMap.find("Path")->second;
+        FileContent = readFile(relativePath);
+    }
+    _Exchanger.setBody(FileContent);
 }
 
 void Respond::RespondToClient(void)
 {
-	std::string response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/html\r\n"
-			"Content-Length: 160\r\n"
-			"Keep - Alive: timeout=1, max=1\r\n"
-			"Accept-Ranges: bytes\r\n"
-			"Connection: close\r\n"
-			"\r\n\r\n";
+    std::string Body;
+    Server tempServer = _Exchanger.getServer();
 
 	if (!CheckConnectionStatus())
 		std::exit(EXIT_FAILURE);
-	response += insertBody(_server.getRoot());
-	std::cout << response;
-	send(_SocketFD, response.c_str(), response.length(), 0);
+
+	insertBody(tempServer.getRoot());
+    Body = _Exchanger.getBody();
+
+	std::string response =
+			setStatus() +
+            setContentLength(Body.length()) +
+            setContentType() +
+			"\r\n\r\n" +
+            Body;
+
+	send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
-////////////// Geter //////////////
+////////////// Getter //////////////
 
 std::size_t Respond::getBodySize(std::string& Body) const
 {
@@ -105,4 +131,30 @@ std::size_t Respond::getBodySize(std::string& Body) const
 const std::string Respond::getFavicon(void)
 {
 	return (readFile("data/www/favicon.html"));
+}
+
+////////////// Setter //////////////
+
+std::string Respond::setStatus(void)
+{
+    HashMap tempHash = _Exchanger.getHashMap();
+    HashMap::iterator it = tempHash.find("HTTPVersion");
+
+    std::string StatusLine = it->second + std::to_string(_Exchanger.getStatusCode()) + "OK\r\n";
+
+    return (StatusLine);
+}
+
+std::string Respond::setContentType(void)
+{
+    std::string ContentType = "Content-Type: text/html\r\n";
+
+    return (ContentType);
+}
+
+std::string Respond::setContentLength(std::size_t BodyLength)
+{
+    std::string ContentLength = "Content-Length: " + std::to_string(BodyLength) + "\r\n";
+
+    return (ContentLength);
 }

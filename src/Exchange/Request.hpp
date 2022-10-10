@@ -19,7 +19,7 @@ public:
     typedef std::map<std::string, std::string> map;
 
     // Ctor & Dtor
-    explicit Request(const std::string&, const Server&, int32_t);
+    explicit Request(std::string, Exchange);
     Request(const Request&);
     ~Request(void);
 
@@ -27,18 +27,14 @@ public:
     Request& operator=(const Request& ref);
 
     // Functions
-    const map& getHeader(void) const;
-
 private:
-    Server _server;
-    map _dictHeader;
-    const int32_t _SocketFD;
+    Request(void);
+
+    Exchange _Exchanger;
 
     void HeaderToMap(const std::string&);
     void splitMethod(std::string line);
     std::string AppendRequest(const std::string& Request) const;
 };
-
-std::ostream& operator<<(std::ostream&, const Request&);
 
 #endif //WEBSERV_REQUEST_HPP
