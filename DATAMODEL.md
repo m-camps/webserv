@@ -37,3 +37,27 @@ Main
 	Server servers[TOTAL_SERVERS_BASED_ON_CONFIG];
 
 ```
+
+
+parseNetwork
+	parseServer (std::string from server { to the next } that closes that block)
+		if (location) 
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+		else
+			parseDirective (std::string till end of line (; in our case))
+			parseDirective (std::string till end of line (; in our case))
+	parseServer  (std::vector<std::string> from server { to the next } that closes that block)
+		if (location)
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+				parseLocationDirective (std::string till end of line (; in our case)) //lines of the location eg root etc
+				parseLocationDirective (std::string till end of line (; in our case))
+				parseLocationDirective (std::string till end of line (; in our case))
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+				parseLocationDirective (std::string till end of line (; in our case))
+			parseLocation (std::string from location <name> { to the next } that closes that block)
+				parseLocationDirective (std::string till end of line (; in our case))
+		else
+			parseDirective (std::string till end of line (; in our case))
+			parseDirective (std::string till end of line (; in our case))

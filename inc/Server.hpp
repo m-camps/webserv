@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        ::::::::            */
+/*   Server.hpp                                         :+:    :+:            */
+/*                                                     +:+                    */
+/*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
+/*                                                   +#+                      */
+/*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
+/*   Updated: 2022/10/10 16:26:54 by mcamps        ########   odam.nl         */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "Location.hpp"
 #include <string>
 #include <map>
 #include <list>
@@ -11,110 +24,67 @@
 #include <fcntl.h>
 #include <vector>
 
-#define TOTAL_METHODS 3
-#define TOTAL_ACCEPTED_SOCKETS 4
-
 #define ERROR 1
-
-typedef struct	location //this could also be a class...
-{
-	std::vector<std::string>		_root; //default = "/"
-	std::vector<std::string>		_index; //default = "index.html"
-	std::vector<std::string>		_methods;//[TOTAL_METHODS]; // default = ["GET", "POST", "DELETE"]
-	bool							_autoIndex;	//default = 10;
-	std::string						_cgi_name;	// no-default //what is this?
-	std::string						_cgi_file_extension;	// no-default what is extension?
-}	t_location;
 
 class Server
 {
 	public:
 		Server();
-		Server(const Server& src);
-		Server& operator=(const Server& rhs);
 		~Server();
 
-		/* accessors for Server part */
-		std::vector<std::string>&	getPort(void);
-		std::vector<std::string>&	getName(void);
-		std::vector<std::string>&	getRoot(void);
-		std::vector<std::string>&	getIndex(void);
-		std::vector<t_location>&	getLocations(void);
-		//std::vector<t_location>&	getMethods(void);
-		std::string&				getClientBodySize(void);
-		struct sockaddr_in			getSockAddr(void) const;
-		size_t    					getSockAddrLen(void) const;
+		/* Getters */
+		int									getPort(void) const;
+		std::vector<std::string>			getNames(void) const;
+		std::string							getRoot(void) const;
+		std::string							getIndex(void) const;
+		int									getClientBodySize(void) const;
+		std::vector<std::string>			getMethods(void) const;
+		std::map<std::string, Location>		getLocations(void) const;
+		int									getSocketFd(void) const;
+		struct sockaddr_in*					getSockAddr(void) const;
 
+		/* Setters */
+		void	setPort(int& port);
+		void	setRoot(std::string& root);
+		void	setIndex(std::string& index);
+		void	setClientBody(int& client_body_size);
 
-		/* accessors for location part */
-		//std::vector<std::string>&	getName(void);
-		std::vector<std::string>&	getLocationRoot(void);
-		std::vector<std::string>&	getLocationIndex(void);
-		//std::vector<t_location>&	getMethods(void);
-		bool&						getLocationAutoIndex(void);
-		std::vector<std::string>&	getLocationAllowMethods(void);
-		std::string&				getLocationCgiFileExtension(void);
-		std::string&				getLocationCgiName(void);
+		/* Adders */
+		void	addToName(std::string& name);
+		void	addToMethod(std::string& method);
+		void	addToLocations(std::string &name, Location& location);
 
-
-		/* mutators for Server part*/
-		void	setPort(Server& server, std::string& portToAdd);
-		void	setName(Server& server, std::string& serverNameToAdd);
-		void	setRoot(Server& server, std::string& rootLocationToAdd);
-		void	setIndex(Server& server, std::string& indexToAdd);
-		void	setClientBody(Server& server, std::string& BodySize);
-		void	setMethods(Server& server, std::string& methodToAdd);
-
-		/* mutators for Location part */
-		//void	setLocationIndex(Server& server, std::string& LocationIndexToAdd);
-
-		//void	parseAutoIndex
-
-		/* rest */
+		/* DEBUG */
 		void	printServerAttributes(Server& server);
 
-		// mcamps Functions
+		/* Public Functions */
 		void	setup();
-		void	changePort(std::string newPort);
-		int32_t	getSocketFd(void);
 		int		acceptConnection();
 		bool	isClientFdInServer(int fd);
 
 	private:
-		std::vector<std::string>				_port; //listen
-		std::vector<std::string>				_name; //can be searching for multiple names
-		std::vector<std::string>				_root; //default = "/"
-		std::vector<std::string>				_index; //default = "index.html"
-		std::string								_clientBodySize;	//default = 10;
-		std::list<std::string>					_methods[TOTAL_METHODS]; // default = ["GET", "POST", "DELETE"] //this can be an array
-		//int										_socket_fd;
-		//int										_sockets[TOTAL_ACCEPTED_SOCKETS];
-		struct sockaddr_in						_address;
-		size_t                                  _addressLen;
-		std::vector<t_location>					_locations; //listen
+		/* Orthodox canonical class BS */
+		Server(const Server& src);
+		Server& operator=(const Server& rhs);
 
-		//vector of locations?
-		//std::map<std::string, struct location>	locations<location_path, location>;
+		int								_port; 						// The port server is running on, can maybe be multiple ports?
+		std::vector<std::string>		_names; 						// can be searching for multiple names
+		std::string						_root; 						// default = "/"
+		std::string						_index; 					// default = "index.html"
+		int								_client_body_size;			// default = 10;
+		std::vector<std::string>		_methods;	// default = ["GET", "POST", "DELETE"]
+		struct sockaddr_in*				_address_in; 				// Optional can be deleted
+		int								_socket_fd; 				// Socket FD the server is running on
+		std::vector<int>				_server_fds;				// Client FD's currently associated to this server
+		std::map<std::string, Location>	_locations;					// All locations of the Server
 
-		// mcamps variables
-		struct sockaddr_in	*_address_in;
-		int					_socket_fd;
-		std::vector<int>	_server_fds;
-
-		// mcamps functions
-		void	getSocketAddr();
+		/* Helper Functions */
+		void	makeSocketAddr();
 		void	createSocket();
 		void	setupSocket();
 };
 
-void	setLocationIndex(Server& server, std::string& LocationIndexToAdd);
-void	setCgiName(Server& server, std::string& cgiName);
-void	setCgiFileExtension(Server& server, std::string& cgiFileExtension);
-void	setLocationRoot(Server& server, std::string& locationRootToAdd);
-void	setLocationAllowMethod(Server& server, std::string& locationAllowedMethods);
-void	setLocationAutoindex(Server& server, std::string& AutiondexToSet);
-
-
+/* Stream overload */
 std::ostream& operator<<(std::ostream& stream, const Server& Server);
 
 #endif
