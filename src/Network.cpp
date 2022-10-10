@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/06 17:57:02 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/10 13:05:54 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void Network::run()
 				}
 				else // Else normal connection 
 				// xander this is where the exchange starts fd = cur.fd
-				// RIGHT NOW DOESNT WORK AS INTENDED
+				// RIGHT NOW DOESNT WORK AS INTENDED 
 				{
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
 					if (ret <= 0)
@@ -178,7 +178,6 @@ Server*	Network::getServerBySocketFd(int fd)
 	}
 	return NULL;
 }
-
 
 Server*	Network::getServerByClientFd(int fd)
 {
