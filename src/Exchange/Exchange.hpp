@@ -32,7 +32,7 @@ public:
     void setHashMap(const HashMap);
     void setHeader(const std::string);
     void setBody(const std::string);
-    void setStatusCode(const int32_t);
+    void setStatusCode(const uint32_t);
 
     // adders
     void addHashMapNode(const std::string, const std::string);
@@ -44,10 +44,17 @@ private:
     HashMap _dictHeader;
     std::string _header;
     std::string _body;
-    int32_t _statusCode;
+    uint32_t _statusCode;
     const int32_t _SocketFD;
 };
 
 std::ostream& operator<<(std::ostream&, const Exchange&);
+
+enum e_statusCode
+{
+    e_OK = 200,
+    e_REDIR = 301,
+    e_ERROR = 404
+};
 
 #endif //WEBSERV_EXCHANGE_HPP

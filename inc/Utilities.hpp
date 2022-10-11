@@ -13,5 +13,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 std::vector<int> findCharLocation(std::string& line, int32_t c);
+
+std::string readFile(const std::string&);

@@ -55,30 +55,6 @@ bool Respond::CheckConnectionStatus(void)
 	return (false);
 }
 
-/*
- * /data/www/ does not work...
- * data/www/ does... lol
-*/
-std::string Respond::readFile(const std::string& RespondedFile)
-{
-	std::ifstream File;
-	std::string line;
-	std::string FileContent;
-
-    std::cout << RespondedFile << std::endl;
-	File.open(RespondedFile);
-	if (!File.is_open())
-	{
-		_Exchanger.setStatusCode(404);
-		std::exit(EXIT_FAILURE);
-	}
-
-	while (std::getline(File, line))
-		FileContent += line;
-
-	return (FileContent);
-}
-
 void Respond::insertBody(std::vector<std::string>& ServerRoot)
 {
     std::string FileContent;
@@ -100,6 +76,61 @@ void Respond::insertBody(std::vector<std::string>& ServerRoot)
     _Exchanger.setBody(FileContent);
 }
 
+uint32_t modifyStatusCode(HashMap Map, const std::string& relativePath)
+{
+    std::string Path = Map.find("Path")->second;
+
+    if ("/" == Path)
+        return (301);
+    try
+    {
+        readFile(relativePath);
+    }
+    catch (const std::exception& e)
+    {
+        return (404);
+    }
+    return (200);
+}
+
+void Respond::ResponseBuilder(void)
+{
+    std::string FileContent;
+    std::string relativePath;
+    std::string Root = _Exchanger.getServer().getRoot().back();
+    HashMap tempMap = _Exchanger.getHashMap();
+
+    try
+    {
+        relativePath = Root + tempMap.find("Path")->second;
+        uint32_t StatusCode = modifyStatusCode(tempMap, relativePath);
+        _Exchanger.setStatusCode(StatusCode);
+
+        switch (_Exchanger.getStatusCode())
+        {
+            case e_OK:
+                std::cout << "STATUS 200" << std::endl;
+                FileContent = readFile(relativePath);
+                break ;
+            case e_REDIR:
+                std::cout << "STATUS 301" << std::endl;
+                std::cout << "Still working on" << std::endl;
+                break ;
+            case e_ERROR:
+                std::cout << "STATUS 404" << std::endl;
+                FileContent = readFile(Root + "/Error404.html");
+                std::cout << FileContent << std::endl;
+                break ;
+        }
+        _Exchanger.setBody(FileContent);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        _Exchanger.setStatusCode(404);
+    }
+}
+
 void Respond::RespondToClient(void)
 {
     std::string Body;
@@ -108,13 +139,13 @@ void Respond::RespondToClient(void)
 	if (!CheckConnectionStatus())
 		std::exit(EXIT_FAILURE);
 
-	insertBody(tempServer.getRoot());
+    ResponseBuilder();
+//	insertBody(tempServer.getRoot());
     Body = _Exchanger.getBody();
 
 	std::string response =
 			setStatus() +
             setContentLength(Body.length()) +
-            setContentType() +
 			"\r\n\r\n" +
             Body;
 
@@ -139,9 +170,21 @@ std::string Respond::setStatus(void)
 {
     HashMap tempHash = _Exchanger.getHashMap();
     HashMap::iterator it = tempHash.find("HTTPVersion");
+    std::string StatusLine = it->second + " " + std::to_string(_Exchanger.getStatusCode());
 
-    std::string StatusLine = it->second + std::to_string(_Exchanger.getStatusCode()) + "OK\r\n";
+    switch (_Exchanger.getStatusCode())
+    {
+        case e_OK:
+            StatusLine + " OK\r\n";
+            break ;
+        case e_REDIR:
+            break ;
+        case e_ERROR:
+            StatusLine + " Not Found\r\n";
+            break ;
+    }
 
+    std::cout << StatusLine << std::endl;
     return (StatusLine);
 }
 

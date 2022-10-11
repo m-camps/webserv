@@ -73,7 +73,7 @@ void Exchange::setBody(const std::string NewBody)
     _body = NewBody;
 }
 
-void Exchange::setStatusCode(const int32_t NewStatus)
+void Exchange::setStatusCode(const uint32_t NewStatus)
 {
     _statusCode = NewStatus;
 }

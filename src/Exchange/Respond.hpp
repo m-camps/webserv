@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <exception>
 
 #include "Exchange.hpp" // Exchange Class
 #include "../../inc/Server.hpp" // Server class
@@ -23,6 +24,7 @@ public:
 	~Respond(void);
 
 	Respond& operator=(const Respond&);
+
 private:
 	Respond(void);
 
@@ -31,7 +33,7 @@ private:
 	std::size_t getBodySize(std::string&) const;
 	const std::string getFavicon(void);
 
-	std::string readFile(const std::string&);
+    void ResponseBuilder(void);
 	void insertBody(std::vector<std::string>&);
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);

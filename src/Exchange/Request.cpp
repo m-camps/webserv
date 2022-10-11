@@ -54,7 +54,6 @@ std::string Request::AppendRequest(const std::string& Request) const
 	if (found == std::string::npos)
 	{
 		std::cerr << "No separator found" << std::endl;
-//        std::exit(EXIT_FAILURE);
 	}
 	Header.append(Request, 0, found);
 	return (Header);
