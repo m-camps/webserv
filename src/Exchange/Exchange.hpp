@@ -37,7 +37,7 @@ private:
 
     std::size_t getBodySize(std::string&);
     std::string readFile(const std::string&);
-    std::string insertBody(std::vector<std::string>&);
+   	std::string insertBody(std::string ServerRoot);
     void RespondToClient(void);
     bool CheckConnectionStatus(void);
 };

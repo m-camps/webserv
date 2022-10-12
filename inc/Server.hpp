@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 16:26:54 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 14:09:20 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,10 @@ class Server
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
 		std::map<std::string, Location>		getLocations(void) const;
-		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
+		int									getSocketFd(void) const;
+		std::vector<int>					getClientFds(void) const;
+
 
 		/* Setters */
 		void	setPort(int& port);
@@ -64,8 +66,9 @@ class Server
 
 	private:
 		/* Orthodox canonical class BS */
-		Server(const Server& src);
-		Server& operator=(const Server& rhs);
+		// NEED TO MAKE THESE PUBLIC AND IMPLEMENT
+		// Server(const Server& src);
+		// Server& operator=(const Server& rhs);
 
 		int								_port; 						// The port server is running on, can maybe be multiple ports?
 		std::vector<std::string>		_names; 						// can be searching for multiple names
@@ -75,7 +78,7 @@ class Server
 		std::vector<std::string>		_methods;	// default = ["GET", "POST", "DELETE"]
 		struct sockaddr_in*				_address_in; 				// Optional can be deleted
 		int								_socket_fd; 				// Socket FD the server is running on
-		std::vector<int>				_server_fds;				// Client FD's currently associated to this server
+		std::vector<int>				_client_fds;				// Client FD's currently associated to this server
 		std::map<std::string, Location>	_locations;					// All locations of the Server
 
 		/* Helper Functions */

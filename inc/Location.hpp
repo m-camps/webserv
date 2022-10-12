@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 18:24:18 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 14:19:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ class Location {
 
 		//void						setLocationName(std::string& locationRootToAdd); dont have just yet
 		 void						setLocationRoot(std::string& locationRootToAdd);
-		 void						setLocationIndex(std::string& LocationIndexToAdd);
+		 void						setLocationIndex(std::string& locationIndexToAdd);
 		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
 		 void						setLocationAutoindex(std::string& AutiondexToSet);
 		 void						setCgiName(std::string& cgiName);
@@ -57,13 +57,15 @@ class Location {
 		*/
 };
 
+std::ostream& operator<<(std::ostream& stream, Location& location);
+
 
 typedef void 	(Location::*selectParsingFunctionLocation)(std::string&);
-typedef struct selectParsing
+typedef struct dispatchTableLocation
 {
 	std::string								_name;
-	const selectParsingFunctionLocation			&_pointerToLocationParserFunction; //const?
+	const selectParsingFunctionLocation		&_pointerToLocationParserFunction; //const?
 	//void	(Location::*pointerToLocation)(std::string&);
-}				t_selectLocation;
+}				t_dispatchTableLocation;
 
 

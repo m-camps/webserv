@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 13:05:54 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 14:02:14 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,26 +27,22 @@ Network::~Network() {}
 void Network::setup(std::string file)
 {
 	Parse				parser;
-	std::string			server1 = "Server 1";
-	std::string			server2 = "Server 2";
-	std::string			server3 = "Server 3";
+	std::vector<Server> tmp;
 	
-	_serverConfigs = parser.parseNetwork(file); // Parse config file into server Blocks
+	(void)file;
+	// tmp = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
-	_servers.push_back(Server());
-	_servers.push_back(Server());
-	_servers.push_back(Server());
-	_servers.at(0).changePort("80");
-	_servers.at(0).setName(_servers.at(0),server1);
-	_servers.at(0).setup();
-	
-	_servers.at(1).changePort("81");
-	_servers.at(1).setName(_servers.at(1),server2);
-	_servers.at(1).setup();
-
-	_servers.at(2).changePort("82");
-	_servers.at(2).setName(_servers.at(2), server3);
-	_servers.at(2).setup();
+	// Initialse servers for testing
+	for (int i = 0; i < 3; i++)
+	{
+		int	port = i + 80;
+		std::string name("Server");
+		_servers.push_back(Server());
+		_servers.at(i).setPort(port);
+		_servers.at(i).addToName(name);
+		_servers.at(i).setup();
+	}
+	std::cout << _servers.at(0) << "\n";
 	_total_fd = _servers.size();
 	createFds();
 }

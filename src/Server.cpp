@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 15:58:11 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 14:17:29 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Server::Server()
 {
 	this->_root = "/";
 	this->_index = "index.html";
+	this->_client_body_size = 10;
 }
 
 Server::~Server() { return; }
@@ -33,6 +34,7 @@ std::vector<std::string>		Server::getMethods(void) const { return _methods; }
 std::map<std::string, Location> Server::getLocations(void) const { return _locations; }
 int								Server::getSocketFd(void) const { return _socket_fd; }
 struct sockaddr_in*       		Server::getSockAddr(void) const { return _address_in; }
+std::vector<int>				Server::getClientFds(void) const { return _client_fds; }
 
 /* Setters */
 void	Server::setPort(int& port) { _port = port; }
@@ -70,13 +72,13 @@ int		Server::acceptConnection()
 		std::cout << "Server: ["<<_names.back() << ":" << _port <<   "]\n";
 		std::cout << "Accepted connection from adress: " << client_addr.sin_addr.s_addr <<  "\n";
 	}
-	_server_fds.push_back(clientFd);
+	_client_fds.push_back(clientFd);
 	return (clientFd);
 }
 
 bool	Server::isClientFdInServer(int fd)
 {
-	if (std::find(_server_fds.begin(), _server_fds.end(), fd) != _server_fds.end())
+	if (std::find(_client_fds.begin(), _client_fds.end(), fd) != _client_fds.end())
 		return true;
 	else
 		return false;
@@ -126,18 +128,27 @@ void	Server::makeSocketAddr()
 
 std::ostream& operator<<(std::ostream& stream, const Server& server)
 {
-	stream << "Port= " << server.getPort() << "\n";
-	for(int i = 0; i < server.getNames().size(); i++) 
+	stream << "Name(s) [";
+	for(size_t i = 0; i < server.getNames().size(); i++)
         stream << server.getNames().at(i) << " ";
-	stream << "\n";
-	stream << "Root= " << server.getRoot() << "\n";
-	stream << "Index= " << server.getIndex() << "\n";
-	stream << "ClientBodySize= " << server.getClientBodySize() << "\n";
-	stream << "Methods= ";
-	for(int i = 0; i < server.getMethods().size(); i++) 
+	stream << "]\n";
+	stream << "Port: [" << server.getPort() << "]\n";
+	stream << "Root: [" << server.getRoot() << "]\n";
+	stream << "Index: ["  << server.getIndex() << "]\n";
+	stream << "ClientBodySize: [" << server.getClientBodySize() << "]\n";
+	stream << "Methods [";
+	for(size_t i = 0; i < server.getMethods().size(); i++) 
         stream << server.getMethods().at(i) << " ";
-	stream << "\n";
-	stream << "Root= " << server.getRoot() << "\n";
+	stream << "]\n";
+	stream << "SocketFD: [" << server.getSocketFd() << "]\n";
+	stream << "ClientFD(s) [";
+	for(size_t i = 0; i < server.getClientFds().size(); i++) 
+        stream << server.getClientFds().at(i) << " ";
+	stream << "]\n";
+
+	std::map<std::string, Location>::iterator it = server.getLocations().begin();
+	while (it != server.getLocations().end())
+		stream << it->second << "\n";
     return stream;
 }
 

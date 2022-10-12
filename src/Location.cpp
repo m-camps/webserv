@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 14:46:55 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 14:31:12 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,3 +115,18 @@ void	Location::setLocationAutoindex(std::string& AutiondexToSet)
 	return ;
 }
 
+
+std::ostream& operator<<(std::ostream& stream, Location& location)
+{
+	stream << "LocationName: [" << "]\n";
+	stream << "\tRoot: [" <<  location.getLocationRoot() << "]\n";
+	stream << "\tIndex: [" <<  location.getLocationIndex() << "]\n";
+	stream << "\tAutoIndex: [" <<  location.getLocationAutoIndex() << "]\n";
+	stream << "\tMethods: [";
+	for (size_t i = 0; i < location.getLocationAllowMethods().size(); i++)
+		stream << location.getLocationAllowMethods().at(i) << " ";
+	stream << "]\n";
+	stream << "\tCgiName: [" <<  location.getLocationCgiName() << "]\n";
+	stream << "\tCgiExtension: [" <<  location.getLocationCgiFileExtension() << "]\n";
+	return (stream);
+}

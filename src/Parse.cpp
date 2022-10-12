@@ -63,9 +63,8 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
  * @return value right now is a vector of Server blocks. In the future should just return a std::vector<Server>
  * instantiated by calling Server(std::vector<std::string>)
 ***/
-std::vector<Server>&	Parse::parseNetwork(std::string& file) //parse whole config, puts it into blocks
+std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>& servers) //parse whole config, puts it into blocks
 {
-	std::vector<Server>						servers;
 	std::vector<std::string>				buff;
 	std::string								currentLine;
 	std::ifstream							configStream;
@@ -82,7 +81,8 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file) //parse whole config
 			buff.push_back(currentLine);
 			if (currentLine == "}")  //void    Parse::selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)//get the buffer (block here)
 			{
-				servers.push_back(parseServer(buff));
+				Server server;
+				servers.push_back(parseServer(buff, server));
 				buff.clear();
 			}
 		}
@@ -91,9 +91,8 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file) //parse whole config
 }
 
 
-Server&		Parse::parseServer(std::vector<std::string>& server_block)
+Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& server)
 {
-	Server								server;
 	std::vector<Location>				locations;
 	std::vector<std::string>::iterator	it = server_block.begin();
 	std::stack<char> stack;
@@ -108,7 +107,7 @@ Server&		Parse::parseServer(std::vector<std::string>& server_block)
 		}
 		else
 		{
-			//error print line where parsing error happend
+			// throw error return = line where parsing error happend
 		}
 	}
 	return server;
@@ -121,10 +120,9 @@ Server&		Parse::parseServer(std::vector<std::string>& server_block)
 
 }
 
-Location&	Parse::parseLocation(std::vector<std::string>& location_block) //call it till the end of location block
+Location&	Parse::parseLocation(std::vector<std::string>& location_block, Location& location) //call it till the end of location block
 {
 	std::vector<std::string>::iterator it = location_block.begin();
-	Location location;
 
 	while(it != location_block.end())
 	{
@@ -132,7 +130,7 @@ Location&	Parse::parseLocation(std::vector<std::string>& location_block) //call 
 			parseLocationDirective(*it, location);
 		else
 		{
-			//error print line where parsing error happend
+			// throw error return = line where parsing error happend
 		}
 	}
 	return location;
@@ -171,15 +169,15 @@ void    Parse::parseDirective(std::string& currentLine, Server& server)
 }
 
 //write static const dispatch table
-
-void    Parse::parseLocationDirective(std::string& currentLine, Location& locationInstance)
+void    Parse::parseLocationDirective(std::string& currentLine, Location& location)
 {
+	(void)location;
 	//location ptr server.getlocaton
 	//location structure, we can just get the one (current from server, declare it here and use that var to pull data from)
 	//create here and add to server?
 	//locationInstance.
 	//if this would be static 
-	const t_selectLocation myDispatch[] = 	//map instead
+	const t_dispatchTableLocation myDispatch[] = 	//map instead
 	{
 			{"root", &Location::setLocationRoot},
 			{"index", &Location::setLocationIndex},
@@ -200,7 +198,7 @@ void    Parse::parseLocationDirective(std::string& currentLine, Location& locati
 			{
 				size_t      posInLine = currentWord.length();
 				std::string restOfLine = currentLine.substr(posInLine + 2);
-				myDispatch[i]._pointerToLocationParserFunction(restOfLine);
+				// myDispatch[i]._pointerToLocationParserFunction(restOfLine);
 			}
 		}
 		spaceSeparatedWord = strtok (NULL, " ");
@@ -305,7 +303,7 @@ bool    Parse::isDirective(std::string& currentWord)
 /*** 
  * Checks if a word is a directive of location so we can select an associated function later
 ***/
-bool    isLocationDirective(std::string& currentWord)
+bool    Parse::isLocationDirective(std::string& currentWord)
 {
 	//what happens if the word is empty? wouldnt == overload return true?
 	return (currentWord == "root" || currentWord == "index" ||
@@ -373,7 +371,7 @@ void    parseClientBodySize(Server& server, std::string& currentLine)
 
 void    parseAllowMethods(Server& server, std::string& currentLine)
 {
-	//
+	(void)server; // Server needs to be removed here
 	//separate them by whitespace and strok
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
 	char *spaceSeparatedWord = strtok (remainingLine, " ");
