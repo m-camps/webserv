@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 14:19:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 15:12:00 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,32 +40,15 @@ class Location {
 
 		//void						setLocationName(std::string& locationRootToAdd); dont have just yet
 		 void						setLocationRoot(std::string& locationRootToAdd);
-		 void						setLocationIndex(std::string& locationIndexToAdd);
+		 void						setLocationIndex(std::string& LocationIndexToAdd);
 		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
 		 void						setLocationAutoindex(std::string& AutiondexToSet);
 		 void						setCgiName(std::string& cgiName);
 		 void						setCgiFileExtension(std::string& cgiFileExtension);
-
-		/*
-		std::vector<t_location>&	getMethods(void);
-		std::string					getRoot() const;
-		std::string					getIndex() const;
-		std::vector<std::string>	getMethods() const;
-		bool						getAutoIndex() const;
-		std::string					getCgiName() const;
-		std::string					getCgiExt() const;
-		*/
 };
 
-std::ostream& operator<<(std::ostream& stream, Location& location);
-
-
-typedef void 	(Location::*selectParsingFunctionLocation)(std::string&);
-typedef struct dispatchTableLocation
+typedef struct selectParsing
 {
-	std::string								_name;
-	const selectParsingFunctionLocation		&_pointerToLocationParserFunction; //const?
-	//void	(Location::*pointerToLocation)(std::string&);
-}				t_dispatchTableLocation;
-
-
+	std::string		_name;
+	void			(Location::*pointerToLocation)(std::string&);
+}				t_selectLocation;

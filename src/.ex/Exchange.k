@@ -173,7 +173,7 @@ std::size_t Exchange::getBodySize(std::string& Body)
     return (Body.length());
 }
 
-std::string Exchange::insertBody(std::string ServerRoot)
+std::string Exchange::insertBody(std::vector<std::string>& ServerRoot)
 {
     std::string RequestedFile;
     std::string HTTPMethod = _dictHeader.find("HTTPMethod")->second;
@@ -185,9 +185,9 @@ std::string Exchange::insertBody(std::string ServerRoot)
         return ("");
     }
     RequestedFile = HTTPMethod.substr(found, 11);
-    ServerRoot += RequestedFile;
+    ServerRoot.back() += RequestedFile;
 
-    return (readFile(ServerRoot));
+    return (readFile(ServerRoot.back()));
 }
 
 void Exchange::RespondToClient(void)

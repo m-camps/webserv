@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 14:09:20 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 15:37:37 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <vector>
 
+
 #define ERROR 1
 
 class Server
@@ -31,6 +32,8 @@ class Server
 	public:
 		Server();
 		~Server();
+		Server(const Server& src);
+		Server& operator=(const Server& rhs);
 
 		/* Getters */
 		int									getPort(void) const;
@@ -40,10 +43,9 @@ class Server
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
 		std::map<std::string, Location>		getLocations(void) const;
-		struct sockaddr_in*					getSockAddr(void) const;
 		int									getSocketFd(void) const;
+		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
-
 
 		/* Setters */
 		void	setPort(int& port);
@@ -60,22 +62,20 @@ class Server
 		void	printServerAttributes(Server& server);
 
 		/* Public Functions */
+		void	changePort(std::string newPort);
+		int32_t	getSocketFd(void);
 		void	setup();
 		int		acceptConnection();
 		bool	isClientFdInServer(int fd);
 
 	private:
-		/* Orthodox canonical class BS */
-		// NEED TO MAKE THESE PUBLIC AND IMPLEMENT
-		// Server(const Server& src);
-		// Server& operator=(const Server& rhs);
 
 		int								_port; 						// The port server is running on, can maybe be multiple ports?
 		std::vector<std::string>		_names; 						// can be searching for multiple names
 		std::string						_root; 						// default = "/"
 		std::string						_index; 					// default = "index.html"
 		int								_client_body_size;			// default = 10;
-		std::vector<std::string>		_methods;	// default = ["GET", "POST", "DELETE"]
+		std::vector<std::string>		_methods;					// default = ["GET", "POST", "DELETE"]
 		struct sockaddr_in*				_address_in; 				// Optional can be deleted
 		int								_socket_fd; 				// Socket FD the server is running on
 		std::vector<int>				_client_fds;				// Client FD's currently associated to this server

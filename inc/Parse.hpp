@@ -8,14 +8,6 @@
 #define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
 #define DEBUG false
 
-typedef void 	selectParsingFunction(Server& server, std::string& currentLine);
-typedef struct selectParsing
-{
-	std::string					_name;
-	selectParsingFunction*	    _pointerToParsingFunction;
-}				t_selectParse;
-
-
 class Parse
 {
 	public:
@@ -28,11 +20,23 @@ class Parse
 		std::vector<Server>&	parseNetwork(std::string& file, std::vector<Server>& servers);
 		Server&					parseServer(std::vector<std::string>& server_block, Server& server);
 		Location&				parseLocation(std::vector<std::string>& location_block, Location& location);
+
 		void    				parseDirective(std::string& currentLine, Server &server);
 		void    				parseLocationDirective(std::string& currentLine, Location& location);
 
+		void    				parseListen(Server& server, std::string& currentLine); //was outside before, now member function
+		void    				parseServerName(Server& server, std::string& currentLine); //was outside before, now member function
+		void    				parseRoot(Server& server, std::string& currentLine); //was outside before, now member function
+		void    				parseIndex(Server& server, std::string& currentLine); //was outside before, now member function
+		void    				parseClientBodySize(Server& server, std::string& currentLine); //was outside before, now member function
+
+
+
+		void 					openFile(std::ifstream& configStream, std::string configName);
 
 		void    selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
+		bool    isDirective(std::string& currentWord);
+		bool	isLocationDirective(std::string& currentWord);
 		void    selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
 
 	private:
@@ -41,33 +45,12 @@ class Parse
 		* pointerToParsingFunction is the function associated with the name, in case you find one of those in the config file, 
 		* call the this function to parse further and assign values etc to the server class
 		***/
-
-		/* Util */
-		void 	openFile(std::ifstream& configStream, std::string configName);
-
-		/* Helper */
-		bool    isDirective(std::string& currentWord);
-		bool	isLocationDirective(std::string& currentWord);
-		// t_selectParse _dispatchTable;
-	   
+		//t_selectParse _dispatchTable;
 };
 
-/* will have to put these as member functions, messed up syntax so I keep it here for now */
-void    startParse(Server& server, char *configName);
-
-void    parseListen(Server& server, std::string& currentLine);
-void    parseServerName(Server& server, std::string& currentLine);
-void    parseRoot(Server& server, std::string& currentLine);
-void    parseIndex(Server& server, std::string& currentLine);
-void    parseAutoIndex(Server& server, std::string& currentLine);
-void    parseClientBodySize(Server& server, std::string& currentLine);
-void    parseLocation(Server& server, std::string& currentLine);
-void	parseCgiName(Server& server, std::string& currentLine);
-void	parseCgiFileExtension(Server& server, std::string& currentLine);
-bool    isLocationDirective(std::string& currentWord);
-void    parseAllowMethods(Server& server, std::string& currentLine);
-void    proceedToLocationParser(Server& server, std::ifstream& configStream);
-
-
-
+typedef struct selectParsingServer
+{
+	std::string		_name;
+	void			(Parse::*pointerToParseServerDirectives)(Server& server, std::string& currentLine);
+}				t_selectServer;
 #endif

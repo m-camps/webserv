@@ -6,17 +6,19 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/06 17:26:33 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 15:13:51 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "Server.hpp"
 #include "Parse.hpp"
-#include "../src/Exchange/Exchange.hpp"
+//#include "../src/Exchange/Exchange.hpp"
 #include <poll.h>
 #include <iostream>
 #include <fstream>
+
+typedef std::vector<std::vector<std::string> > ServerConfig; 
 
 class Network
 {
@@ -28,7 +30,7 @@ class Network
 
 	private:
 		std::vector<Server> 					_servers; 			// All the servers
-		std::vector<std::vector<std::string> > 	_serverConfigs; 	// Vector that holds the server configs (can be deleted later on)
+		ServerConfig 							_serverConfigs; 	// Vector that holds the server configs (can be deleted later on)
 		struct pollfd*							_fds; 				// Struct used for the FD's poll monitors
 		int										_total_fd;			// Total active fd's
 		int										_max_fd; 			// Max total fd's

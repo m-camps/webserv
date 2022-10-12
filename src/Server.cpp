@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 14:17:29 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 15:36:43 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,32 @@ Server::Server()
 {
 	this->_root = "/";
 	this->_index = "index.html";
-	this->_client_body_size = 10;
 }
 
 Server::~Server() { return; }
+
+
+Server::Server(const Server& src)
+{
+    *this = src;
+    return;
+}
+
+Server& Server::operator=(const Server& rhs)
+{
+    if (this != &rhs)
+    {
+        this->_names = rhs._names;
+        this->_port = rhs._port;
+        this->_root = rhs._root;
+        this->_index = rhs._index;
+        this->_client_body_size = rhs._client_body_size;
+        //methods?this->_methods = rhs._methods;
+    }
+    return *this;
+}
+
+
 
 /* Getters */
 int								Server::getPort(void) const { return _port; }
