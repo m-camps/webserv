@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "Server.hpp" // Server class
+#include "../../inc/Server.hpp" // Server class
 
 typedef std::map<std::string, std::string> HashMap;
 
@@ -23,8 +23,9 @@ public:
     // Geters
     Server getServer(void) const;
     HashMap getHashMap(void) const;
+	std::string getHeader(void) const;
     std::string getBody(void) const;
-    int32_t getStatusCode(void) const;
+    uint32_t getStatusCode(void) const;
     int32_t getSocketFD(void) const;
 
     // Seters
@@ -35,6 +36,7 @@ public:
     void setStatusCode(const uint32_t);
 
     // adders
+	void addLineToHeader(const std::string);
     void addHashMapNode(const std::string, const std::string);
 
 private:

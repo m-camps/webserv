@@ -10,8 +10,8 @@
 #include <fstream> // std::istream
 #include <sstream> // issstringstream()
 
-#include "../../inc/Server.hpp" // Server class
 #include "Respond.hpp"
+#include "../../inc/Server.hpp" // Server class
 
 class Request
 {

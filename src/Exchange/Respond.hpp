@@ -16,6 +16,9 @@
 
 typedef std::map<std::string, std::string> HashMap;
 
+uint32_t modifyStatusCode(HashMap, const std::string&);
+std::string getValidFile(std::string, std::string, uint32_t);
+
 class Respond
 {
 public:
@@ -34,15 +37,13 @@ private:
 	const std::string getFavicon(void);
 
     void ResponseBuilder(void);
-	void insertBody(std::vector<std::string>&);
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
 
     // Private Seters
-    std::string setStatus(void);
-    std::string setContentType(void);
-    std::string setContentLength(std::size_t);
+    void setStatus(void);
+    void setContentLength(std::size_t);
+	void setLocation(const std::string);
 };
-
 
 #endif //WEBSERV_RESPOND_HPP
