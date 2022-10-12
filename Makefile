@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/06 15:36:20 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/12 16:35:17 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ SHELL := /bin/bash
 INC := -Iinc -Isrc
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g3
 else ifdef FSAN
 	CFLAGS += -fsanitize=address
 else

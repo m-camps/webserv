@@ -6,7 +6,7 @@
 #include "Server.hpp"
 
 #define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
-#define DEBUG false
+#define DEBUG true
 
 class Parse
 {

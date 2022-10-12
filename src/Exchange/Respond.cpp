@@ -9,6 +9,7 @@
 Respond::Respond(Exchange& ExchangeRef)
 	: _Exchanger(ExchangeRef)
 {
+	std::cout << "CONSTRUCTED RESPONSE\n";
 	RespondToClient();
 }
 
@@ -97,7 +98,7 @@ void Respond::ResponseBuilder(void)
 {
     std::string FileContent;
     std::string relativePath;
-    std::string Root = _Exchanger.getServer().getRoot().back();
+    std::string Root = _Exchanger.getServer().getRoot();
     HashMap tempMap = _Exchanger.getHashMap();
 
     try

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:37:37 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 15:49:14 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class Server
 
 		/* Public Functions */
 		void	changePort(std::string newPort);
-		int32_t	getSocketFd(void);
 		void	setup();
 		int		acceptConnection();
 		bool	isClientFdInServer(int fd);

@@ -65,7 +65,6 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 ***/
 std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>& servers) //parse whole config, puts it into blocks
 {
-	std::vector<Server>						servers;
 	std::vector<std::string>				buff;
 	std::string								currentLine;
 	std::ifstream							configStream;
@@ -85,15 +84,15 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>&
 			char *spaceSeparatedWord = strtok (remainingLine, " ");
 			while (spaceSeparatedWord != NULL)
 			{
-				if (spaceSeparatedWord == "{") //not sure if this always works but ok for now
+				if (!strcmp(spaceSeparatedWord, "{")) //not sure if this always works but ok for now
 				{
 					stack.push(spaceSeparatedWord[0]);
 				}
-				if (spaceSeparatedWord == "}")
+				if (!strcmp(spaceSeparatedWord, "}"))
 				{
 					stack.pop();
 				}
-				if (stack.empty() == true)
+				if (stack.empty() == true) // Always true if no { in first line
 				{
 					Server server;
 					servers.push_back(parseServer(buff, server)); //this should happen if we got "server already",
@@ -126,6 +125,7 @@ Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& serv
 		{
 			// throw error return = line where parsing error happend
 		}
+		it++;
 	}
 	return server;
 	
@@ -139,9 +139,7 @@ Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& serv
 
 Location&	Parse::parseLocation(std::vector<std::string>& location_block, Location& location) //call it till the end of location block
 {
-	Server								server;
 	std::vector<std::string>::iterator it = location_block.begin();
-	Location location;
 
 	while(it != location_block.end())
 	{
@@ -336,7 +334,7 @@ bool    Parse::isDirective(std::string& currentWord)
 /*** 
  * Checks if a word is a directive of location so we can select an associated function later
 ***/
-bool    isLocationDirective(std::string& currentWord)
+bool    Parse::isLocationDirective(std::string& currentWord)
 {
 	//what happens if the word is empty? wouldnt == overload return true?
 	return (currentWord == "root" || currentWord == "index" ||
@@ -369,6 +367,7 @@ void    Parse::parseListen(Server& server, std::string& currentLine) //listen
 
 void    Parse::parseIndex(Server& server, std::string& currentLine)
 {
+	(void)server;
 	currentLine.erase(remove(currentLine.begin(), currentLine.end(), ';'), currentLine.end()); //index.html
 	//server.setIndex(currentLine);
 	
@@ -406,6 +405,7 @@ void    Parse::parseClientBodySize(Server& server, std::string& currentLine)
 void    parseAllowMethods(Server& server, std::string& currentLine)
 {
 	//
+	(void)server;
 	//separate them by whitespace and strok
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
 	char *spaceSeparatedWord = strtok (remainingLine, " ");

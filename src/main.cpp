@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/10 13:06:11 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 16:33:14 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int32_t	main(int argc, char *argv[])
 	(void)argc;
 	if (argc != 2)
 		std::exit(EXIT_FAILURE);
-    (void) argv;
+    // (void) argv;
 
 	Network network;
 

@@ -6,11 +6,15 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:32:52 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 18:13:42 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
+#include "../inc/Server.hpp"
+#include "Exchange/Exchange.hpp"
+#include "Exchange/Request.hpp"
+
 #define BUFF 10000
 /* Default constructor */
 Network::Network() : _max_fd(5) {}
@@ -29,23 +33,29 @@ void Network::setup(std::string file)
 	Parse				parser;
 	std::vector<Server> tmp;
 	
-	(void)file;
-	// tmp = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
+	// (void)file;
+	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
-	// Initialse servers for testing
-	for (int i = 0; i < 3; i++)
-	{
-		int	port = i + 80;
-		std::string name("Server");
-		_servers.push_back(Server());
-		_servers.at(i).setPort(port);
-		_servers.at(i).addToName(name);
-		_servers.at(i).setup();
-	}
-	std::cout << _servers.at(0) << "\n";
+	for (size_t i = 0; i < tmp.size(); i++)
+		std::cout << _servers.at(i) << "\n";
+		
+	// std::string			servername[] = {"Server 1", "Server 2", "Server 3"};
+	// _servers.push_back(Server());
+	// _servers.push_back(Server());
+	// _servers.push_back(Server());
+	// for (int i = 0; i < 3; i++)
+	// {
+	// 	int	port = i + 80;
+		
+	// 	_servers.at(i).setPort(port);
+	// 	_servers.at(i).addToName(servername[i]);
+	// 	_servers.at(i).setup();
+	// 	std::cout << _servers.size() << "\n";
+	// }
 	_total_fd = _servers.size();
 	createFds();
 }
+
 
 /* Poll() loop of the network */
 void Network::run()
@@ -64,8 +74,10 @@ void Network::run()
 		for (int i = 0; i < _total_fd; i++)
 		{
  			struct pollfd cur = _fds[i];
+			// std::cout << cur.fd << "\n";
 			if ((cur.revents & POLLIN))
 			{
+
 				if (isSocketFd(cur.fd)) // If fd is a socket fd accept new connection
 				{
 					Server *server = getServerBySocketFd(cur.fd);
@@ -90,7 +102,12 @@ void Network::run()
 					}
 					request.append(buff);
 					if (ret != BUFF)
-						Exchange exchange(request, *getServerByClientFd(cur.fd), cur.fd);
+					{
+						std::cout << "POLL\n";
+						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
+						Request request(buff, exchange);
+					}	
+
 					*buff = '\0';
 				}
 			}

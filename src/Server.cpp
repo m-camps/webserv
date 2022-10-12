@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:36:43 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 16:44:11 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,9 +168,9 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
         stream << server.getClientFds().at(i) << " ";
 	stream << "]\n";
 
-	std::map<std::string, Location>::iterator it = server.getLocations().begin();
-	while (it != server.getLocations().end())
-		stream << it->second << "\n";
+	// std::map<std::string, Location>::iterator it = server.getLocations().begin();
+	// while (it != server.getLocations().end())
+	// 	stream << &it->second << "\n";
     return stream;
 }
 

@@ -6,13 +6,14 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:13:51 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/12 16:11:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "Server.hpp"
 #include "Parse.hpp"
+#include "../src/Exchange/Exchange.hpp"
 //#include "../src/Exchange/Exchange.hpp"
 #include <poll.h>
 #include <iostream>
