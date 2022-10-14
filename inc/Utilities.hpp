@@ -1,19 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   Config.hpp                                         :+:    :+:            */
+/*   Utilities.hpp                                      :+:    :+:            */
 /*                                                     +:+                    */
-/*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
+/*   By: xvoorvaa <xvoorvaa@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2022/09/16 14:39:35 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/09/16 14:44:14 by mcamps        ########   odam.nl         */
+/*   Created: 2022/10/09 15:03:03 by xvoorvaa      #+#    #+#                 */
+/*   Updated: 2022/10/09 15:07:34 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 
-#include <iostream>
+#include <vector>
+#include <string>
 
-class Config{
-	public:
-		static const int port = 80;
-};
+std::vector<int> findCharLocation(std::string& line, int32_t c);
+
+std::string readFile(const std::string&);
