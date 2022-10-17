@@ -5,10 +5,11 @@
 #ifndef WEBSERV_RESPOND_HPP
 #define WEBSERV_RESPOND_HPP
 
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <exception>
+#include <iostream> // std::
+#include <fstream> // std::istream
+#include <sstream> // std::istringstream
+#include <map> // std::map<>
+#include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
 #include "../../inc/Server.hpp" // Server class
@@ -44,10 +45,11 @@ private:
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
 
-    // Private Setters
-    void setStatus(void);
-    void setContentLength(std::size_t);
-	void setLocation(const std::string);
+    // Generate
+    void generateStatus(void);
+    void generateContentLength(std::size_t);
+	void generateLocation(const std::string);
+	void generateContentType(void);
 };
 
 #endif //WEBSERV_RESPOND_HPP

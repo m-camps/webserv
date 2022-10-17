@@ -85,14 +85,14 @@ void Respond::BuildGet(void)
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
         if (StatusCode == 301)
         {
-            setStatus();
-            setLocation("/index.html");
+            generateStatus();
+            generateLocation("/index.html");
             return ;
         }
 
-		setStatus();
+        generateStatus();
 		_Exchanger.setBody(FileContent);
-		setContentLength(_Exchanger.getBody().length());
+        generateContentLength(_Exchanger.getBody().length());
 	}
 	catch (const std::exception& e)
 	{
@@ -113,7 +113,20 @@ void Respond::BuildDelete()
 
 void Respond::BuildPost()
 {
+    std::string Body = _Exchanger.getHashMap().find("Body")->second;
+
     std::cout << "POST" << std::endl;
+    std::cout << Body << std::endl;
+    try
+    {
+        generateStatus();
+        generateContentType();
+        _Exchanger.setBody(Body);
+    }
+    catch (const std::exception& e)
+    {
+
+    }
     return ;
 }
 
@@ -125,7 +138,7 @@ void Respond::ResponseBuilder(void)
 	{
 		std::string Method;
 		void (Respond::*FuncPointer)(void);
-	}   t_Methods;
+	};
 
     void (Respond::*FuncPointer)(void) = nullptr;
 
@@ -156,11 +169,14 @@ void Respond::RespondToClient(void)
     std::string Body;
 	std::string Header;
     Server tempServer = _Exchanger.getServer();
-
-	if (!CheckConnectionStatus())
-		std::exit(EXIT_FAILURE);
+    HashMap tempMap = _Exchanger.getHashMap();
 
     ResponseBuilder();
+
+//    std::cout <<
+//        "Body: \n" <<
+//        tempMap.find("Body")->second <<
+//    "\n";
 
 	Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
@@ -239,15 +255,15 @@ const std::string Respond::getFavicon(void)
 
 #pragma endregion Getter
 
-#pragma region Setter
+#pragma region generators
 
-////////////// Setter //////////////
+////////////// Generators //////////////
 
 /*
  * The status of the site should ALWAYS be the first line of the header.
  * The rest can be any line.
  */
-void Respond::setStatus(void)
+void Respond::generateStatus(void)
 {
     HashMap tempHash = _Exchanger.getHashMap();
     std::string StatusLine = tempHash.find("HTTPVersion")->second;
@@ -267,16 +283,38 @@ void Respond::setStatus(void)
 	_Exchanger.setHeader(StatusLine);
 }
 
-void Respond::setContentLength(std::size_t BodyLength)
+/* //////////////////////////// */
+
+void Respond::generateContentLength(std::size_t BodyLength)
 {
     std::string ContentLength = "Content-Length: " + std::to_string(BodyLength) + "\r\n";
 	_Exchanger.addLineToHeader(ContentLength);
 }
 
-void Respond::setLocation(const std::string NewLocation)
+/* //////////////////////////// */
+
+void Respond::generateLocation(const std::string NewLocation)
 {
 	std::string Location = "Location: " + NewLocation + "\r\n";
 	_Exchanger.addLineToHeader(Location);
 }
 
-#pragma endregion Setter
+/* //////////////////////////// */
+
+void Respond::generateContentType(void)
+{
+    std::string line;
+    std::string RequestBody = _Exchanger.getHashMap().find("Body")->second;
+    std::istringstream issBody(RequestBody);
+
+    while (std::getline(issBody, line))
+    {
+        if (line.compare(0, 13, "Content-Type:") == 0)
+        {
+            _Exchanger.addLineToHeader(line);
+            return ;
+        }
+    }
+}
+
+#pragma endregion generators

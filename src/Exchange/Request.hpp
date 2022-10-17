@@ -34,7 +34,8 @@ private:
 
     void HeaderToMap(const std::string&);
     void splitMethod(std::string line);
-    std::string AppendRequest(const std::string& Request) const;
+    std::string AppendRequestToHeader(const std::string& Request) const;
+    std::string AppendRequestToBody(const std::string& Request) const;
 };
 
 #endif //WEBSERV_REQUEST_HPP

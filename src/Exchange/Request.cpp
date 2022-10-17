@@ -14,9 +14,11 @@ typedef std::map<std::string, std::string> map;
 Request::Request(const std::string Request, Exchange NewExchanger)
 		: _Exchanger(NewExchanger)
 {
-	const std::string Header = AppendRequest(Request);
+	const std::string Header = AppendRequestToHeader(Request);
+	const std::string Body = AppendRequestToBody(Request);
 
 	HeaderToMap(Header);
+    _Exchanger.addHashMapNode("Body", Body);
 	Respond Responder(_Exchanger);
 }
 
@@ -46,7 +48,7 @@ Request &Request::operator=(const Request& ref)
  * I look for the "\\r\\n\\r\\n" seperator by using std::find.
  * Which I will then append to the Header string.
  */
-std::string Request::AppendRequest(const std::string& Request) const
+std::string Request::AppendRequestToHeader(const std::string& Request) const
 {
 	std::string Header;
 
@@ -57,6 +59,19 @@ std::string Request::AppendRequest(const std::string& Request) const
 	}
 	Header.append(Request, 0, found);
 	return (Header);
+}
+
+std::string Request::AppendRequestToBody(const std::string &Request) const
+{
+    std::string Body;
+
+    std::size_t found = Request.find("\r\n\r\n");
+    if (found == std::string::npos)
+    {
+        std::cerr << "No separator found" << std::endl;
+    }
+    Body.append(Request, found, Request.length() - found);
+    return (Body);
 }
 
 /**
@@ -85,8 +100,6 @@ void Request::splitMethod(std::string line)
 }
 
 /*
- * This is gonna be a long one...
- *
  * I created a HashMap by using std::map.
  * You can use std::map::at() to find the data you are looking for. \n
  *
