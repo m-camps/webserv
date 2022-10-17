@@ -94,7 +94,7 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>&
 				if (!strcmp(spaceSeparatedWord, "}"))
 				{
 					stack.pop();
-					if (stack.empty() == 1) // Always true if no { in first line
+					if (stack.empty() == 1)
 					{
 						Server server;
 						servers.push_back(parseServer(buff, server)); //this should happen if we got "server already",
@@ -109,107 +109,16 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>&
 	return(servers);
 }
 
-
-Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& server)
-{
-	std::vector<std::string>			buff;
-	std::vector<Location>				locations;
-	std::vector<std::string>::iterator	it = server_block.begin();
-	std::stack<char> stack;
-
-	// size_t i = 0;
-	// size_t block_size = server_block.size();
-	// while(i < block_size)
-	// {
-	// 	std::cout << it[i] << " " << std::endl;
-	// 	i++;
-	// }
-
-
-
-	while(it != server_block.end())
-	{
-		//at this point we should set somehow if there was a "location line found"
-		std::cout << *it << " is line" << std::endl;
-		//std::string								currentLine;
-		//int i = 0 ;
-
-		char *remainingLine = const_cast<char *>((*it).c_str());
-		char *spaceSeparatedWord = strtok (remainingLine, "\t");
-		while (spaceSeparatedWord != NULL)
-		{
-			std::string directiveCheck(spaceSeparatedWord);
-			if (isDirective(directiveCheck))
-			{
-				//std::cout << " giving " << *it << " to parsedirectives" << std::endl;
-				parseDirective(*it, server);
-				break ;
-			}
-			spaceSeparatedWord = strtok (NULL, " ");
-		}
-			
-		// //if (isDirective(*it)) //if its server directive, it is essentially a a line
-		// if (true) // Need to implement isLocationBlock(); //how can we check if its a location block?
-		// {
-		// 	Location location; //server locatons i guess is enough
-			//we have to do the same, push stuff into buffer until there is an opening and closing bracket
-			//
-			/*
-			while(!configStream.eof())
-			{
-				getline(configStream, currentLine);
-				if (configStream.good()) //we should check word by word?
-				{
-					buff.push_back(currentLine);
-					char *remainingLine = const_cast<char *>(currentLine.c_str());
-					char *spaceSeparatedWord = strtok (remainingLine, " ");
-					while (spaceSeparatedWord != NULL)
-					{
-						if (!strcmp(spaceSeparatedWord, "{")) //not sure if this always works but ok for now
-						{
-							stack.push(spaceSeparatedWord[0]);
-						}
-						if (!strcmp(spaceSeparatedWord, "}"))
-						{
-							stack.pop();
-							if (stack.empty() == true) // Always true if no { in first line
-							{
-								Server server;
-								servers.push_back(parseServer(buff, server)); //this should happen if we got "server already",
-								buff.clear();
-							}
-						}
-						spaceSeparatedWord = strtok (NULL, " ");
-					}
-				}
-			}
-			*/
-			// locations.push_back(parseLocation(extractLocationBlock(*it), location)); // Need To make extractLocationBlock
-		// }
-		// else
-		// {
-		// 	// throw error return = line where parsing error happend
-		// }
-		it++;
-	}
-	return server;
-	
-	//here call it until the end of the block of "server"
-	//Parse::selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)//get the buffer (block here)
-	//check line by line, if its server stuff
-
-	//otehrwite location
-
-}
-
 Location&	Parse::parseLocation(std::vector<std::string>& location_block, Location& location) //call it till the end of location block
 {
 	std::vector<std::string>::iterator it = location_block.begin();
-
+	std::cout << "ENTERED PARSE LOCATION" << std::endl;
 	while(it != location_block.end())
 	{
 		if (isLocationDirective(*it))
+		{
 			parseLocationDirective(*it, location);
+		}
 		else
 		{
 			//error print line where parsing error happend
@@ -217,6 +126,79 @@ Location&	Parse::parseLocation(std::vector<std::string>& location_block, Locatio
 	}
 	return location;
 }
+
+
+Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& server)
+{
+	std::vector<std::string>			buff;
+	std::vector<Location>				locations;
+	std::stack<char> 					stack;
+	std::vector<std::string>::iterator	it = server_block.begin();
+	std::vector<std::string>::iterator	itLocation;// = server_block.begin();
+
+	while(it != server_block.end())
+	{
+		//at this point we should set somehow if there was a "location line found"
+		char *remainingLine = const_cast<char *>((*it).c_str());
+		char *spaceSeparatedWord = strtok (remainingLine, "\t");
+		while (spaceSeparatedWord != NULL)
+		{
+			std::string directiveCheck(spaceSeparatedWord);
+			if (isDirective(directiveCheck) && stack.empty() == false)
+			{
+				parseDirective(*it, server); //call server w dtable
+				break ;
+			}
+			else if (directiveCheck == "location")
+			{
+				itLocation = it;
+				while(itLocation != server_block.end())
+				{
+					char *remainingLine = const_cast<char *>((*itLocation).c_str());
+					char *spaceSeparatedWord = strtok (remainingLine, " ");
+					while (spaceSeparatedWord != NULL)
+					{
+						directiveCheck = spaceSeparatedWord;
+						directiveCheck.erase(remove(directiveCheck.begin(), directiveCheck.end(), '\t'), directiveCheck.end()); // tab or so before
+						if (spaceSeparatedWord != NULL && strcmp(spaceSeparatedWord, "location") != 0)
+						{
+							buff.push_back(*itLocation);
+						}
+						if (!strcmp(spaceSeparatedWord, "{")) //not sure if this always works but ok for now
+						{
+							stack.push('{');
+						}
+						if (!strcmp(spaceSeparatedWord, "}"))
+						{
+							stack.pop();
+							if (isLocationDirective(directiveCheck) && stack.empty() == false)
+							{
+								Location instance;
+								parseLocation(buff, instance);
+								//parseLocationDirective(buff, instance)
+								//locations.push_back(); //this should happen if we got "server already",
+								buff.clear();
+							}
+						}
+						spaceSeparatedWord = strtok (NULL, " ");
+					}
+					itLocation++;
+				}	
+			}
+			spaceSeparatedWord = strtok (NULL, " ");
+		}
+		it++;
+	}
+	return server;
+		//here call it until the end of the block of "server"
+	//Parse::selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)//get the buffer (block here)
+	//check line by line, if its server stuff
+
+	//otehrwite location
+
+
+}
+	
 
 /*** 
  * Based on the currentWord, an associated parsing function will be called
@@ -226,7 +208,7 @@ Location&	Parse::parseLocation(std::vector<std::string>& location_block, Locatio
 void    Parse::parseDirective(std::string& currentLine, Server& server)
 {
 	std::string restOfLine;
-	std::cout << currentLine << " is currentline in parsedirectives " << std::endl;
+	//std::cout << "| " << currentLine << "| " << " IS CURRENTLINE BEFORE DISPATCH TABLE" << std::endl;
 	void	(Parse::*pointerToParseServerDirectives)(Server&, std::string&) = NULL;
 	const t_selectServer myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
 	{
@@ -238,28 +220,24 @@ void    Parse::parseDirective(std::string& currentLine, Server& server)
 	};
 
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	std::cout << *remainingLine << " IS REMAININGLINE " << std::endl;
-
 	char *spaceSeparatedWord = strtok (remainingLine, " ");
-		std::cout << *spaceSeparatedWord << " IS SPACESEPARATED " << std::endl;
-	///PROBLEM IS HERE, THIS DOES NOT SEE ANYTHING, NO REMAINNIN NEITHER SPACESEPARATED
 	while (spaceSeparatedWord != NULL)
 	{
 		std::string currentWord(spaceSeparatedWord);
 		for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR; i++)
 		{
+			currentLine.erase(remove(currentLine.begin(), currentLine.end(), '\t'), currentLine.end()); // tab or so before
 			if (currentWord == myDispatch[i]._name)
 			{
 				size_t      posInLine = currentWord.length();
 				restOfLine = currentLine.substr(posInLine + 1); //index index.html
-				std::cout << currentWord << " IS CURRENTWORD " << myDispatch[i]._name << " IS NAME" << std::endl;
 				pointerToParseServerDirectives = myDispatch[i].pointerToParseServerDirectives;
-				break ;
+				(this->*pointerToParseServerDirectives)(server, restOfLine);
+				return ;
 			}
 		}
 		spaceSeparatedWord = strtok (remainingLine, " ");
 	}
-	(this->*pointerToParseServerDirectives)(server, restOfLine);
 }
 
 //write static const dispatch table
