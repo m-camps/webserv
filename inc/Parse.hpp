@@ -5,8 +5,9 @@
 #include <vector>
 #include "Server.hpp"
 
+typedef std::vector<std::string>::iterator vecIt;
+
 #define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
-#define DEBUG true
 
 class Parse
 {

@@ -6,12 +6,13 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 18:13:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 12:45:59 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
 #include "../inc/Server.hpp"
+#include "../inc/Constants.hpp"
 #include "Exchange/Exchange.hpp"
 #include "Exchange/Request.hpp"
 
@@ -50,7 +51,6 @@ void Network::setup(std::string file)
 	// 	_servers.at(i).setPort(port);
 	// 	_servers.at(i).addToName(servername[i]);
 	// 	_servers.at(i).setup();
-	// 	std::cout << _servers.size() << "\n";
 	// }
 	_total_fd = _servers.size();
 	createFds();
@@ -103,7 +103,7 @@ void Network::run()
 					request.append(buff);
 					if (ret != BUFF)
 					{
-						std::cout << "POLL\n";
+						std::cout << "POLLING\n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(buff, exchange);
 					}	

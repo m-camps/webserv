@@ -1,6 +1,7 @@
 #include "../inc/Parse.hpp"
 #include "../inc/Server.hpp"
 #include "../inc/Location.hpp"
+#include "../inc/Constants.hpp"
 #include <fstream>
 #include <sstream>
 #include <string.h>
@@ -57,6 +58,27 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 		std::exit(EXIT_FAILURE);
 	}
 }
+
+std::vector<std::string> splitLineWithStrtok(std::string& line)
+{
+	char	*c_line = strdup(const_cast<char *>(line.c_str()));
+	char	*word;
+	std::vector<std::string> ret;
+
+	while ((word = strtok(c_line, " \t")))
+	{
+		ret.push_back(word);
+		c_line = NULL;
+	}
+	if (DEBUG)
+	{
+		for (size_t i = 0; i < ret.size(); i++)
+			std::cout  << "[word " << i << "]: " << ret[i] << '\n';
+	}
+	free(c_line);
+	return ret;
+}
+
 /***
  * Parse the configFile into individual Server Blocks // Server Block type vector<std::string>
  * 
@@ -78,37 +100,51 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>&
 	{
 		getline(configStream, currentLine);
 		if (configStream.good()) //we should check word by word?
-		{	
-			char *remainingLine = const_cast<char *>(currentLine.c_str());
-			char *spaceSeparatedWord = strtok (remainingLine, " ");
-			if (spaceSeparatedWord != NULL && strcmp(spaceSeparatedWord, "server") != 0)
+		{
+			std::vector<std::string> line = splitLineWithStrtok(currentLine);
+
+			if (!line.empty() && line[0].compare("server") != 0)
 			{
 				buff.push_back(currentLine);
 			}
-			while (spaceSeparatedWord != NULL)
+			for (vecIt it = line.begin(); it != line.end(); it++)
 			{
-				if (!strcmp(spaceSeparatedWord, "{")) //not sure if this always works but ok for now
+				if ((*it).compare("{") == 0)
 				{
 					stack.push('{');
 				}
-				if (!strcmp(spaceSeparatedWord, "}"))
+				if ((*it).compare("}") == 0)
 				{
 					stack.pop();
-					if (stack.empty() == 1) // Always true if no { in first line
+					if (stack.empty())
 					{
 						Server server;
-						servers.push_back(parseServer(buff, server)); //this should happen if we got "server already",
+						servers.push_back(parseServer(buff, server));
 						buff.clear();
+						std::cout << "SERVER SETUP\n" << server << '\n';
 					}
 				}
-
-				spaceSeparatedWord = strtok (NULL, " ");
 			}
 		}
 	}
 	return(servers);
 }
 
+std::vector<std::string>	extractLocation(std::vector<std::string>::iterator& it, std::vector<std::string>& server_block)
+{
+	std::vector<std::string> ret;
+
+	while (it != server_block.end())
+	{
+		ret.push_back(*it);
+		if ((*it).compare("\t}") == 0)
+		{
+			break ;
+		}
+		it++;
+	}
+	return ret;
+}
 
 Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& server)
 {
@@ -117,89 +153,28 @@ Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& serv
 	std::vector<std::string>::iterator	it = server_block.begin();
 	std::stack<char> stack;
 
-	// size_t i = 0;
-	// size_t block_size = server_block.size();
-	// while(i < block_size)
-	// {
-	// 	std::cout << it[i] << " " << std::endl;
-	// 	i++;
-	// }
-
-
-
 	while(it != server_block.end())
 	{
 		//at this point we should set somehow if there was a "location line found"
-		std::cout << *it << " is line" << std::endl;
-		//std::string								currentLine;
-		//int i = 0 ;
-
-		char *remainingLine = const_cast<char *>((*it).c_str());
-		char *spaceSeparatedWord = strtok (remainingLine, "\t");
-		while (spaceSeparatedWord != NULL)
+		std::vector<std::string> line = splitLineWithStrtok(*it);
+		if (!line.empty() && isDirective(line[0]))
 		{
-			std::string directiveCheck(spaceSeparatedWord);
-			if (isDirective(directiveCheck))
-			{
-				//std::cout << " giving " << *it << " to parsedirectives" << std::endl;
-				parseDirective(*it, server);
-				break ;
-			}
-			spaceSeparatedWord = strtok (NULL, " ");
+			parseDirective(*it, server);
 		}
-			
-		// //if (isDirective(*it)) //if its server directive, it is essentially a a line
-		// if (true) // Need to implement isLocationBlock(); //how can we check if its a location block?
-		// {
-		// 	Location location; //server locatons i guess is enough
-			//we have to do the same, push stuff into buffer until there is an opening and closing bracket
-			//
-			/*
-			while(!configStream.eof())
-			{
-				getline(configStream, currentLine);
-				if (configStream.good()) //we should check word by word?
-				{
-					buff.push_back(currentLine);
-					char *remainingLine = const_cast<char *>(currentLine.c_str());
-					char *spaceSeparatedWord = strtok (remainingLine, " ");
-					while (spaceSeparatedWord != NULL)
-					{
-						if (!strcmp(spaceSeparatedWord, "{")) //not sure if this always works but ok for now
-						{
-							stack.push(spaceSeparatedWord[0]);
-						}
-						if (!strcmp(spaceSeparatedWord, "}"))
-						{
-							stack.pop();
-							if (stack.empty() == true) // Always true if no { in first line
-							{
-								Server server;
-								servers.push_back(parseServer(buff, server)); //this should happen if we got "server already",
-								buff.clear();
-							}
-						}
-						spaceSeparatedWord = strtok (NULL, " ");
-					}
-				}
-			}
-			*/
-			// locations.push_back(parseLocation(extractLocationBlock(*it), location)); // Need To make extractLocationBlock
-		// }
-		// else
-		// {
-		// 	// throw error return = line where parsing error happend
-		// }
+		else if(line[0] == "location")
+		{
+			Location	location;
+			std::vector<std::string> location_block = extractLocation(it, server_block);
+			locations.push_back(parseLocation(location_block, location));
+			std::cout << locations[0] << "\n";
+		}
+		else
+		{
+			// throw(error); and return currentline;
+		}
 		it++;
 	}
 	return server;
-	
-	//here call it until the end of the block of "server"
-	//Parse::selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)//get the buffer (block here)
-	//check line by line, if its server stuff
-
-	//otehrwite location
-
 }
 
 Location&	Parse::parseLocation(std::vector<std::string>& location_block, Location& location) //call it till the end of location block
@@ -208,14 +183,30 @@ Location&	Parse::parseLocation(std::vector<std::string>& location_block, Locatio
 
 	while(it != location_block.end())
 	{
-		if (isLocationDirective(*it))
+		std::vector<std::string> line = splitLineWithStrtok(*it);
+
+
+		if (!line.empty() && isLocationDirective(line[0]))
 			parseLocationDirective(*it, location);
 		else
 		{
 			//error print line where parsing error happend
 		}
+		it++;
 	}
 	return location;
+}
+
+std::string convertFromVector(std::vector<std::string> line)
+{
+	std::string ret = "";
+
+	ret = ret + line[1];
+	for (size_t i = 2; i < line.size(); i++)
+	{
+		ret = ret + " " + line[i];
+ 	}
+	return (ret);
 }
 
 /*** 
@@ -226,7 +217,8 @@ Location&	Parse::parseLocation(std::vector<std::string>& location_block, Locatio
 void    Parse::parseDirective(std::string& currentLine, Server& server)
 {
 	std::string restOfLine;
-	std::cout << currentLine << " is currentline in parsedirectives " << std::endl;
+	std::vector<std::string> line = splitLineWithStrtok(currentLine);
+	
 	void	(Parse::*pointerToParseServerDirectives)(Server&, std::string&) = NULL;
 	const t_selectServer myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
 	{
@@ -237,36 +229,19 @@ void    Parse::parseDirective(std::string& currentLine, Server& server)
 			{"client_body_size", &Parse::parseClientBodySize},
 	};
 
-	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	std::cout << *remainingLine << " IS REMAININGLINE " << std::endl;
-
-	char *spaceSeparatedWord = strtok (remainingLine, " ");
-		std::cout << *spaceSeparatedWord << " IS SPACESEPARATED " << std::endl;
-	///PROBLEM IS HERE, THIS DOES NOT SEE ANYTHING, NO REMAINNIN NEITHER SPACESEPARATED
-	while (spaceSeparatedWord != NULL)
+	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR; i++)
 	{
-		std::string currentWord(spaceSeparatedWord);
-		for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR; i++)
+		if (line[0] == myDispatch[i]._name)
 		{
-			if (currentWord == myDispatch[i]._name)
-			{
-				size_t      posInLine = currentWord.length();
-				restOfLine = currentLine.substr(posInLine + 1); //index index.html
-				std::cout << currentWord << " IS CURRENTWORD " << myDispatch[i]._name << " IS NAME" << std::endl;
-				pointerToParseServerDirectives = myDispatch[i].pointerToParseServerDirectives;
-				break ;
-			}
+			restOfLine = convertFromVector(line);
+			pointerToParseServerDirectives = myDispatch[i].pointerToParseServerDirectives;
+			break ;
 		}
-		spaceSeparatedWord = strtok (remainingLine, " ");
 	}
-	(this->*pointerToParseServerDirectives)(server, restOfLine);
+	if (pointerToParseServerDirectives)
+		(this->*pointerToParseServerDirectives)(server, restOfLine);
 }
 
-//write static const dispatch table
-///
-///
-//
-//asdasd
 
 void    Parse::parseLocationDirective(std::string& currentLine, Location& locationInstance)
 {
@@ -274,9 +249,11 @@ void    Parse::parseLocationDirective(std::string& currentLine, Location& locati
 	//location structure, we can just get the one (current from server, declare it here and use that var to pull data from)
 	//create here and add to server?
 	//locationInstance.
-	//if this would be static 
-	void	(Location::*pointerToLocation)(std::string&) = NULL;
+	//if this would be static
 
+	std::string restOfLine;
+	std::vector<std::string> line = splitLineWithStrtok(currentLine);
+	void	(Location::*pointerToLocation)(std::string&) = NULL;
 	const t_selectLocation myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
 	{
 			{"root", &Location::setLocationRoot},
@@ -287,24 +264,48 @@ void    Parse::parseLocationDirective(std::string& currentLine, Location& locati
 			{"cgi_file_extension", &Location::setCgiFileExtension}
 	};
 
-	//not sure if this
-	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, " ");
-	while (spaceSeparatedWord != NULL)
+	for (int i = 0; i < 6; i++)
 	{
-		std::string currentWord(spaceSeparatedWord);
-		for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++) //have to alter macro
+		if (line[0] == myDispatch[i]._name)
 		{
-			if (currentWord == myDispatch[i]._name)
-			{
-				size_t      posInLine = currentWord.length();
-				std::string restOfLine = currentLine.substr(posInLine + 2);
-				pointerToLocation = myDispatch[i].pointerToLocation;
-				(&locationInstance->*pointerToLocation)(restOfLine);
-			}
+			restOfLine = convertFromVector(line);
+			pointerToLocation = myDispatch[i].pointerToLocation;
+			break ;
 		}
-		spaceSeparatedWord = strtok (NULL, " ");
 	}
+	if (pointerToLocation)
+		(&locationInstance->*pointerToLocation)(restOfLine);
+
+	// void	(Location::*pointerToLocation)(std::string&) = NULL;
+
+	// const t_selectLocation myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
+	// {
+	// 		{"root", &Location::setLocationRoot},
+	// 		{"index", &Location::setLocationIndex},
+	// 		{"allow_methods", &Location::setLocationAllowMethod},
+	// 		{"autoindex", &Location::setLocationAutoindex},
+	// 		{"cgi_name", &Location::setCgiName},
+	// 		{"cgi_file_extension", &Location::setCgiFileExtension}
+	// };
+
+	// //not sure if this
+	// char *remainingLine = const_cast<char *>(currentLine.c_str());
+	// char *spaceSeparatedWord = strtok (remainingLine, " ");
+	// while (spaceSeparatedWord != NULL)
+	// {
+	// 	std::string currentWord(spaceSeparatedWord);
+	// 	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++) //have to alter macro
+	// 	{
+	// 		if (currentWord == myDispatch[i]._name)
+	// 		{
+	// 			size_t      posInLine = currentWord.length();
+	// 			std::string restOfLine = currentLine.substr(posInLine + 2);
+	// 			pointerToLocation = myDispatch[i].pointerToLocation;
+	// 			(&locationInstance->*pointerToLocation)(restOfLine);
+	// 		}
+	// 	}
+	// 	spaceSeparatedWord = strtok (NULL, " ");
+	// }
 }
 
 
@@ -397,7 +398,9 @@ void    Parse::parseLocationDirective(std::string& currentLine, Location& locati
 bool    Parse::isDirective(std::string& currentWord)
 {
 	//what happens if the word is empty? wouldnt == overload return true? 
-	return (currentWord == "server_name" || currentWord == "root" || currentWord == "index" || currentWord == "client_body_size");
+	return (currentWord == "server_name" || currentWord == "root" || \
+			currentWord == "index" || currentWord == "client_body_size" || \
+			currentWord == "listen" || currentWord == "error_page");
 			//currentWord == "location"); adding location later
 }
 
@@ -439,7 +442,7 @@ void    Parse::parseIndex(Server& server, std::string& currentLine)
 {
 	(void)server;
 	currentLine.erase(remove(currentLine.begin(), currentLine.end(), ';'), currentLine.end()); //index.html
-	//server.setIndex(currentLine);
+	server.setIndex(currentLine);
 	
 	return ;
 }

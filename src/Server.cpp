@@ -6,13 +6,13 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 16:44:11 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 17:54:36 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 #include "../inc/Location.hpp"
-
+#include "../inc/Constants.hpp"
 #include <iostream>
 
 Server::Server()
@@ -89,9 +89,9 @@ int		Server::acceptConnection()
 	
 
 	int	clientFd = accept(_socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
-	if (clientFd != -1)
+	if (clientFd != -1 && DEBUG)
 	{
-		std::cout << "Server: ["<<_names.back() << ":" << _port <<   "]\n";
+		std::cout << "["<<_names.back() << ":" << _port <<   "] ";
 		std::cout << "Accepted connection from adress: " << client_addr.sin_addr.s_addr <<  "\n";
 	}
 	_client_fds.push_back(clientFd);
@@ -168,9 +168,10 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
         stream << server.getClientFds().at(i) << " ";
 	stream << "]\n";
 
-	// std::map<std::string, Location>::iterator it = server.getLocations().begin();
-	// while (it != server.getLocations().end())
-	// 	stream << &it->second << "\n";
+	std::map<std::string, Location>::iterator it = server.getLocations().begin();
+	std::cout << server.getLocations().size() << " locsize\n";
+	while (it != server.getLocations().end())
+		stream << &it->second << "\n";
     return stream;
 }
 
