@@ -4,6 +4,8 @@
 
 #include "Respond.hpp"
 
+#define ERROR 1
+
 #pragma region "ctor & dtor"
 
 ////////// Ctor & Dtor ///////////
@@ -73,46 +75,66 @@ void Respond::BuildGet(void)
 	std::string Root = _Exchanger.getServer().getRoot().back();
 	HashMap tempMap = _Exchanger.getHashMap();
 
+    std::cout << "GET" << std::endl;
 	try
 	{
-		// Get status-code
 		relativePath = Root + tempMap.find("Path")->second;
 		uint32_t StatusCode = modifyStatusCode(tempMap, relativePath);
 		_Exchanger.setStatusCode(StatusCode);
 
-		// Check if file is valid & if so, open its content.
-		// If not, redirect to "index.html"
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+        if (StatusCode == 301)
+        {
+            setStatus();
+            setLocation("/index.html");
+            return ;
+        }
 
-		// Put the content length and body in the exchanger.
 		setStatus();
 		_Exchanger.setBody(FileContent);
 		setContentLength(_Exchanger.getBody().length());
 	}
 	catch (const std::exception& e)
 	{
-		// If "getValidFile fails, it will be catched and redirected to "index.html"
-		setStatus();
-		setLocation(e.what());
+        std::cerr << "Fatal Error" << std::endl;
+        std::exit(ERROR);
 	}
 }
 
+/* //////////////////////////// */
+
+void Respond::BuildDelete()
+{
+    std::cout << "DELETE" << std::endl;
+    return ;
+}
+
+/* //////////////////////////// */
+
+void Respond::BuildPost()
+{
+    std::cout << "POST" << std::endl;
+    return ;
+}
+
+/* //////////////////////////// */
+
 void Respond::ResponseBuilder(void)
 {
-	typedef void (Respond::*FuncPointer)(void);
-
-
 	struct s_Methods
 	{
 		std::string Method;
-		FuncPointer function;
+		void (Respond::*FuncPointer)(void);
 	}   t_Methods;
+
+    void (Respond::*FuncPointer)(void) = nullptr;
 
 	const s_Methods CompareMethods [3] = {
 			{ "GET", &Respond::BuildGet },
 			{ "POST", &Respond::BuildPost },
 			{ "DELETE", &Respond::BuildDelete }
 	};
+
 	HashMap HashMap = _Exchanger.getHashMap();
 	std::string Method = HashMap.find("HTTPMethod")->second;
 
@@ -120,7 +142,9 @@ void Respond::ResponseBuilder(void)
 	{
 		if (Method == CompareMethods[i].Method)
 		{
-			CompareMethods[i].function;
+			FuncPointer = CompareMethods[i].FuncPointer;
+            (this->*FuncPointer)();
+            break ;
 		}
 	}
 }
@@ -184,7 +208,7 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 				FileContent = readFile(relativePath);
 				break ;
 			case e_REDIR:
-				throw (std::runtime_error("/index.html"));
+                break ;
 			case e_NOTFOUND:
 				FileContent = readFile(Root + "/Error404.html");
 				break ;

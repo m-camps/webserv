@@ -13,7 +13,7 @@ std::string defaultStatusPage(uint32_t StatusCode)
 	return (
 			"<!DOCTYPE html>\n"
 			"<body>\n"
-			"<h1>ERROR" + std::to_string(StatusCode) +
+			"<h1>ERROR " + std::to_string(StatusCode) +
 			"</h1>\n"
 			"</body>\n"
 			"</html>"

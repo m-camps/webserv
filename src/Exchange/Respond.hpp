@@ -40,6 +40,7 @@ private:
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);
+
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
 
