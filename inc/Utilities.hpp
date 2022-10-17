@@ -18,3 +18,5 @@
 std::vector<int> findCharLocation(std::string& line, int32_t c);
 
 std::string readFile(const std::string&);
+
+std::string defaultStatusPage(uint32_t StatusCode);

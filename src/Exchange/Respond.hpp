@@ -37,10 +37,13 @@ private:
 	const std::string getFavicon(void);
 
     void ResponseBuilder(void);
+	void BuildGet(void);
+	void BuildPost(void);
+	void BuildDelete(void);
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
 
-    // Private Seters
+    // Private Setters
     void setStatus(void);
     void setContentLength(std::size_t);
 	void setLocation(const std::string);

@@ -59,38 +59,70 @@ bool Respond::CheckConnectionStatus(void)
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << "Client disconnected" << std::endl;
 	}
 	return (false);
 }
 
 /* //////////////////////////// */
 
-void Respond::ResponseBuilder(void)
+void Respond::BuildGet(void)
 {
-    std::string FileContent;
-    std::string relativePath;
-    std::string Root = _Exchanger.getServer().getRoot().back();
-    HashMap tempMap = _Exchanger.getHashMap();
+	std::string FileContent;
+	std::string relativePath;
+	std::string Root = _Exchanger.getServer().getRoot().back();
+	HashMap tempMap = _Exchanger.getHashMap();
 
-    try
-    {
-        relativePath = Root + tempMap.find("Path")->second;
-        uint32_t StatusCode = modifyStatusCode(tempMap, relativePath);
-        _Exchanger.setStatusCode(StatusCode);
+	try
+	{
+		// Get status-code
+		relativePath = Root + tempMap.find("Path")->second;
+		uint32_t StatusCode = modifyStatusCode(tempMap, relativePath);
+		_Exchanger.setStatusCode(StatusCode);
 
-	    FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+		// Check if file is valid & if so, open its content.
+		// If not, redirect to "index.html"
+		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
 
+		// Put the content length and body in the exchanger.
 		setStatus();
-        _Exchanger.setBody(FileContent);
+		_Exchanger.setBody(FileContent);
 		setContentLength(_Exchanger.getBody().length());
-    }
-    catch (const std::exception& e)
-    {
-		// Gonna change this for sure.
+	}
+	catch (const std::exception& e)
+	{
+		// If "getValidFile fails, it will be catched and redirected to "index.html"
 		setStatus();
 		setLocation(e.what());
-    }
+	}
+}
+
+void Respond::ResponseBuilder(void)
+{
+	typedef void (Respond::*FuncPointer)(void);
+
+
+	struct s_Methods
+	{
+		std::string Method;
+		FuncPointer function;
+	}   t_Methods;
+
+	const s_Methods CompareMethods [3] = {
+			{ "GET", &Respond::BuildGet },
+			{ "POST", &Respond::BuildPost },
+			{ "DELETE", &Respond::BuildDelete }
+	};
+	HashMap HashMap = _Exchanger.getHashMap();
+	std::string Method = HashMap.find("HTTPMethod")->second;
+
+	for (int32_t i = 0; i < 3; i++)
+	{
+		if (Method == CompareMethods[i].Method)
+		{
+			CompareMethods[i].function;
+		}
+	}
 }
 
 /* //////////////////////////// */
@@ -144,16 +176,23 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 {
 	std::string FileContent;
 
-	switch (StatusCode)
+	try
 	{
-		case e_OK:
-			FileContent = readFile(relativePath);
-			break ;
-		case e_REDIR:
-			throw(std::runtime_error("/index.html"));
-		case e_ERROR:
-			FileContent = readFile(Root + "/Error404.html");
-			break ;
+		switch (StatusCode)
+		{
+			case e_OK:
+				FileContent = readFile(relativePath);
+				break ;
+			case e_REDIR:
+				throw (std::runtime_error("/index.html"));
+			case e_NOTFOUND:
+				FileContent = readFile(Root + "/Error404.html");
+				break ;
+		}
+	}
+	catch (const std::exception& e)
+	{
+		FileContent = defaultStatusPage(StatusCode);
 	}
 	return (FileContent);
 }
@@ -192,13 +231,13 @@ void Respond::setStatus(void)
     switch (_Exchanger.getStatusCode())
     {
         case e_OK:
-		    StatusLine += " 200 OK\r\n";
+		    StatusLine += " 200\r\n";
 			break ;
         case e_REDIR:
-			StatusLine += " 301 Moved Permanently\r\n";
+			StatusLine += " 301\r\n";
             break ;
-        case e_ERROR:
-		    StatusLine += " 404 Not Found\r\n";
+        case e_NOTFOUND:
+		    StatusLine += " 404\r\n";
 			break ;
     }
 	_Exchanger.setHeader(StatusLine);
