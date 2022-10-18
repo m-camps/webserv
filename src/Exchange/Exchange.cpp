@@ -63,6 +63,13 @@ HashMap Exchange::getHashMap(void) const
 
 /* //////////////////////////// */
 
+std::string Exchange::getHashMapString(const std::string& RequestedMap) const
+{
+    return (_dictHeader.find(RequestedMap)->second);
+}
+
+/* //////////////////////////// */
+
 std::string Exchange::getHeader(void) const
 {
 	return (_header);

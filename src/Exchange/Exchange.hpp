@@ -23,6 +23,7 @@ public:
     // Geters
     Server getServer(void) const;
     HashMap getHashMap(void) const;
+    std::string getHashMapString(const std::string&) const;
 	std::string getHeader(void) const;
     std::string getBody(void) const;
     uint32_t getStatusCode(void) const;

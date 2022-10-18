@@ -35,5 +35,6 @@ std::string readFile(const std::string& RespondedFile)
     File.read(FileContent, len);
 
     std::string FileContentStr(FileContent);
+    delete [] FileContent;
     return (FileContentStr);
 }

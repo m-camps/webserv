@@ -96,7 +96,7 @@ void Respond::BuildGet(void)
 	}
 	catch (const std::exception& e)
 	{
-        std::cerr << "Fatal Error" << std::endl;
+        std::cerr << "Fatal Error: " << e.what() << std::endl;
         std::exit(ERROR);
 	}
 }
@@ -111,13 +111,26 @@ void Respond::BuildDelete()
 
 /* //////////////////////////// */
 
+void Respond::putBodyInFile(std::string& Body)
+{
+    std::string word;
+    std::ofstream File("test.html");
+    std::istringstream iss(Body);
+    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
+    std::string boundry = "--";
+    std::size_t found = ContentType.find('=');
+
+    if (found == std::string::npos)
+        throw("No boundry");
+    boundry += ContentType.substr(found + 1, ContentType.size() - found);
+    File << Body;
+}
+
+/* //////////////////////////// */
+
 void Respond::BuildPost()
 {
-    std::string line;
     std::string Body = _Exchanger.getHashMap().find("Body")->second;
-    std::ofstream File("test.png");
-    std::istringstream issBody(Body);
-    std::fstream pic(".png");
 
     std::cout << "POST" << std::endl;
     try
@@ -125,7 +138,7 @@ void Respond::BuildPost()
         generateStatus();
         generateContentType();
 
-
+        putBodyInFile(Body);
         _Exchanger.setBody(Body);
     }
     catch (const std::exception& e)

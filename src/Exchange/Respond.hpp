@@ -44,6 +44,7 @@ private:
 
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
+    void putBodyInFile(std::string&);
 
     // Generate
     void generateStatus(void);
