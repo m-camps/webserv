@@ -113,14 +113,19 @@ void Respond::BuildDelete()
 
 void Respond::BuildPost()
 {
+    std::string line;
     std::string Body = _Exchanger.getHashMap().find("Body")->second;
+    std::ofstream File("test.png");
+    std::istringstream issBody(Body);
+    std::fstream pic(".png");
 
     std::cout << "POST" << std::endl;
-    std::cout << Body << std::endl;
     try
     {
         generateStatus();
         generateContentType();
+
+
         _Exchanger.setBody(Body);
     }
     catch (const std::exception& e)

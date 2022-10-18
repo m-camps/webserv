@@ -5,6 +5,16 @@
 #include <iostream>
 #include <fstream>
 
+int64_t getLength(std::ifstream& File)
+{
+    int64_t len;
+
+    File.seekg(0, File.end);
+    len = File.tellg();
+    File.seekg(0, File.beg);
+    return (len);
+}
+
 /*
  * /data/www/ does not work...
  * data/www/ does... lol
@@ -13,16 +23,17 @@
 */
 std::string readFile(const std::string& RespondedFile)
 {
+    int64_t len;
     std::ifstream File;
-    std::string line;
-    std::string FileContent;
 
     File.open(RespondedFile);
     if (!File.is_open())
         throw (std::invalid_argument("File does not exist."));
 
-    while (std::getline(File, line))
-        FileContent += line;
+    len = getLength(File);
+    char *FileContent = new char [len];
+    File.read(FileContent, len);
 
-    return (FileContent);
+    std::string FileContentStr(FileContent);
+    return (FileContentStr);
 }
