@@ -95,7 +95,7 @@ int32_t	main(int argc, char *argv[])
     int32_t ListenSocket = 0;
 
     fcntl(ListenSocket, F_SETFL, O_NONBLOCK);
-    char buffer[30000] = {0};
+    char buffer[1000000] = {0};
 
 	while (true) {
 		std::cout << "\n+++++++ Waiting for new connection ++++++++\n\n" << std::endl;

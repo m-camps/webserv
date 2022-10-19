@@ -128,15 +128,61 @@ void Respond::putBodyInFile(std::string& Body)
 
 /* //////////////////////////// */
 
+std::string Respond::generateBoundry(void)
+{
+    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
+
+    std::size_t found = ContentType.find('=');
+    if (found == std::string::npos)
+    {
+        std::cerr << "No boundry found" << std::endl;
+        std::exit(ERROR);
+    }
+    return (ContentType.substr(found + 1, ContentType.length() - found));
+}
+
+/* //////////////////////////// */
+
+#define CRLF "\r\n"
+
+std::string Respond::getDataOfBody(void)
+{
+    std::string MetaData;
+    std::string ContentFile;
+    std::string RequestBody = _Exchanger.getHashMapString("Body");
+    std::string Boundry = generateBoundry();
+
+
+//    std::cout << RequestBody << std::endl;
+    RequestBody = RequestBody.substr(Boundry.length() + 8, RequestBody.length() - (Boundry.length() * 2) - 16);
+
+    std::size_t found;
+
+    while ((found = RequestBody.find(CRLF)) != std::string::npos)
+    {
+        std::cout << found << std::endl;
+        std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
+        MetaData += RequestBody.substr(0, found) + "\n";
+        RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+    }
+    ContentFile = RequestBody.substr(0, RequestBody.length());
+    std::cout << "Metadata: \n" << MetaData << std::endl;
+    std::cout << "ContentFile: \n" << ContentFile << std::endl;
+
+    return (ContentFile);
+}
+
+/* //////////////////////////// */
+
 void Respond::BuildPost()
 {
-    std::string Body = _Exchanger.getHashMap().find("Body")->second;
+    std::string Body = _Exchanger.getHashMapString("Body");
 
     std::cout << "POST" << std::endl;
     try
     {
         generateStatus();
-        generateContentType();
+        Body = getDataOfBody();
 
         putBodyInFile(Body);
         _Exchanger.setBody(Body);
@@ -166,8 +212,7 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
-	HashMap HashMap = _Exchanger.getHashMap();
-	std::string Method = HashMap.find("HTTPMethod")->second;
+	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
 
 	for (int32_t i = 0; i < 3; i++)
 	{
@@ -322,7 +367,7 @@ void Respond::generateLocation(const std::string NewLocation)
 void Respond::generateContentType(void)
 {
     std::string line;
-    std::string RequestBody = _Exchanger.getHashMap().find("Body")->second;
+    std::string RequestBody = _Exchanger.getHashMapString("Body");
     std::istringstream issBody(RequestBody);
 
     while (std::getline(issBody, line))

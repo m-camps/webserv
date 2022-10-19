@@ -32,7 +32,17 @@ std::string readFile(const std::string& RespondedFile)
 
     len = getLength(File);
     char *FileContent = new char [len];
-    File.read(FileContent, len);
+
+    try
+    {
+        File.read(FileContent, len);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        std::exit(1);
+    }
+    File.close();
 
     std::string FileContentStr(FileContent);
     delete [] FileContent;

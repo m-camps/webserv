@@ -45,12 +45,14 @@ private:
 	void RespondToClient(void);
 	bool CheckConnectionStatus(void);
     void putBodyInFile(std::string&);
+    std::string getDataOfBody(void);
 
     // Generate
     void generateStatus(void);
     void generateContentLength(std::size_t);
 	void generateLocation(const std::string);
 	void generateContentType(void);
+    std::string generateBoundry(void);
 };
 
 #endif //WEBSERV_RESPOND_HPP
