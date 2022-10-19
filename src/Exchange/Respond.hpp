@@ -17,7 +17,7 @@
 
 typedef std::map<std::string, std::string> HashMap;
 
-uint32_t modifyStatusCode(HashMap, const std::string&);
+uint32_t modifyStatusCode(std::string, const std::string&);
 std::string getValidFile(std::string, std::string, uint32_t);
 
 class Respond
@@ -34,6 +34,9 @@ private:
 
     Exchange _Exchanger;
 
+    // Tijdelijk
+    std::string _MetaData;
+
 	std::size_t getBodySize(std::string&) const;
 
     void ResponseBuilder(void);
@@ -42,8 +45,7 @@ private:
 	void BuildDelete(void);
 
 	void RespondToClient(void);
-	bool CheckConnectionStatus(void);
-    void putBodyInFile(std::string&);
+    void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
 
     // Generate
