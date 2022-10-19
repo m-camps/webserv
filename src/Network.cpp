@@ -91,14 +91,13 @@ void Network::run()
 						delFromPollFds(i);
 					}
 					request.append(buff);
-					if (ret != BUFF)
+					if (ret != BUFF && ret > 0)
 					{
 						// std::cout << "POLLING\n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(buff, exchange);
-					}	
-
-					*buff = '\0';
+					}
+					bzero(buff, '\0');
 				}
 			}
 		}

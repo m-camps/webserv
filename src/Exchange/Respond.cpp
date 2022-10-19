@@ -224,10 +224,10 @@ void Respond::RespondToClient(void)
 
 	std::string response =
 			Header +
-			"\r\n\r\n" +
+			"\r\n" +
             Body;
 
-	send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
+    send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
 #pragma region "NonClass functions"
@@ -323,7 +323,7 @@ void Respond::generateStatus(void)
 
 void Respond::generateContentLength(std::size_t BodyLength)
 {
-    std::string ContentLength = "Content-Length: " + std::to_string(BodyLength + 2) + "\r\n";
+    std::string ContentLength = "Content-Length: " + std::to_string(BodyLength) + "\r\n";
 	_Exchanger.addLineToHeader(ContentLength);
 }
 

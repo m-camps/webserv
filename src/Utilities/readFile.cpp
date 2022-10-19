@@ -44,7 +44,8 @@ std::string readFile(const std::string& RespondedFile)
     }
     File.close();
 
-    std::string FileContentStr(FileContent);
+    std::string FileContentStr;
+    FileContentStr.append(FileContent, len);
     delete [] FileContent;
     return (FileContentStr);
 }
