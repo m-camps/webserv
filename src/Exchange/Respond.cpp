@@ -44,49 +44,27 @@ Respond& Respond::operator=(const Respond& ref)
 
 //////////// Responder ////////////
 
-bool Respond::CheckConnectionStatus(void)
-{
-    HashMap tempMap = _Exchanger.getHashMap();
-
-	try
-	{
-		HashMap::iterator ConnectionValue = tempMap.find("Connection");
-
-		if (ConnectionValue->second == "keep-alive")
-		{
-			std::cout << "Client is connected" << "\n";
-			return (true);
-		}
-		std::cerr << "Client disconnected" << std::endl;
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "Client disconnected" << std::endl;
-	}
-	return (false);
-}
-
-/* //////////////////////////// */
-
 void Respond::BuildGet(void)
 {
 	std::string FileContent;
 	std::string relativePath;
 	std::string Root = _Exchanger.getServer().getRoot();
-	HashMap tempMap = _Exchanger.getHashMap();
+	std::string Path = _Exchanger.getHashMapString("Path");
 
     std::cout << "GET" << std::endl;
 	try
 	{
-		relativePath = Root + tempMap.find("Path")->second;
-		uint32_t StatusCode = modifyStatusCode(tempMap, relativePath);
+		relativePath = Root + Path;
+		uint32_t StatusCode = modifyStatusCode(Path, relativePath);
 		_Exchanger.setStatusCode(StatusCode);
 
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
         if (StatusCode == 301)
         {
+            const std::string NewLocation = _Exchanger.getServer().getIndex();
+
             generateStatus();
-            generateLocation("/index.html");
+            generateLocation(NewLocation);
             return ;
         }
 
@@ -105,24 +83,42 @@ void Respond::BuildGet(void)
 
 void Respond::BuildDelete()
 {
+    std::string relativePath;
+    std::string Root = _Exchanger.getServer().getRoot();
+    std::string Path = _Exchanger.getHashMapString("Path");
+
     std::cout << "DELETE" << std::endl;
-    return ;
+    try
+    {
+        relativePath = Root + Path;
+        uint32_t StatusCode = modifyStatusCode(Path, relativePath);
+        _Exchanger.setStatusCode(StatusCode);
+
+        getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+
+        generateStatus();
+        _Exchanger.setBody("");
+        generateContentLength(_Exchanger.getBody().length());
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Fatal Error: " << e.what() << std::endl;
+        std::exit(ERROR);
+    }
 }
 
 /* //////////////////////////// */
 
-void Respond::putBodyInFile(std::string& Body)
+void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
-    std::string word;
-    std::ofstream File("test.html");
-    std::istringstream iss(Body);
-    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
-    std::string boundry = "--";
-    std::size_t found = ContentType.find('=');
+    std::string ContentType;
+    std::size_t found = MetaData.find("Content-Type:");
+    std::ofstream File("data/www/test.html");
 
-    if (found == std::string::npos)
-        throw("No boundry");
-    boundry += ContentType.substr(found + 1, ContentType.size() - found);
+    std::cout << found << std::endl;
+
+    std::cout << ContentType << std::endl;
+
     File << Body;
 }
 
@@ -132,27 +128,21 @@ void Respond::putBodyInFile(std::string& Body)
 
 std::string Respond::getDataOfBody(void)
 {
-    std::string MetaData;
     std::string ContentFile;
     std::string RequestBody = _Exchanger.getHashMapString("Body");
     std::string Boundry = generateBoundry();
 
-
-    std::cout << RequestBody << std::endl;
-    RequestBody = RequestBody.substr(Boundry.length() + 8, RequestBody.length() - (Boundry.length() * 2) - 16);
+    RequestBody = RequestBody.substr(Boundry.length() + 8,
+                                     RequestBody.length() - (Boundry.length() * 2) - 16);
 
     std::size_t found;
 
     while ((found = RequestBody.find(CRLF)) != std::string::npos)
     {
-        std::cout << found << std::endl;
-        std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
-        MetaData += RequestBody.substr(0, found) + "\n";
+        _MetaData += RequestBody.substr(0, found) + "\n";
         RequestBody = RequestBody.substr(found + 2, RequestBody.length());
     }
     ContentFile = RequestBody.substr(0, RequestBody.length());
-     std::cout << "Metadata: \n" << MetaData << std::endl;
-     std::cout << "ContentFile: \n" << ContentFile << std::endl;
 
     return (ContentFile);
 }
@@ -161,6 +151,7 @@ std::string Respond::getDataOfBody(void)
 
 void Respond::BuildPost()
 {
+    std::string MetaData;
     std::string Body = _Exchanger.getHashMapString("Body");
 
     std::cout << "POST" << std::endl;
@@ -169,7 +160,7 @@ void Respond::BuildPost()
         generateStatus();
         Body = getDataOfBody();
 
-        putBodyInFile(Body);
+        putBodyInFile(_MetaData, Body);
         _Exchanger.setBody(Body);
     }
     catch (const std::exception& e)
@@ -234,20 +225,12 @@ void Respond::RespondToClient(void)
 
 /* ///////// External Functions ////////// */
 
-uint32_t modifyStatusCode(HashMap Map, const std::string& relativePath)
+uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 {
-	std::string Path = Map.find("Path")->second;
-
 	if ("/" == Path)
 		return (301);
-	try
-	{
-		readFile(relativePath);
-	}
-	catch (const std::exception& e)
-	{
+    if (access(relativePath.c_str(), F_OK) != 0)
 		return (404);
-	}
 	return (200);
 }
 
