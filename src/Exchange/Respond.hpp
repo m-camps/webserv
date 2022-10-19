@@ -35,7 +35,6 @@ private:
     Exchange _Exchanger;
 
 	std::size_t getBodySize(std::string&) const;
-	const std::string getFavicon(void);
 
     void ResponseBuilder(void);
 	void BuildGet(void);

@@ -128,21 +128,6 @@ void Respond::putBodyInFile(std::string& Body)
 
 /* //////////////////////////// */
 
-std::string Respond::generateBoundry(void)
-{
-    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
-
-    std::size_t found = ContentType.find('=');
-    if (found == std::string::npos)
-    {
-        std::cerr << "No boundry found" << std::endl;
-        std::exit(ERROR);
-    }
-    return (ContentType.substr(found + 1, ContentType.length() - found));
-}
-
-/* //////////////////////////// */
-
 #define CRLF "\r\n"
 
 std::string Respond::getDataOfBody(void)
@@ -189,7 +174,8 @@ void Respond::BuildPost()
     }
     catch (const std::exception& e)
     {
-
+        std::cerr << e.what() << std::endl;
+        std::exit(1);
     }
     return ;
 }
@@ -231,15 +217,8 @@ void Respond::RespondToClient(void)
 {
     std::string Body;
 	std::string Header;
-    Server tempServer = _Exchanger.getServer();
-    HashMap tempMap = _Exchanger.getHashMap();
 
     ResponseBuilder();
-
-//    std::cout <<
-//        "Body: \n" <<
-//        tempMap.find("Body")->second <<
-//    "\n";
 
 	Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
@@ -311,11 +290,6 @@ std::size_t Respond::getBodySize(std::string& Body) const
 	return (Body.length());
 }
 
-const std::string Respond::getFavicon(void)
-{
-	return (readFile("data/www/favicon.html"));
-}
-
 #pragma endregion Getter
 
 #pragma region generators
@@ -378,6 +352,21 @@ void Respond::generateContentType(void)
             return ;
         }
     }
+}
+
+/* //////////////////////////// */
+
+std::string Respond::generateBoundry(void)
+{
+    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
+
+    std::size_t found = ContentType.find('=');
+    if (found == std::string::npos)
+    {
+        std::cerr << "No boundry found" << std::endl;
+        std::exit(ERROR);
+    }
+    return (ContentType.substr(found + 1, ContentType.length() - found));
 }
 
 #pragma endregion generators
