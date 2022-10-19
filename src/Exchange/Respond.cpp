@@ -138,21 +138,21 @@ std::string Respond::getDataOfBody(void)
     std::string Boundry = generateBoundry();
 
 
-//    std::cout << RequestBody << std::endl;
+    std::cout << RequestBody << std::endl;
     RequestBody = RequestBody.substr(Boundry.length() + 8, RequestBody.length() - (Boundry.length() * 2) - 16);
 
     std::size_t found;
 
     while ((found = RequestBody.find(CRLF)) != std::string::npos)
     {
-        // std::cout << found << std::endl;
-        // std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
+        std::cout << found << std::endl;
+        std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
         MetaData += RequestBody.substr(0, found) + "\n";
         RequestBody = RequestBody.substr(found + 2, RequestBody.length());
     }
     ContentFile = RequestBody.substr(0, RequestBody.length());
-    // std::cout << "Metadata: \n" << MetaData << std::endl;
-    // std::cout << "ContentFile: \n" << ContentFile << std::endl;
+     std::cout << "Metadata: \n" << MetaData << std::endl;
+     std::cout << "ContentFile: \n" << ContentFile << std::endl;
 
     return (ContentFile);
 }
@@ -177,7 +177,6 @@ void Respond::BuildPost()
         std::cerr << e.what() << std::endl;
         std::exit(1);
     }
-    return ;
 }
 
 /* //////////////////////////// */
@@ -324,7 +323,7 @@ void Respond::generateStatus(void)
 
 void Respond::generateContentLength(std::size_t BodyLength)
 {
-    std::string ContentLength = "Content-Length: " + std::to_string(BodyLength) + "\r\n";
+    std::string ContentLength = "Content-Length: " + std::to_string(BodyLength + 2) + "\r\n";
 	_Exchanger.addLineToHeader(ContentLength);
 }
 

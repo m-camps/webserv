@@ -11,9 +11,6 @@
 /* ************************************************************************** */
 
 #include <iostream> // std::
-#include <sys/socket.h> // socket(), bind()
-#include <netinet/in.h> // INADDR_ANY
-#include <unistd.h> // Write & Read
 #include <fcntl.h>
 #define DEBUG false
 

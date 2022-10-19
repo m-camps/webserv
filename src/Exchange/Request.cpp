@@ -14,12 +14,9 @@ typedef std::map<std::string, std::string> map;
 Request::Request(const std::string Request, Exchange NewExchanger)
 		: _Exchanger(NewExchanger)
 {
-	const std::string Header = AppendRequestToHeader(Request);
-	const std::string Body = AppendRequestToBody(Request);
+	const std::string Header = AppendRequest(Request);
 
-	std::cout << Request << std::endl;
 	HeaderToMap(Header);
-    _Exchanger.addHashMapNode("Body", Body);
 	Respond Responder(_Exchanger);
 }
 
@@ -49,8 +46,9 @@ Request &Request::operator=(const Request& ref)
  * I look for the "\\r\\n\\r\\n" seperator by using std::find.
  * Which I will then append to the Header string.
  */
-std::string Request::AppendRequestToHeader(const std::string& Request) const
+std::string Request::AppendRequest(const std::string& Request)
 {
+    std::string Body;
 	std::string Header;
 
 	std::size_t found = Request.find("\r\n\r\n");
@@ -59,20 +57,11 @@ std::string Request::AppendRequestToHeader(const std::string& Request) const
 		std::cerr << "No separator found" << std::endl;
 	}
 	Header.append(Request, 0, found);
-	return (Header);
-}
 
-std::string Request::AppendRequestToBody(const std::string &Request) const
-{
-    std::string Body;
-
-    std::size_t found = Request.find("\r\n\r\n");
-    if (found == std::string::npos)
-    {
-        std::cerr << "No separator found" << std::endl;
-    }
     Body.append(Request, found, Request.length() - found);
-    return (Body);
+    _Exchanger.addHashMapNode("Body", Body);
+
+	return (Header);
 }
 
 /**
