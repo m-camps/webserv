@@ -15,6 +15,7 @@
 #include "../inc/Constants.hpp"
 #include "Exchange/Exchange.hpp"
 #include "Exchange/Request.hpp"
+#include <iostream>
 
 #define BUFF 10000
 /* Default constructor */
@@ -36,6 +37,8 @@ void Network::setup(std::string file)
 	
 	// (void)file;
 	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
+
+	//server.getLocations().begin();
 
 	for (size_t i = 0; i < tmp.size(); i++)
 		std::cout << _servers.at(i) << "\n";
@@ -62,7 +65,7 @@ void Network::run()
 {
 	char buff[BUFF]; //  test buffer (can change later or keep it here)
 	std::string request;
-
+	//check if both location is seen here
 	while (true)
 	{
 		if (poll(_fds, _total_fd, 0) == -1)

@@ -19,26 +19,27 @@ class Parse
 
 		/* Parsing */
 		std::vector<Server>&	parseNetwork(std::string& file, std::vector<Server>& servers);
+		//void					searchForServerBlock(std::vector<std::string> tokenizedLine, std::vector<std::string>& buff ,std::vector<Server>& servers);
+		//void					otherf(std::vector<std::string> location_block, std::vector<std::string> line, Server& server);
 		Server&					parseServer(std::vector<std::string>& server_block, Server& server);
 		Location&				parseLocation(std::vector<std::string>& location_block, Location& location);
 
 		void    				parseDirective(std::string& currentLine, Server &server);
 		void    				parseLocationDirective(std::string& currentLine, Location& location);
 
-		void    				parseListen(Server& server, std::string& currentLine); //was outside before, now member function
-		void    				parseServerName(Server& server, std::string& currentLine); //was outside before, now member function
-		void    				parseRoot(Server& server, std::string& currentLine); //was outside before, now member function
-		void    				parseIndex(Server& server, std::string& currentLine); //was outside before, now member function
-		void    				parseClientBodySize(Server& server, std::string& currentLine); //was outside before, now member function
-
+		void    				parseListen(Server& server, std::string& currentLine);
+		void    				parseServerName(Server& server, std::string& currentLine);
+		void    				parseRoot(Server& server, std::string& currentLine);
+		void    				parseIndex(Server& server, std::string& currentLine);
+		void    				parseClientBodySize(Server& server, std::string& currentLine);
 
 
 		void 					openFile(std::ifstream& configStream, std::string configName);
 
-		void    selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
-		bool    isDirective(std::string& currentWord);
-		bool	isLocationDirective(std::string& currentWord);
-		void    selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
+		void    				selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
+		bool					isServerDirective(std::string& currentWord);
+		bool					isLocationDirective(std::string& currentWord);
+		void					selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
 
 	private:
 		/*** 

@@ -31,6 +31,7 @@ class Location {
 		Location();
 		~Location();
 
+		std::string&				getLocationName(void);
 		std::string&				getLocationRoot(void);
 		std::string&				getLocationIndex(void);
 		bool&						getLocationAutoIndex(void);
@@ -38,7 +39,7 @@ class Location {
 		std::string&				getLocationCgiFileExtension(void);
 		std::string&				getLocationCgiName(void);
 
-		//void						setLocationName(std::string& locationRootToAdd); dont have just yet
+		void						setLocationName(std::string& locationNameToAdd);
 		 void						setLocationRoot(std::string& locationRootToAdd);
 		 void						setLocationIndex(std::string& LocationIndexToAdd);
 		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
