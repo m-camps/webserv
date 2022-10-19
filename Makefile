@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/04 12:31:48 by xvoorvaa      ########   odam.nl          #
+#    Updated: 2022/10/17 12:23:06 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ EXTRA := -std=c++98
 SHELL := /bin/bash
 
 ifdef DEBUG
-	CFLAGS += -g
+	CFLAGS += -g3
 else ifdef FSAN
 	CFLAGS += -fsanitize=address
 else
@@ -42,7 +42,7 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $(NAME)
 
 all: $(NAME)
-	@printf "$(GREEN)Compilation Complete$(COL_END)"
+	@printf "$(GREEN)Compilation Complete$(COL_END)\n"
 
 # For LLDB or any other debugger
 debug:
@@ -53,6 +53,10 @@ debug:
 rebug: fclean
 	make debug
 
+client:
+	$(GCC) client/main.cpp -o not_server $(FLAGS) $(EXTRA)
+	./not_server
+	
 clean:
 	rm -rf $(BUILDDIR)
 
@@ -76,6 +80,12 @@ run: all
 rerun: fclean all
 	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
 	./$(NAME) $(CONFIG)
+
+
+# My test function (max)
+test: all
+	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)\n"
+	@./$(NAME) conf/basic.conf
 
 # Colors
 RED=\x1b[1;31m

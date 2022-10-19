@@ -34,3 +34,8 @@ build/*
 *.exe
 *.out
 *.app
+
+./webserv
+./not_server
+
+./vscode/

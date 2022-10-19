@@ -1,9 +1,11 @@
 #include "../inc/Parse.hpp"
 #include "../inc/Server.hpp"
+#include "../inc/Location.hpp"
+#include "../inc/Constants.hpp"
 #include <fstream>
 #include <sstream>
 #include <string.h>
-
+#include <stack>
 
 /* CONSTRUCTORS */
 
@@ -42,17 +44,6 @@ Parse::~Parse()
 /*** 
  * MAIN PARSING FUNCTION
 ***/
-void    startParse(Server& server, char *configName)
-{
-	Parse           parseInstance;
-	std::ifstream   config;
-
-	//open and create file
-	parseInstance.openFile(config, configName);
-	//read line by line
-	parseInstance.processFile(config, parseInstance, server);
-	return ;
-}
 
 void Parse::openFile(std::ifstream& configStream, std::string configName)
 {
@@ -68,123 +59,205 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 	}
 }
 
-void    proceedToLocationParser(Server& server, std::ifstream& configStream, Parse& parseInstance)
-{	
-	//we might have go to the next line, stirp {}
-	std::string         currentLine;
-	std::string         currentWord;
-	std::istringstream  iss;
-	//push smth into a new location?
+std::vector<std::string> splitLineWithStrtok(std::string& line)
+{
+	char	*c_line = strdup(const_cast<char *>(line.c_str()));
+	char	*word;
+	std::vector<std::string> ret;
 
-	//create a new location, parse it then push it into the location inside the server?
-	t_location newLocation;
-	server.getLocations().push_back(newLocation);
-	while (!configStream.eof()) //the other closing bracket is not found
+	word = strtok(c_line, " \t");
+	while (word != NULL)
 	{
-		getline(configStream, currentLine); //double check line endings, shouldn't it read until ; ? what happens if there is a newline before ; ? etc
+		ret.push_back(word);
+		word = strtok(NULL, " \t");
+	}
+	if (DEBUG)
+	{
+		for (size_t i = 0; i < ret.size(); i++)
+			std::cout  << "[word " << i << "]: " << ret[i] << '\n';
+	}
+	free(c_line);
+	return ret;
+}
+
+
+/***
+ * loops over tokenized lines.
+ * The function is using balanced parantheses datastruct to identify
+ * if the block is correctly 
+ * 
+***/
+/* will work later, atm some scope issues still
+void    Parse::searchForServerBlock(std::vector<std::string> tokenizedLine, std::vector<std::string>& buff ,std::vector<Server>& servers) //splitLineWithStrtok
+{
+    std::stack<char> stack;
+
+    for (vecIt it = tokenizedLine.begin(); it != tokenizedLine.end(); it++)
+    {
+        if ((*it).compare("{") == 0)
+        {
+            stack.push('{');
+        }
+        if ((*it).compare("}") == 0)
+        {
+            stack.pop();
+            if (stack.empty())
+            {
+                Server server;
+                servers.push_back(parseServer(buff, server));
+                buff.clear();
+            }
+        }
+    }
+    return ;
+}
+*/
+
+
+/***
+ * Parse the configFile into individual Server Blocks // Server Block type vector<std::string>
+ * 
+ * @return value right now is a vector of Server blocks. In the future should just return a std::vector<Server>
+ * instantiated by calling Server(std::vector<std::string>)
+ * in the loop if we find { - >push to stack, run loop until we find }, if we found,pop it and if the stack is empty, the input was correct, proceed to parse the rest
+***/
+std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>& servers) //parse whole config, puts it into blocks
+{
+	std::vector<std::string>	buff;
+	std::string					currentLine;
+	std::ifstream				configStream;
+	std::stack<char> 			stack;
+
+	openFile(configStream, file);
+	while(!configStream.eof())
+	{
+		getline(configStream, currentLine);
 		if (configStream.good())
 		{
-			iss.clear();
-			iss.str(currentLine);
-			while (iss.good())
+			std::vector<std::string> line = splitLineWithStrtok(currentLine);
+			if (!line.empty() && line[0].compare("server") != 0)
 			{
-				iss >> currentWord;
-				if (isLocationDirective(currentWord) == true)
+				buff.push_back(currentLine);
+			}
+			for (vecIt it = line.begin(); it != line.end(); it++)
+			{
+				if ((*it).compare("{") == 0)
 				{
-					parseInstance.selectLocationParserFunction(currentLine, currentWord, parseInstance, server);
+					stack.push('{');
 				}
-				else if (currentWord == "}")
+				if ((*it).compare("}") == 0)
 				{
-					return ;
+					stack.pop();
+					if (stack.empty())
+					{
+						Server server;
+						servers.push_back(parseServer(buff, server));
+						buff.clear();
+					}
 				}
 			}
 		}
 	}
-	return ;
+
+	return(servers);
 }
 
-void    Parse::selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)
+std::vector<std::string>	extractLocation(std::vector<std::string>::iterator& it, std::vector<std::string>& server_block)
 {
-	(void)parseInstance;
-	const t_selectParse myDispatch[] = 
+	std::vector<std::string> ret;
+	std::stack<char> stack;
+	stack.push('{');
+	while (it != server_block.end())
 	{
-		{"root", setLocationRoot},
-		{"index", setLocationIndex},
-		{"allow_methods", setLocationAllowMethod},
-		{"autoindex", setLocationAutoindex},
-		{"cgi_name", setCgiName},
-		{"cgi_file_extension", setCgiFileExtension}
-	};
-	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++)
-	{
-		if (currentWord == myDispatch[i]._name)
+		ret.push_back(*it);
+		std::string strippedFromTab = *it;
+		strippedFromTab.erase(remove(strippedFromTab.begin(), strippedFromTab.end(), '\t'), strippedFromTab.end());
+		if ((strippedFromTab).compare("}") == 0)
 		{
-			size_t      posInLine = currentWord.length();
-			std::string restOfLine = currentLine.substr(posInLine + 2);
-			myDispatch[i]._pointerToParsingFunction(server, restOfLine);
-		}
-	}
-}
-
-
-/*** 
- * Loops through all the lines in the given file
- * If a word in a line is a directive, proceeds to select the function to be used for that directive
-***/
-void    Parse::processFile(std::ifstream& configStream, Parse& parseInstance, Server& server)
-{
-	std::string         currentLine;
-	std::string         currentWord;
-	std::istringstream  iss;
-
-	while (!configStream.eof())
-	{
-		getline(configStream, currentLine); //double check line endings, shouldn't it read until ; ? what happens if there is a newline before ; ? etc
-		if (configStream.good())
-		{
-			iss.clear();
-			iss.str(currentLine);
-			while (iss.good())
+			stack.pop();
+			if (stack.empty() == true)
 			{
-				iss >> currentWord;
-				//could be solved only to look for first words of the line, but that assumes correct input 
-				if (isDirective(currentWord) == true)
-				{
-					selectParseFunction(currentLine, currentWord, parseInstance, server);
-				}
-				else if (currentWord == "location")
-				{
-					proceedToLocationParser(server, configStream, parseInstance);
-					currentWord = "";
-					break ;
-				}
+				break ; 
 			}
 		}
+		it++;
 	}
+	return ret;
 }
 
-
-/*** 
- * Checks if a word is a directive so we can select an associated function later
-***/
-bool    Parse::isDirective(std::string& currentWord)
+Server&		Parse::parseServer(std::vector<std::string>& server_block, Server& server)
 {
-	//what happens if the word is empty? wouldnt == overload return true? 
-	return (currentWord == "server_name" || currentWord == "root" ||
-			currentWord == "root" || currentWord == "index" || currentWord == "client_body_size");
-			//currentWord == "location"); adding location later
+	std::vector<std::string>			buff;
+	std::vector<Location>				locations;
+	std::vector<std::string>::iterator	it = server_block.begin();
+	std::stack<char> stack;
+
+	while(it != server_block.end())
+	{
+		std::vector<std::string> line = splitLineWithStrtok(*it);
+		if (!line.empty() && isServerDirective(line[0]))
+		{
+			parseDirective(*it, server);
+		}
+		else if(line[0] == "location")
+		{
+			Location	location;
+			std::string nameLocation;
+			if (line.size() != 1)
+			{
+				nameLocation = line[1];
+			}
+			else
+			{
+				nameLocation = line[0];
+			}
+			std::vector<std::string> location_block = extractLocation(it, server_block);
+			server.addToLocations(nameLocation, parseLocation(location_block, location));
+			//std::map<std::string, Location>::iterator it = server.getLocations().end(); //this will be deleted here
+			//server.getLocations().find('/python'); //prob we have to use find, but apart from the syntax which I cant find atm, this worked. Find based on name, will output locationblock results
+		}
+		else
+		{
+			// throw(error); and return currentline;
+		}
+		it++;
+	}
+	return server;
 }
 
-/*** 
- * Checks if a word is a directive of location so we can select an associated function later
-***/
-bool    isLocationDirective(std::string& currentWord)
+Location&	Parse::parseLocation(std::vector<std::string>& location_block, Location& location)
 {
-	//what happens if the word is empty? wouldnt == overload return true?
-	return (currentWord == "root" || currentWord == "index" ||
-			currentWord == "allow_methods" || currentWord == "autoindex" ||
-			currentWord == "cgi_name" || currentWord == "cgi_file_extension");
-			//currentWord == "location"); adding location later
+	std::vector<std::string>::iterator it = location_block.begin();
+	while(it != location_block.end())
+	{
+		std::vector<std::string> line = splitLineWithStrtok(*it);
+		if (!line.empty() && isLocationDirective(line[0]))
+		{
+			parseLocationDirective(*it, location);
+		}
+		else if (line[0] == "}")
+		{
+			return location;
+		}
+		else
+		{
+			//error print line where parsing error happend
+		}
+		it++;
+	}
+	return location;
+}
+
+std::string convertFromVector(std::vector<std::string> line)
+{
+	std::string ret = "";
+
+	ret = ret + line[1];
+	for (size_t i = 2; i < line.size(); i++)
+	{
+		ret = ret + " " + line[i];
+ 	}
+	return (ret);
 }
 
 /*** 
@@ -192,47 +265,152 @@ bool    isLocationDirective(std::string& currentWord)
  * The parsing function will start to look for input after the currentWord in the currentLine
  * This is skipping location for now entirely, have to alter struct a bit
 ***/
-void    Parse::selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server)
+void    Parse::parseDirective(std::string& currentLine, Server& server)
 {
-	(void)parseInstance;
-	const t_selectParse myDispatch[] = 
+	std::string restOfLine;
+	std::vector<std::string> line = splitLineWithStrtok(currentLine);
+	
+	void	(Parse::*pointerToParseServerDirectives)(Server&, std::string&) = NULL;
+	const t_selectServer myDispatch[] = //map instead, name of the table typedef is not descriptive enough
 	{
-		{"listen", parseListen},
-		{"server_name", parseServerName},
-		{"root", parseRoot},
-		{"index", parseIndex},
-		{"client_body_size", parseClientBodySize}
-		//{"location", parseLocation}
-		//if there is a location, we should skip x amount of lines right?
+			{"listen", &Parse::parseListen},
+			{"server_name", &Parse::parseServerName},
+			{"root", &Parse::parseRoot},
+			{"index", &Parse::parseIndex},
+			{"client_body_size", &Parse::parseClientBodySize},
 	};
 
 	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR; i++)
 	{
-		if (currentWord == myDispatch[i]._name)
+		if (line[0] == myDispatch[i]._name)
 		{
-			size_t      posInLine = currentWord.length();
-			std::string restOfLine = currentLine.substr(posInLine + 1);
-			myDispatch[i]._pointerToParsingFunction(server, restOfLine);
-
+			restOfLine = convertFromVector(line);
+			pointerToParseServerDirectives = myDispatch[i].pointerToParseServerDirectives;
+			break ;
 		}
+	}
+	if (pointerToParseServerDirectives)
+	{
+		(this->*pointerToParseServerDirectives)(server, restOfLine);
 	}
 }
 
-/* SEPARATE PARSERS FOR THE RESPECTIVE DIRECTIVES */
-void    parseListen(Server& server, std::string& currentLine)
+
+void    Parse::parseLocationDirective(std::string& currentLine, Location& locationInstance)
 {
-	std::size_t firstFoundDigit = currentLine.find_first_of("0123456789"); //what happens if port start with 0, is that valid?
+	std::string restOfLine;
+	std::vector<std::string> line = splitLineWithStrtok(currentLine);
+	void	(Location::*pointerToLocation)(std::string&) = NULL;
+	const t_selectLocation myDispatch[] = //map instead, name of the table typedef is not descriptive enough
+	{
+			{"root", &Location::setLocationRoot},
+			{"index", &Location::setLocationIndex},
+			{"allow_methods", &Location::setLocationAllowMethod},
+			{"autoindex", &Location::setLocationAutoindex},
+			{"cgi_name", &Location::setCgiName},
+			{"cgi_file_extension", &Location::setCgiFileExtension}
+	};
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (line[0] == myDispatch[i]._name)
+		{
+			restOfLine = convertFromVector(line);
+			pointerToLocation = myDispatch[i].pointerToLocation;
+			break ;
+		}
+	}
+	if (pointerToLocation)
+	{
+		(&locationInstance->*pointerToLocation)(restOfLine);
+	}
+
+	// void	(Location::*pointerToLocation)(std::string&) = NULL;
+
+	// const t_selectLocation myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
+	// {
+	// 		{"root", &Location::setLocationRoot},
+	// 		{"index", &Location::setLocationIndex},
+	// 		{"allow_methods", &Location::setLocationAllowMethod},
+	// 		{"autoindex", &Location::setLocationAutoindex},
+	// 		{"cgi_name", &Location::setCgiName},
+	// 		{"cgi_file_extension", &Location::setCgiFileExtension}
+	// };
+
+	// //not sure if this
+	// char *remainingLine = const_cast<char *>(currentLine.c_str());
+	// char *spaceSeparatedWord = strtok (remainingLine, " ");
+	// while (spaceSeparatedWord != NULL)
+	// {
+	// 	std::string currentWord(spaceSeparatedWord);
+	// 	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++) //have to alter macro
+	// 	{
+	// 		if (currentWord == myDispatch[i]._name)
+	// 		{
+	// 			size_t      posInLine = currentWord.length();
+	// 			std::string restOfLine = currentLine.substr(posInLine + 2);
+	// 			pointerToLocation = myDispatch[i].pointerToLocation;
+	// 			(&locationInstance->*pointerToLocation)(restOfLine);
+	// 		}
+	// 	}
+	// 	spaceSeparatedWord = strtok (NULL, " ");
+	// }
+}
+
+/*** 
+ * Checks if a word is a directive so we can select an associated function later
+***/
+bool    Parse::isServerDirective(std::string& currentWord)
+{
+	//what happens if the word is empty? wouldnt == overload return true? 
+	return (currentWord == "server_name" || currentWord == "root" || \
+			currentWord == "index" || currentWord == "client_body_size" || \
+			currentWord == "listen" || currentWord == "error_page");
+}
+
+/*** 
+ * Checks if a word is a directive of location so we can select an associated function later
+***/
+bool    Parse::isLocationDirective(std::string& currentWord)
+{
+	//what happens if the word is empty? wouldnt == overload return true?
+	return (currentWord == "root" || currentWord == "index" ||
+			currentWord == "allow_methods" || currentWord == "autoindex" ||
+			currentWord == "cgi_name" || currentWord == "cgi_file_extension");
+}
+
+
+/* SEPARATE PARSERS FOR THE RESPECTIVE DIRECTIVES */
+void    Parse::parseRoot(Server& server, std::string& currentLine)
+{
+		currentLine.erase(remove(currentLine.begin(), currentLine.end(), ';'), currentLine.end());
+		server.setRoot(currentLine);
+		return ;
+}
+
+void    Parse::parseListen(Server& server, std::string& currentLine) //listen
+{
+	std::size_t firstFoundDigit = currentLine.find_first_of("0123456789");
 	if (firstFoundDigit != std::string::npos)
 	{
 		std::string portNumber = currentLine.substr(firstFoundDigit);
-		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
 		portNumber.erase(remove(portNumber.begin(), portNumber.end(), ';'), portNumber.end());
-		server.setPort(server, portNumber);
+		int portNrInt = std::stoi(portNumber, nullptr, 10);
+		server.setPort(portNrInt);
 	}
 	return ;
 }
 
-void    parseServerName(Server& server, std::string& currentLine)
+void    Parse::parseIndex(Server& server, std::string& currentLine)
+{
+	(void)server;
+	currentLine.erase(remove(currentLine.begin(), currentLine.end(), ';'), currentLine.end()); //index.html
+	server.setIndex(currentLine);
+	
+	return ;
+}
+
+void    Parse::parseServerName(Server& server, std::string& currentLine)
 {
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
 	char *spaceSeparatedWord = strtok (remainingLine, " ");
@@ -240,79 +418,30 @@ void    parseServerName(Server& server, std::string& currentLine)
 	while (spaceSeparatedWord != NULL)
 	{
 		std::string serverNameToAdd(spaceSeparatedWord);
-		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
 		serverNameToAdd.erase(remove(serverNameToAdd.begin(), serverNameToAdd.end(), ';'), serverNameToAdd.end());
-		server.setName(server, serverNameToAdd);
+		server.addToName(serverNameToAdd);
 		spaceSeparatedWord = strtok (NULL, " ");
 	}
 	return ;
 }
 
-void    parseRoot(Server& server, std::string& currentLine)
+void    Parse::parseClientBodySize(Server& server, std::string& currentLine)
 {
-	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, " ");
-
-	while (spaceSeparatedWord != NULL)
-	{
-		std::string rootToAdd(spaceSeparatedWord);
-		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
-		rootToAdd.erase(remove(rootToAdd.begin(), rootToAdd.end(), ';'), rootToAdd.end());
-		server.setRoot(server, rootToAdd);
-		spaceSeparatedWord = strtok (NULL, " ");
-	}
-	return ;
-}
-
-void    parseIndex(Server& server, std::string& currentLine)
-{
-	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, " ");
-
-	while (spaceSeparatedWord != NULL)
-	{
-		std::string indexToAdd(spaceSeparatedWord);
-		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
-		indexToAdd.erase(remove(indexToAdd.begin(), indexToAdd.end(), ';'), indexToAdd.end());
-		server.setIndex(server, indexToAdd);
-		spaceSeparatedWord = strtok (NULL, " ");
-	}
-	return ;
-}
-
-void    parseClientBodySize(Server& server, std::string& currentLine)
-{
-	std::size_t firstFoundDigit = currentLine.find_first_of("0123456789"); //what happens if port start with 0, is that valid?
+	std::size_t firstFoundDigit = currentLine.find_first_of("0123456789");
 	if (firstFoundDigit != std::string::npos)
 	{
 		std::string bodySize = currentLine.substr(firstFoundDigit);
-		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
 		bodySize.erase(remove(bodySize.begin(), bodySize.end(), ';'), bodySize.end());
-		server.setClientBody(server, bodySize);
+		int bodySizeInt = std::stoi(bodySize, nullptr, 10);
+		server.setClientBody(bodySizeInt);
 	}
 	return ;
 }
-
-/*
-
-typedef struct	location
-{
-	std::vector<std::string>		_root; //default = "/"
-	std::vector<std::string>		_index; //default = "index.html"
-	std::list<std::string>			_methods[TOTAL_METHODS]; // default = ["GET", "POST", "DELETE"]
-	std::string						cgi_ext;	// no-default
-	std::string						cgi_name;	// no-default
-	bool							autoindex; // default = false (off)
-}		t_location;
-
-*/
-
-//=, -, ~*, ^~ ->modifiers might have to be checked
-
 
 void    parseAllowMethods(Server& server, std::string& currentLine)
 {
 	//
+	(void)server;
 	//separate them by whitespace and strok
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
 	char *spaceSeparatedWord = strtok (remainingLine, " ");
@@ -323,11 +452,13 @@ void    parseAllowMethods(Server& server, std::string& currentLine)
 		//trail the last; -> what happens if there are more ;;;;, other error checks are needed
 		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
 
-		server.setMethods(server, methodToAdd);
+
+		// server.setMethods(methodToAdd);
 		spaceSeparatedWord = strtok (NULL, " ");
 	}
 }
 
+/*
 void    parseAutoIndex(Server& server, std::string& currentLine)
 {
 	//strtok, on or off?
@@ -365,3 +496,88 @@ void	parseCgiFileExtension(Server& server, std::string& currentLine)
 	//std::cout << server.getLocations().back()._cgi_file_extension << " is cgi_file_extension now" << std::endl;
 	return ;
 }
+*/
+
+
+
+
+// THIS IS NOW A NEW FUNCTION KEEPING HERE FOR REFERENCE
+/*** 
+ * Loops through all the lines in the given file
+ * If a word in a line is a directive, proceeds to select the function to be used for that directive
+***/
+
+// void    Parse::parseServer(std::string serverBlock, Server& server)
+// {
+// 	std::string         currentLine;
+// 	std::string         currentWord;
+// 	std::istringstream  iss;
+
+// 	while (!configStream.eof())
+// 	{
+// 		getline(configStream, currentLine); //double check line endings, shouldn't it read until ; ? what happens if there is a newline before ; ? etc
+// 		if (configStream.good())
+// 		{
+// 			iss.clear();
+// 			iss.str(currentLine);
+// 			while (iss.good())
+// 			{
+// 				iss >> currentWord;
+// 				//could be solved only to look for first words of the line, but that assumes correct input 
+// 				//if we fond server, create Server Server;
+		
+// 				if (isServerDirective(currentWord) == true) //find any keyword for server currentWord == server
+// 				{
+// 					selectParseFunction(currentLine, currentWord, parseInstance, server);
+// 				}
+// 				else if (currentWord == "location") //if its location
+// 				{
+					
+// 					//create a location instance here?
+// 					//you need the name + instance to push to the server
+// 					//you create an instance of class Location, proceed with loactnopareser
+// 					proceedToLocationParser(server, configStream, parseInstance);
+// 					currentWord = "";
+// 					break ;
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
+//this is b for location
+// void    proceedToLocationParser(Server& server, std::ifstream& configStream, Parse& parseInstance)
+// {	
+// 	//we might have go to the next line, stirp {}
+// 	std::string         currentLine;
+// 	std::string         currentWord;
+// 	std::istringstream  iss;
+// 	//push smth into a new location?
+
+// 	//create a new location, parse it then push it into the location inside the server?
+// 	server.getLocations().push_back(newLocation); //this doesnt exist anymore
+// 	//at this point we know we should have a location instance added to the server
+// 	while (!configStream.eof()) //the other closing bracket is not found
+// 	{
+// 		getline(configStream, currentLine); //double check line endings, shouldn't it read until ; ? what happens if there is a newline before ; ? etc
+// 		if (configStream.good())
+// 		{
+// 			iss.clear();
+// 			iss.str(currentLine);
+// 			while (iss.good())
+// 			{
+// 				iss >> currentWord;
+// 				if (isLocationDirective(currentWord) == true)
+// 				{
+// 					parseInstance.selectLocationParserFunction(currentLine, currentWord, parseInstance, server);
+// 				}
+// 				else if (currentWord == "}")
+// 				{
+// 					return ;
+// 					//
+// 				}
+// 			}
+// 		}
+// 	}
+// 	return ;
+// }

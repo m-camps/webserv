@@ -2,16 +2,12 @@
 #define PARSE_H
 
 #include <iostream>
+#include <vector>
 #include "Server.hpp"
 
-#define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
+typedef std::vector<std::string>::iterator vecIt;
 
-typedef void    selectParsingFunction(Server& server, std::string& currentLine);
-typedef struct selectParsing
-{
-	std::string					_name;
-	selectParsingFunction*	    _pointerToParsingFunction;
-}				t_selectParse;
+#define NR_OF_DIRECTIVES_TO_LOOK_FOR 5 //will be more later
 
 class Parse
 {
@@ -21,12 +17,29 @@ class Parse
 		Parse& operator=(const Parse& rhs);
 		~Parse();
 
-		void 	openFile(std::ifstream& configStream, std::string configName);
-		void    processFile(std::ifstream& configStream, Parse& parseInstance, Server& server);
-		void    selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
-		bool    isDirective(std::string& currentWord);
-		bool	isLocationDirective(std::string& currentWord);
-		void    selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
+		/* Parsing */
+		std::vector<Server>&	parseNetwork(std::string& file, std::vector<Server>& servers);
+		//void					searchForServerBlock(std::vector<std::string> tokenizedLine, std::vector<std::string>& buff ,std::vector<Server>& servers);
+		//void					otherf(std::vector<std::string> location_block, std::vector<std::string> line, Server& server);
+		Server&					parseServer(std::vector<std::string>& server_block, Server& server);
+		Location&				parseLocation(std::vector<std::string>& location_block, Location& location);
+
+		void    				parseDirective(std::string& currentLine, Server &server);
+		void    				parseLocationDirective(std::string& currentLine, Location& location);
+
+		void    				parseListen(Server& server, std::string& currentLine);
+		void    				parseServerName(Server& server, std::string& currentLine);
+		void    				parseRoot(Server& server, std::string& currentLine);
+		void    				parseIndex(Server& server, std::string& currentLine);
+		void    				parseClientBodySize(Server& server, std::string& currentLine);
+
+
+		void 					openFile(std::ifstream& configStream, std::string configName);
+
+		void    				selectParseFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
+		bool					isServerDirective(std::string& currentWord);
+		bool					isLocationDirective(std::string& currentWord);
+		void					selectLocationParserFunction(std::string& currentLine, std::string& currentWord, Parse& parseInstance, Server& server);
 
 	private:
 		/*** 
@@ -35,25 +48,11 @@ class Parse
 		* call the this function to parse further and assign values etc to the server class
 		***/
 		//t_selectParse _dispatchTable;
-	   
 };
 
-/* will have to put these as member functions, messed up syntax so I keep it here for now */
-void    startParse(Server& server, char *configName);
-
-void    parseListen(Server& server, std::string& currentLine);
-void    parseServerName(Server& server, std::string& currentLine);
-void    parseRoot(Server& server, std::string& currentLine);
-void    parseIndex(Server& server, std::string& currentLine);
-void    parseAutoIndex(Server& server, std::string& currentLine);
-void    parseClientBodySize(Server& server, std::string& currentLine);
-void    parseLocation(Server& server, std::string& currentLine);
-void	parseCgiName(Server& server, std::string& currentLine);
-void	parseCgiFileExtension(Server& server, std::string& currentLine);
-bool    isLocationDirective(std::string& currentWord);
-void    parseAllowMethods(Server& server, std::string& currentLine);
-void    proceedToLocationParser(Server& server, std::ifstream& configStream);
-
-
-
+typedef struct selectParsingServer
+{
+	std::string		_name;
+	void			(Parse::*pointerToParseServerDirectives)(Server& server, std::string& currentLine);
+}				t_selectServer;
 #endif

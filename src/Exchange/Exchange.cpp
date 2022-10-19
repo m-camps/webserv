@@ -1,29 +1,25 @@
 //
-// Created by Xander Voorvaart on 10/10/22.
+// Created by Xander Voorvaart on 9/30/22.
 //
 
 #include "Exchange.hpp"
 
-#pragma region "ctor & dtor"
+////////////// Ctor & Dtor //////////////
 
-Exchange::Exchange(void)
-    : _statusCode(200), _SocketFD(0)
+/**
+ * @param Request will be the header & the body in one string
+ */
+Exchange::Exchange(const std::string& Request, const Server& new_server, int32_t new_socket)
+    : _server(new_server), _ListenSocket(new_socket)
 {
+    const std::string Header = AppendRequest(Request);
+
+    HeaderToMap(Header);
+    RespondToClient();
 }
 
-/* //////////////////////////// */
-
-Exchange::Exchange(Server NewSever, int32_t NewSocketFD)
-    : _server(NewSever), _body(""),
-        _statusCode(200), _SocketFD(NewSocketFD)
-{
-}
-
-/* //////////////////////////// */
-
-Exchange::Exchange(const Exchange &ref)
-    : _server(ref._server), _dictHeader(ref._dictHeader),
-        _body(ref._body), _statusCode(ref._statusCode), _SocketFD(ref._SocketFD)
+Exchange::Exchange(const Exchange& ref)
+    : _server(ref._server), _dictHeader(ref._dictHeader), _ListenSocket(ref._ListenSocket)
 {
 }
 
@@ -33,126 +29,184 @@ Exchange::~Exchange(void)
 {
 }
 
-#pragma endregion ctoranddtor
+////////////// Operators //////////////
 
-/* //////////////////////////// */
-
-Exchange& Exchange::operator=(const Exchange& ref)
+Exchange &Exchange::operator=(const Exchange& ref)
 {
     if (this != &ref)
     {
+        _dictHeader = ref._dictHeader;
+        _server = ref._server;
     }
     return (*this);
 }
 
-#pragma region getter
-
-/* ////////// Getter //////////// */
-
-Server Exchange::getServer(void) const
+/*
+ * Prints only the std::map::_dictHeader
+ */
+std::ostream& operator<<(std::ostream& out, const Exchange& ref)
 {
-    return (_server);
+    std::map<std::string, std::string> Header = ref.getHeader();
+    std::map<std::string, std::string>::iterator it = Header.begin();
+
+    for ( ; it != Header.end(); it++)
+    {
+        out <<
+            std::endl <<
+            "Key: " << it->first <<
+            "\n" <<
+            "Value: " << it->second <<
+            std::endl;
+    }
+    return (out);
 }
 
-/* //////////////////////////// */
+////////////// Functions //////////////
 
-HashMap Exchange::getHashMap(void) const
+/**
+ * I look for the "\\r\\n\\r\\n" seperator by using std::find.
+ * Which I will then append to the Header string.
+ */
+std::string Exchange::AppendRequest(const std::string& Request) const
+{
+    std::string Header;
+
+    std::size_t found = Request.find("\r\n\r\n");
+    if (found == std::string::npos)
+    {
+        std::cerr << "No separator found" << std::endl;
+//        std::exit(EXIT_FAILURE);
+    }
+    Header.append(Request, 0, found);
+    return (Header);
+}
+
+/*
+ * This is gonna be a long one...
+ *
+ * I created a HashMap by using std::map.
+ * You can use std::map::at() to find the data you are looking for. \n
+ *
+ * For example:
+ * std::cout << std::map::at("HTTPMethod") << std::endl;
+ *
+ * Output:
+ * GET / HTTP/1.1
+ *
+ * The following keywords are important:
+ * HTTPMethod <-- Here you can find obviously the method and the address that is requested
+ * Host <-- What is the hostname
+ * Connection <-- To check connection
+ * User-Agent <-- Information of the user
+ */
+void Exchange::HeaderToMap(const std::string& Header)
+{
+    std::string line;
+    std::istringstream issHeader(Header);
+
+    while (std::getline(issHeader, line))
+    {
+        std::size_t found = line.find(':');
+        if (found == std::string::npos)
+        {
+            _dictHeader["HTTPMethod"] = line.substr(0, line.size() - 1);
+            continue ;
+        }
+        _dictHeader[line.substr(0, found)] =
+                line.substr(found + 2, (line.size() - found - 3));
+    }
+}
+
+////////////// Geter //////////////
+
+const Exchange::map& Exchange::getHeader(void) const
 {
     return (_dictHeader);
 }
 
-/* //////////////////////////// */
+//////////// Responder ////////////
 
-std::string Exchange::getHashMapString(const std::string& RequestedMap) const
+bool Exchange::CheckConnectionStatus(void)
 {
-    return (_dictHeader.find(RequestedMap)->second);
+    try
+    {
+        map::iterator ConnectionValue = _dictHeader.find("Connection");
+
+        if (ConnectionValue->second == "keep-alive")
+        {
+            std::cout << "Client is connected" << "\n";
+            return (true);
+        }
+        std::cerr << "Client disconnected" << std::endl;
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+    return (false);
 }
 
-/* //////////////////////////// */
-
-std::string Exchange::getHeader(void) const
+/*
+ * /data/www/ does not work...
+ * data/www/ does... lol
+*/
+std::string Exchange::readFile(const std::string& RequestedFile)
 {
-	return (_header);
+    std::ifstream File;
+    std::string line;
+    std::string FileContent;
+
+    File.open(RequestedFile);
+    if (!File.is_open())
+    {
+        std::cerr << "404 Error" << std::endl;gs
+        std::exit(EXIT_FAILURE);
+    }
+
+    while (std::getline(File, line))
+        FileContent += line;
+
+    return (FileContent);
 }
 
-/* //////////////////////////// */
-
-std::string Exchange::getBody(void) const
+std::size_t Exchange::getBodySize(std::string& Body)
 {
-    return (_body);
+    return (Body.length());
 }
 
-/* //////////////////////////// */
-
-uint32_t Exchange::getStatusCode(void) const
+std::string Exchange::insertBody(std::vector<std::string>& ServerRoot)
 {
-    return (_statusCode);
+    std::string RequestedFile;
+    std::string HTTPMethod = _dictHeader.find("HTTPMethod")->second;
+    std::size_t found = HTTPMethod.find('/');
+
+    if (found == std::string::npos)
+    {
+        std::cerr << "Path not found -> send 404" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
+    RequestedFile = HTTPMethod.substr(found, 11);
+    ServerRoot.back() += RequestedFile;
+
+    return (readFile(ServerRoot.back()));
 }
 
-/* //////////////////////////// */
-
-int32_t Exchange::getSocketFD(void) const
+void Exchange::RespondToClient(void)
 {
-    return (_SocketFD);
-}
+    std::string response =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/html\r\n"
+            "Content-Length: 160\r\n"
+            "Keep - Alive: timeout=1, max=1\r\n"
+            "Accept-Ranges: bytes\r\n"
+            "Connection: close\r\n"
+            "\r\n\r\n";
 
-/* //////////////////////////// */
-
-void Exchange::setServer(const Server NewServer)
-{
-    _server = NewServer;
-}
-
-/* //////////////////////////// */
-
-void Exchange::setHashMap(const HashMap NewHashMap)
-{
-    _dictHeader = NewHashMap;
-}
-
-#pragma endregion getter
-
-#pragma region setter
-
-/* ////////// Setter //////////// */
-
-void Exchange::setBody(const std::string NewBody)
-{
-    _body = NewBody;
-}
-
-/* //////////////////////////// */
-
-void Exchange::setStatusCode(const uint32_t NewStatus)
-{
-    _statusCode = NewStatus;
-}
-
-/* //////////////////////////// */
-
-void Exchange::setHeader(const std::string NewHeader)
-{
-    _header = NewHeader;
-}
-
-#pragma endregion setter
-
-#pragma region adders
-
-/* ////////// Adders //////////// */
-
-void Exchange::addHashMapNode(const std::string NameNode, const std::string ContentNode)
-{
-    _dictHeader[NameNode] = ContentNode;
-}
-
-/* //////////////////////////// */
-
-void Exchange::addLineToHeader(const std::string NewLine)
-{
-	std::string NewHeader = getHeader() + NewLine;
-
-	setHeader(NewHeader);
+    if (!CheckConnectionStatus())
+        std::exit(EXIT_FAILURE);
+    response += insertBody(_server.getRoot());
+    std::cout << response;
+    send(_ListenSocket, response.c_str(), response.length(), 0);
 }
 
 #pragma endregion adders
