@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:12:00 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 17:48:22 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ class Location {
 		Location();
 		~Location();
 
+		std::string&				getLocationName(void);
 		std::string&				getLocationRoot(void);
 		std::string&				getLocationIndex(void);
 		bool&						getLocationAutoIndex(void);
@@ -38,7 +39,7 @@ class Location {
 		std::string&				getLocationCgiFileExtension(void);
 		std::string&				getLocationCgiName(void);
 
-		//void						setLocationName(std::string& locationRootToAdd); dont have just yet
+		void						setLocationName(std::string& locationNameToAdd);
 		 void						setLocationRoot(std::string& locationRootToAdd);
 		 void						setLocationIndex(std::string& LocationIndexToAdd);
 		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
@@ -46,6 +47,8 @@ class Location {
 		 void						setCgiName(std::string& cgiName);
 		 void						setCgiFileExtension(std::string& cgiFileExtension);
 };
+
+std::ostream& operator<<(std::ostream& stream, Location& location);
 
 typedef struct selectParsing
 {

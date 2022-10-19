@@ -23,6 +23,11 @@ Location::Location()
 Location::~Location(){}
 
 /* ACCESSORS */
+std::string&				Location::getLocationName(void)
+{
+		return _name;
+}
+
 std::string&	Location::getLocationRoot(void)
 {
 	return _root;
@@ -55,6 +60,15 @@ std::string&	Location::getLocationCgiName(void)
 
 
 /* MUTATORS */
+
+void	Location::setLocationName(std::string& locationNameToAdd)
+{
+	locationNameToAdd.erase(remove(locationNameToAdd.begin(), locationNameToAdd.end(), ';'), locationNameToAdd.end());
+	_name = locationNameToAdd;
+	return ;
+}
+
+
 void	Location::setLocationIndex(std::string& LocationIndexToAdd)
 {
 	LocationIndexToAdd.erase(remove(LocationIndexToAdd.begin(), LocationIndexToAdd.end(), ';'), LocationIndexToAdd.end());

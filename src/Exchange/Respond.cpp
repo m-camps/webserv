@@ -47,7 +47,7 @@ bool Respond::CheckConnectionStatus(void)
 			std::cout << "Client is connected" << "\n";
 			return (true);
 		}
-		std::cerr << "Client disconnected" << std::endl;
+		throw (std::runtime_error("Client Disconnected"));
 	}
 	catch (const std::exception& e)
 	{
@@ -137,8 +137,8 @@ void Respond::RespondToClient(void)
     std::string Body;
     Server tempServer = _Exchanger.getServer();
 
-	if (!CheckConnectionStatus())
-		std::exit(EXIT_FAILURE);
+	// if (!CheckConnectionStatus())
+		// std::exit(EXIT_FAILURE);
 
     ResponseBuilder();
 //	insertBody(tempServer.getRoot());

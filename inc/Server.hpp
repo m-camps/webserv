@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 15:49:14 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 16:51:58 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <vector>
-
 
 #define ERROR 1
 
@@ -42,10 +41,11 @@ class Server
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
-		std::map<std::string, Location>		getLocations(void) const;
+		std::map<std::string, Location>&	getLocations(void) ;
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
+		std::string							getErrorPage(int statuscode) const;
 
 		/* Setters */
 		void	setPort(int& port);
@@ -70,7 +70,7 @@ class Server
 	private:
 
 		int								_port; 						// The port server is running on, can maybe be multiple ports?
-		std::vector<std::string>		_names; 						// can be searching for multiple names
+		std::vector<std::string>		_names; 					// can be searching for multiple names
 		std::string						_root; 						// default = "/"
 		std::string						_index; 					// default = "index.html"
 		int								_client_body_size;			// default = 10;
@@ -79,6 +79,7 @@ class Server
 		int								_socket_fd; 				// Socket FD the server is running on
 		std::vector<int>				_client_fds;				// Client FD's currently associated to this server
 		std::map<std::string, Location>	_locations;					// All locations of the Server
+		std::map<int, std::string>		_erorr_pages;				//
 
 		/* Helper Functions */
 		void	makeSocketAddr();

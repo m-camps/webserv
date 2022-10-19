@@ -96,3 +96,6 @@ You can test it yourself by doing the following:
 - [Struct used in lecture](https://www.gta.ufrj.br/ensino/eel878/sockets/sockaddr_inman.html)
 - [Socket/Client applications](https://www.bogotobogo.com/cplusplus/sockets_server_client.php)
 - [Web Server Concepts and Examples](https://www.youtube.com/watch?v=9J1nJOivdyw)
+
+
+https://stackoverflow.com/questions/34061604/c-strtok-with-multiple-spaces-tabs-checking-for-null-with-pointer

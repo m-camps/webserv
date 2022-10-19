@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 16:33:14 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 12:34:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <netinet/in.h> // INADDR_ANY
 #include <unistd.h> // Write & Read
 #include <fcntl.h>
+#define DEBUG false
 
 //#include "Exchange/Exchange.hpp"
 #include "../inc/Server.hpp"
@@ -32,5 +33,6 @@ int32_t	main(int argc, char *argv[])
 
 	network.setup(argv[1]);
 	network.run();
+	
 	return (0);
 }

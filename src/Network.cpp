@@ -6,14 +6,16 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 18:13:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/17 12:45:59 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
 #include "../inc/Server.hpp"
+#include "../inc/Constants.hpp"
 #include "Exchange/Exchange.hpp"
 #include "Exchange/Request.hpp"
+#include <iostream>
 
 #define BUFF 10000
 /* Default constructor */
@@ -36,6 +38,8 @@ void Network::setup(std::string file)
 	// (void)file;
 	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
+	//server.getLocations().begin();
+
 	for (size_t i = 0; i < tmp.size(); i++)
 		std::cout << _servers.at(i) << "\n";
 		
@@ -50,7 +54,6 @@ void Network::setup(std::string file)
 	// 	_servers.at(i).setPort(port);
 	// 	_servers.at(i).addToName(servername[i]);
 	// 	_servers.at(i).setup();
-	// 	std::cout << _servers.size() << "\n";
 	// }
 	_total_fd = _servers.size();
 	createFds();
@@ -62,7 +65,7 @@ void Network::run()
 {
 	char buff[BUFF]; //  test buffer (can change later or keep it here)
 	std::string request;
-
+	//check if both location is seen here
 	while (true)
 	{
 		if (poll(_fds, _total_fd, 0) == -1)
@@ -103,7 +106,7 @@ void Network::run()
 					request.append(buff);
 					if (ret != BUFF)
 					{
-						std::cout << "POLL\n";
+						std::cout << "POLLING\n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(buff, exchange);
 					}	
