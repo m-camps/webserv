@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 15:46:03 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/19 18:06:40 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void Network::run()
 					{
 						request.clear();
 						if (ret == 0)
-							std::cout << "Connection closed\n";
+							;
 						else
 							perror("In recv: ");
 						
