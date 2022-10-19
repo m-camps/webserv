@@ -72,7 +72,7 @@ void Respond::BuildGet(void)
 {
 	std::string FileContent;
 	std::string relativePath;
-	std::string Root = _Exchanger.getServer().getRoot().back();
+	std::string Root = _Exchanger.getServer().getRoot();
 	HashMap tempMap = _Exchanger.getHashMap();
 
     std::cout << "GET" << std::endl;
@@ -145,14 +145,14 @@ std::string Respond::getDataOfBody(void)
 
     while ((found = RequestBody.find(CRLF)) != std::string::npos)
     {
-        std::cout << found << std::endl;
-        std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
+        // std::cout << found << std::endl;
+        // std::cout << "FOUND: " << RequestBody.substr(0, found) << std::endl;
         MetaData += RequestBody.substr(0, found) + "\n";
         RequestBody = RequestBody.substr(found + 2, RequestBody.length());
     }
     ContentFile = RequestBody.substr(0, RequestBody.length());
-    std::cout << "Metadata: \n" << MetaData << std::endl;
-    std::cout << "ContentFile: \n" << ContentFile << std::endl;
+    // std::cout << "Metadata: \n" << MetaData << std::endl;
+    // std::cout << "ContentFile: \n" << ContentFile << std::endl;
 
     return (ContentFile);
 }

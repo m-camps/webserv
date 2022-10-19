@@ -5,7 +5,7 @@
 #ifndef WEBSERV_EXCHANGE_HPP
 #define WEBSERV_EXCHANGE_HPP
 
-#include <string>
+#include <iostream>
 
 #include "../../inc/Server.hpp" // Server class
 

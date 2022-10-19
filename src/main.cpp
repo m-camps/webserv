@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 15:32:42 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/19 15:37:10 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,11 @@
 
 int32_t	main(int argc, char *argv[])
 {
-	(void)argc;
 	if (argc != 2)
 	{
 		std::cerr << "Need a config file" << std::endl;
 		std::exit(EXIT_FAILURE);
-    // (void) argv;
+	}
 
 	Network network;
 

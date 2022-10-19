@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 14:16:54 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/19 15:46:03 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void Network::run()
 					request.append(buff);
 					if (ret != BUFF)
 					{
-						std::cout << "POLLING\n";
+						// std::cout << "POLLING\n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(buff, exchange);
 					}	

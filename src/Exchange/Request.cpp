@@ -17,6 +17,7 @@ Request::Request(const std::string Request, Exchange NewExchanger)
 	const std::string Header = AppendRequestToHeader(Request);
 	const std::string Body = AppendRequestToBody(Request);
 
+	std::cout << Request << std::endl;
 	HeaderToMap(Header);
     _Exchanger.addHashMapNode("Body", Body);
 	Respond Responder(_Exchanger);
