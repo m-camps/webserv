@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/17 16:51:58 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/19 14:08:08 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,14 @@
 
 #define ERROR 1
 
+typedef std::map<std::string, Location>::iterator locIt;
+
 class Server
 {
 	public:
 		Server();
 		~Server();
 		Server(const Server& src);
-		Server& operator=(const Server& rhs);
 
 		/* Getters */
 		int									getPort(void) const;
@@ -41,7 +42,7 @@ class Server
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
-		std::map<std::string, Location>&	getLocations(void) ;
+		std::map<std::string, Location>		getLocations(void) const;
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;

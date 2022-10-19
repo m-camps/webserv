@@ -65,10 +65,11 @@ std::vector<std::string> splitLineWithStrtok(std::string& line)
 	char	*word;
 	std::vector<std::string> ret;
 
-	while ((word = strtok(c_line, " \t")))
+	word = strtok(c_line, " \t");
+	while (word != NULL)
 	{
 		ret.push_back(word);
-		c_line = NULL;
+		word = strtok(NULL, " \t");
 	}
 	if (DEBUG)
 	{
@@ -151,10 +152,7 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>&
 					{
 						Server server;
 						servers.push_back(parseServer(buff, server));
-						std::cout << server.getLocations().begin()->second << std::endl; //it also sees it here
-						//std::cout << server.getLocations().end()->second << std::endl; //this doesnt work, does the second overwrite the first location block added?
 						buff.clear();
-						std::cout << "SERVER SETUP\n" << server << '\n';
 					}
 				}
 			}

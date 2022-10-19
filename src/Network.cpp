@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/17 12:45:59 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/19 14:16:54 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,23 +38,12 @@ void Network::setup(std::string file)
 	// (void)file;
 	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
-	//server.getLocations().begin();
-
-	for (size_t i = 0; i < tmp.size(); i++)
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
 		std::cout << _servers.at(i) << "\n";
-		
-	// std::string			servername[] = {"Server 1", "Server 2", "Server 3"};
-	// _servers.push_back(Server());
-	// _servers.push_back(Server());
-	// _servers.push_back(Server());
-	// for (int i = 0; i < 3; i++)
-	// {
-	// 	int	port = i + 80;
-		
-	// 	_servers.at(i).setPort(port);
-	// 	_servers.at(i).addToName(servername[i]);
-	// 	_servers.at(i).setup();
-	// }
+		_servers.at(i).setup();
+	}
+
 	_total_fd = _servers.size();
 	createFds();
 }
@@ -77,10 +66,8 @@ void Network::run()
 		for (int i = 0; i < _total_fd; i++)
 		{
  			struct pollfd cur = _fds[i];
-			// std::cout << cur.fd << "\n";
 			if ((cur.revents & POLLIN))
 			{
-
 				if (isSocketFd(cur.fd)) // If fd is a socket fd accept new connection
 				{
 					Server *server = getServerBySocketFd(cur.fd);

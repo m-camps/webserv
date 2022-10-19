@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 12:18:47 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/19 14:14:33 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Server::Server()
 {
 	this->_root = "/";
 	this->_index = "index.html";
+	this->_socket_fd = 0;
 }
 
 Server::~Server() { return; }
@@ -30,22 +31,6 @@ Server::Server(const Server& src)
     return;
 }
 
-Server& Server::operator=(const Server& rhs)
-{
-    if (this != &rhs)
-    {
-        this->_names = rhs._names;
-        this->_port = rhs._port;
-        this->_root = rhs._root;
-        this->_index = rhs._index;
-        this->_client_body_size = rhs._client_body_size;
-        //methods?this->_methods = rhs._methods;
-    }
-    return *this;
-}
-
-
-
 /* Getters */
 int								Server::getPort(void) const { return _port; }
 std::vector<std::string>		Server::getNames(void) const { return _names; }
@@ -53,7 +38,7 @@ std::string						Server::getRoot(void) const { return _root; }
 std::string  					Server::getIndex(void) const { return _index; }
 int								Server::getClientBodySize(void) const { return _client_body_size; }
 std::vector<std::string>		Server::getMethods(void) const { return _methods; }
-std::map<std::string, Location>& Server::getLocations(void)  { return _locations; } //shouldnt this be a poiter?
+std::map<std::string, Location> Server::getLocations(void) const { return _locations; } //shouldnt this be a poiter?
 int								Server::getSocketFd(void) const { return _socket_fd; }
 struct sockaddr_in*       		Server::getSockAddr(void) const { return _address_in; }
 std::vector<int>				Server::getClientFds(void) const { return _client_fds; }
@@ -168,13 +153,11 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
         stream << server.getClientFds().at(i) << " ";
 	stream << "]\n";
 
-	//std::cout << server.getLocations().begin()->second << std::endl;
+	std::map<std::string, Location> locations = server.getLocations(); //this will be deleted here
+	std::cout << locations.size() << " locsize\n";
+	for (locIt it = locations.begin(); it != locations.end(); it++)
+		stream << it->second << "\n";
 
-	//std::map<std::string, Location>::iterator it = server.getLocations().begin(); //this will be deleted here
-	//std::cout << server.getLocations().size() << " locsize\n";
-	//server.getLocations().begin()
-	//while (it != server.getLocations().end())
-	//	stream << &it->second << "\n";
     return stream;
 }
 
