@@ -119,24 +119,33 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 
 /* //////////////////////////// */
 
-#define CRLF "\r\n"
-
 std::string Respond::getDataOfBody(void)
 {
     std::size_t found;
     std::string ContentFile;
     std::string RequestBody = _Exchanger.getHashMapString("Body");
-    std::string Boundry = generateBoundry();
-
-    RequestBody = RequestBody.substr(Boundry.length() + 8,
-                                     RequestBody.length() - (Boundry.length() * 2) - 16);
-
-    while ((found = RequestBody.find(CRLF)) != std::string::npos)
+    try
     {
-        _MetaData += RequestBody.substr(0, found) + "\n";
-        RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+        std::string Boundry = generateBoundry();
+        RequestBody = RequestBody.substr(Boundry.length() + 8,
+                                         RequestBody.length() - (Boundry.length() * 2) - 16);
+
+        while ((found = RequestBody.find(CRLF)) != std::string::npos)
+        {
+            _MetaData += RequestBody.substr(0, found) + "\n";
+            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+        }
+        ContentFile = RequestBody.substr(0, RequestBody.length());
     }
-    ContentFile = RequestBody.substr(0, RequestBody.length());
+    catch (const std::exception& e)
+    {
+        while ((found = RequestBody.find(CRLF)) != std::string::npos)
+        {
+            _MetaData += RequestBody.substr(0, found) + "\n";
+            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+        }
+        ContentFile = RequestBody.substr(0, RequestBody.length());
+    }
 
     return (ContentFile);
 }
@@ -160,7 +169,7 @@ void Respond::BuildPost()
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        std::exit(1);
+        std::exit(EXIT_FAILURE);
     }
 }
 
@@ -199,8 +208,8 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
-    if (!MethodIsAllowed(Method, ConfMethods))
-        throw (std::logic_error("Method not allowed"));
+//    if (!MethodIsAllowed(Method, ConfMethods))
+//        throw (std::logic_error("Method not allowed"));
 
 	for (int32_t i = 0; i < 3; i++)
 	{
@@ -371,10 +380,8 @@ std::string Respond::generateBoundry(void)
 
     std::size_t found = ContentType.find('=');
     if (found == std::string::npos)
-    {
-        std::cerr << "No boundry found" << std::endl;
-        return ("");
-    }
+        throw (std::logic_error("No boundry found"));
+
     return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
 }
 
