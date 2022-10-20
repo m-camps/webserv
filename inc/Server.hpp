@@ -42,6 +42,7 @@ class Server
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
+		std::vector<std::string>&			getMethodsReference(void);
 		std::map<std::string, Location>		getLocations(void) const;
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;

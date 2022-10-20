@@ -278,9 +278,10 @@ void    Parse::parseDirective(std::string& currentLine, Server& server)
 			{"root", &Parse::parseRoot},
 			{"index", &Parse::parseIndex},
 			{"client_body_size", &Parse::parseClientBodySize},
+			{"allow_methods", &Parse::parseAllowedMethods},
 	};
 
-	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR; i++)
+	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++)
 	{
 		if (line[0] == myDispatch[i]._name)
 		{
@@ -365,7 +366,7 @@ bool    Parse::isServerDirective(std::string& currentWord)
 	//what happens if the word is empty? wouldnt == overload return true? 
 	return (currentWord == "server_name" || currentWord == "root" || \
 			currentWord == "index" || currentWord == "client_body_size" || \
-			currentWord == "listen" || currentWord == "error_page");
+			currentWord == "listen" || currentWord == "error_page" || currentWord == "allow_methods");
 }
 
 /*** 
@@ -438,6 +439,23 @@ void    Parse::parseClientBodySize(Server& server, std::string& currentLine)
 	return ;
 }
 
+void	Parse::parseAllowedMethods(Server& server, std::string& currentLine)
+{
+	char *remainingLine = const_cast<char *>(currentLine.c_str());
+	char *spaceSeparatedWord = strtok (remainingLine, "\t");
+	while (spaceSeparatedWord != NULL)
+	{
+		std::string methodToAdd(spaceSeparatedWord);
+		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
+		server.getMethodsReference().push_back(methodToAdd);
+		//it = myvector.insert(it, methodToAdd); //does this work now?
+		spaceSeparatedWord = strtok (NULL, "\t");
+	}
+	return ;
+}
+
+
+/*
 void    parseAllowMethods(Server& server, std::string& currentLine)
 {
 	//
@@ -457,7 +475,7 @@ void    parseAllowMethods(Server& server, std::string& currentLine)
 		spaceSeparatedWord = strtok (NULL, " ");
 	}
 }
-
+*/
 /*
 void    parseAutoIndex(Server& server, std::string& currentLine)
 {
