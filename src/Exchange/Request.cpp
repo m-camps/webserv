@@ -4,8 +4,6 @@
 
 #include "Request.hpp"
 
-typedef std::map<std::string, std::string> map;
-
 ////////////// Ctor & Dtor //////////////
 
 /**
