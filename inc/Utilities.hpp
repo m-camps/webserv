@@ -24,3 +24,5 @@ std::string defaultStatusPage(uint32_t StatusCode);
 int64_t getLength(std::ifstream& File);
 
 std::string readFile(const std::istringstream& Body);
+
+void deleteFile(std::string& filePath);
