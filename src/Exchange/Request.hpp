@@ -13,6 +13,8 @@
 #include "Respond.hpp"
 #include "../../inc/Server.hpp" // Server class
 
+typedef std::map<std::string, std::string> map;
+
 class Request
 {
 public:

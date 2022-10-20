@@ -12,8 +12,9 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
+#include "../../inc/Macros.hpp" // Macros
 #include "../../inc/Server.hpp" // Server class
-#include "../../inc/Utilities.hpp" // findCharLocation
+#include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 
 typedef std::map<std::string, std::string> HashMap;
 

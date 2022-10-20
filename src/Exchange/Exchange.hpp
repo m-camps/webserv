@@ -20,7 +20,7 @@ public:
 
     Exchange& operator=(const Exchange&);
 
-    // Geters
+    // Getters
     Server getServer(void) const;
     HashMap getHashMap(void) const;
     std::string getHashMapString(const std::string&) const;
@@ -29,7 +29,7 @@ public:
     uint32_t getStatusCode(void) const;
     int32_t getSocketFD(void) const;
 
-    // Seters
+    // Setters
     void setServer(const Server);
     void setHashMap(const HashMap);
     void setHeader(const std::string);
@@ -59,6 +59,7 @@ enum e_statusCode
 	e_ACCEPTED = 202,
 	e_NOCONTENT = 204,
     e_REDIR = 301,
+    e_FORBIDDEN = 401,
     e_NOTFOUND = 404
 };
 
