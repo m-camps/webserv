@@ -83,14 +83,17 @@ std::string Request::AppendRequest(const std::string& Request)
  */
 void Request::splitMethod(std::string line)
 {
+    int32_t last_it;
 	std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
 	std::vector<int>::iterator it = AllSpaceLocations.begin();
 
 	try
 	{
         _Exchanger.addHashMapNode("HTTPMethod", line.substr(0, *it));
-        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - 4));
-        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length()));
+        last_it = *it + 1;
+        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
+        last_it = *it;
+        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it));
 	}
 	catch(const std::exception& e)
 	{

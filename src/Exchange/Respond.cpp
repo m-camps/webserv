@@ -98,12 +98,12 @@ void Respond::BuildDelete()
 
         generateStatus();
         _Exchanger.setBody("");
-        generateContentLength(_Exchanger.getBody().length());
+        deleteFile(relativePath);
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Fatal Error: " << e.what() << std::endl;
-        std::exit(ERROR);
+        std::cerr << "Fatal Error: " << e.what() << '\n';
+        std::exit(EXIT_FAILURE);
     }
 }
 
