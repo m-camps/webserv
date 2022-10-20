@@ -16,6 +16,8 @@
 #include "../../inc/Server.hpp" // Server class
 #include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 
+#define CRLF "\r\n"
+
 typedef std::map<std::string, std::string> HashMap;
 
 uint32_t modifyStatusCode(std::string, const std::string&);
