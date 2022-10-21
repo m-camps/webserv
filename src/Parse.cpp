@@ -442,14 +442,14 @@ void    Parse::parseClientBodySize(Server& server, std::string& currentLine)
 void	Parse::parseAllowedMethods(Server& server, std::string& currentLine)
 {
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, "\t");
+	char *spaceSeparatedWord = strtok (remainingLine, "\t ");
 	while (spaceSeparatedWord != NULL)
 	{
 		std::string methodToAdd(spaceSeparatedWord);
 		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
 		server.getMethodsReference().push_back(methodToAdd);
 		//it = myvector.insert(it, methodToAdd); //does this work now?
-		spaceSeparatedWord = strtok (NULL, "\t");
+		spaceSeparatedWord = strtok (NULL, "\t ");
 	}
 	return ;
 }

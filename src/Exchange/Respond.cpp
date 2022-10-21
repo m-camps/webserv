@@ -65,6 +65,8 @@ void Respond::BuildGet(void)
 
             generateStatus();
             generateLocation(NewLocation);
+            _Exchanger.setBody("");
+            generateContentLength(0);
             return ;
         }
 
@@ -108,13 +110,32 @@ void Respond::BuildDelete()
 
 /* //////////////////////////// */
 
+/*
+ * Gonna make this a bit more elegant.
+ */
+std::string getFilename(std::string& MetaData)
+{
+    std::string line;
+    std::size_t found = MetaData.find("filename=");
+    if (found == std::string::npos)
+    {
+        std::cerr << "File has no name" << std::endl;
+        return ("UserUpload");
+    }
+
+    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
+    std::getline(issFile, line);
+
+    line = line.substr(0, line.length() - 1);
+    return (line);
+}
+
 void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
     std::string ContentType;
-    std::size_t found = MetaData.find("Content-Type:");
-    std::ofstream File("data/www/test.html");
+    std::string Root = _Exchanger.getServer().getRoot();
+    std::ofstream File(Root + "/" + getFilename(MetaData));
 
-    (void) found;
     File << Body;
 }
 
@@ -166,6 +187,7 @@ void Respond::BuildPost()
 
         putBodyInFile(_MetaData, Body);
         _Exchanger.setBody(Body);
+        generateContentLength(_Exchanger.getBody().length());
     }
     catch (const std::exception& e)
     {
