@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 15:46:03 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/21 17:56:43 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <iostream>
 
 #define BUFF 10000
+
 /* Default constructor */
 Network::Network() : _max_fd(5) {}
 
@@ -48,16 +49,15 @@ void Network::setup(std::string file)
 	createFds();
 }
 
-
 /* Poll() loop of the network */
 void Network::run()
 {
-	char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::string request;
-	//check if both location is seen here
+	char buff[BUFF];
+	// std::string newbuff = "";
+
 	while (true)
 	{
-		if (poll(_fds, _total_fd, 0) == -1)
+		if (poll(_fds, _total_fd, -1) == -1)
 		{
 			perror("In poll: ");
 			free(_fds);
@@ -65,40 +65,47 @@ void Network::run()
 		}
 		for (int i = 0; i < _total_fd; i++)
 		{
+			std::cout << _total_fd << _fds[i].fd << '\n';
  			struct pollfd cur = _fds[i];
 			if ((cur.revents & POLLIN))
 			{
-				if (isSocketFd(cur.fd)) // If fd is a socket fd accept new connection
+				if (isSocketFd(cur.fd))
 				{
+					std::cout << "New connection" << "\n";
 					Server *server = getServerBySocketFd(cur.fd);
 					int newFd = server->acceptConnection();
 					addToPollFds(newFd);
+					// std::cout << *server << std::endl;
+					std::cout << "On FD " << newFd << std::endl;
 				}
-				else // Else normal connection 
-				// xander this is where the exchange starts fd = cur.fd
-				// RIGHT NOW DOESNT WORK AS INTENDED 
+				else
 				{
+					bzero(buff, BUFF);
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
+					std::cout << "\nret = " << ret;
 					if (ret <= 0)
 					{
-						request.clear();
+						_buffer.erase(cur.fd);
+						std::cout << _buffer.size() << "size is "  << std::endl;
 						if (ret == 0)
-							std::cout << "Connection closed\n";
+							;
 						else
 							perror("In recv: ");
-						
 						close(cur.fd);
 						delFromPollFds(i);
 					}
-					request.append(buff);
+					else
+						_buffer.find(cur.fd)->second.append(buff, 0, BUFF);
+					// std::cout << buff << "\n";
 					if (ret != BUFF && ret > 0)
 					{
-						// std::cout << "POLLING\n";
+						// std::cout << _buffer.find(cur.fd)->second << "buffer \n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-						Request request(buff, exchange);
+						Request request(_buffer.find(cur.fd)->second, exchange);
 					}
-					bzero(buff, '\0');
+					
 				}
+				cur.revents = 0;
 			}
 		}
 	}
@@ -140,6 +147,7 @@ void	Network::addToPollFds(int fd)
 		_fds = tmp;
 	}
 	_fds[_total_fd] = createNewPollfd(fd);
+	_buffer.insert(std::pair<int, std::string>(fd, ""));
 	_total_fd++;
 }
 

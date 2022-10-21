@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 14:08:08 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/21 16:18:57 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ class Server
 		void	addToMethod(std::string& method);
 		void	addToLocations(std::string &name, Location& location);
 
-		/* DEBUG */
-		void	printServerAttributes(Server& server);
+		/* Delete */
+		void	removeFromClientFds(int fd);
 
 		/* Public Functions */
 		void	changePort(std::string newPort);

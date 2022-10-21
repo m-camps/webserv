@@ -227,6 +227,8 @@ void Respond::RespondToClient(void)
 			"\r\n" +
             Body;
 
+	std::cout << response << '\n';
+	std::cout << _Exchanger.getSocketFD() << "\n";
     send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 

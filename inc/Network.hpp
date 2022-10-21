@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 16:11:02 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/21 15:31:08 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ class Network
 		struct pollfd*							_fds; 				// Struct used for the FD's poll monitors
 		int										_total_fd;			// Total active fd's
 		int										_max_fd; 			// Max total fd's
-
+		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
+		
 		/* Orthodox canonical class BS */
 		Network(const Network &obj);
 		Network &operator=(const Network &obj);

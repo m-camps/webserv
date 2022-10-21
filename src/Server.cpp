@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 14:14:33 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/21 16:22:16 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,18 @@ void	Server::addToMethod(std::string& method) {_methods.push_back(method); }
 void	Server::addToLocations(std::string &name, Location& location)
 {
 	_locations.insert(std::pair<std::string, Location>(name, location));
+}
+
+/* Delete */
+
+void	Server::removeFromClientFds(int fd) 
+{
+	std::vector<int>::iterator it = _client_fds.begin();
+	for (; it != _client_fds.end(); it++)
+	{
+		if (*it == fd)
+			_client_fds.erase(it);
+	}
 }
 
 /* Public Functions */ 
