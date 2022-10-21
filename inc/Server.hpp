@@ -42,8 +42,11 @@ class Server
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		std::map<std::string, Location>&	getLocations(void) ;
 =======
+=======
+>>>>>>> Stashed changes
 		std::vector<std::string>&			getMethodsReference(void);
 
 		std::map<std::string, Location>		getLocations(void) const;

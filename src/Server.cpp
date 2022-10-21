@@ -54,8 +54,11 @@ std::string  					Server::getIndex(void) const { return _index; }
 int								Server::getClientBodySize(void) const { return _client_body_size; }
 std::vector<std::string>		Server::getMethods(void) const { return _methods; }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 std::map<std::string, Location>& Server::getLocations(void)  { return _locations; } //shouldnt this be a poiter?
 =======
+=======
+>>>>>>> Stashed changes
 std::vector<std::string>&		Server::getMethodsReference(void) { return _methods; }
 
 std::map<std::string, Location> Server::getLocations(void) const { return _locations; } //shouldnt this be a poiter?
