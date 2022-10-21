@@ -102,6 +102,7 @@ void Network::run()
 						// std::cout << _buffer.find(cur.fd)->second << "buffer \n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(_buffer.find(cur.fd)->second, exchange);
+						// _buffer.erase(cur.fd) // This should be added
 					}
 					
 				}
