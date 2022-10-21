@@ -326,6 +326,43 @@ void    Parse::parseLocationDirective(std::string& currentLine, Location& locati
 	{
 		(&locationInstance->*pointerToLocation)(restOfLine);
 	}
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+
+	// void	(Location::*pointerToLocation)(std::string&) = NULL;
+
+	// const t_selectLocation myDispatch[] = 	//map instead, name of the table typedef is not descriptive enough
+	// {
+	// 		{"root", &Location::setLocationRoot},
+	// 		{"index", &Location::setLocationIndex},
+	// 		{"allow_methods", &Location::setLocationAllowMethod},
+	// 		{"autoindex", &Location::setLocationAutoindex},
+	// 		{"cgi_name", &Location::setCgiName},
+	// 		{"cgi_file_extension", &Location::setCgiFileExtension}
+	// };
+
+	// //not sure if this
+	// char *remainingLine = const_cast<char *>(currentLine.c_str());
+	// char *spaceSeparatedWord = strtok (remainingLine, " ");
+	// while (spaceSeparatedWord != NULL)
+	// {
+	// 	std::string currentWord(spaceSeparatedWord);
+	// 	for (int i = 0; i < NR_OF_DIRECTIVES_TO_LOOK_FOR + 1; i++) //have to alter macro
+	// 	{
+	// 		if (currentWord == myDispatch[i]._name)
+	// 		{
+	// 			size_t      posInLine = currentWord.length();
+	// 			std::string restOfLine = currentLine.substr(posInLine + 2);
+	// 			pointerToLocation = myDispatch[i].pointerToLocation;
+	// 			(&locationInstance->*pointerToLocation)(restOfLine);
+	// 		}
+	// 	}
+	// 	spaceSeparatedWord = strtok (NULL, " ");
+	// }
+=======
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 }
 
 /*** 

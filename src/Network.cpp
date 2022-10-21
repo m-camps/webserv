@@ -38,7 +38,21 @@ void Network::setup(std::string file)
 	// (void)file;
 	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
+<<<<<<< Updated upstream
 	//server.getLocations().begin();
+=======
+<<<<<<< Updated upstream
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+=======
+	//server.getLocations().begin();
+
+	for (size_t i = 0; i < tmp.size(); i++)
+>>>>>>> Stashed changes
+		std::cout << _servers.at(i) << "\n";
+		_servers.at(i).setup();
+	}
+>>>>>>> Stashed changes
 
 	for (size_t i = 0; i < tmp.size(); i++)
 		std::cout << _servers.at(i) << "\n";

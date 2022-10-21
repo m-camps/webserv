@@ -43,6 +43,7 @@ class Server
 		std::vector<std::string>			getMethods(void) const;
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		std::map<std::string, Location>&	getLocations(void) ;
 =======
 =======
@@ -50,6 +51,9 @@ class Server
 		std::vector<std::string>&			getMethodsReference(void);
 
 		std::map<std::string, Location>		getLocations(void) const;
+>>>>>>> Stashed changes
+=======
+		std::map<std::string, Location>&	getLocations(void) ;
 >>>>>>> Stashed changes
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
