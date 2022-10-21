@@ -449,8 +449,11 @@ void    Parse::parseClientBodySize(Server& server, std::string& currentLine)
 void	Parse::parseAllowedMethods(Server& server, std::string& currentLine)
 {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
 	std::cout << currentLine << " inside parseallowmethod" << std::endl;
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 	char *remainingLine = const_cast<char *>(currentLine.c_str());
 	char *spaceSeparatedWord = strtok (remainingLine, "\t");

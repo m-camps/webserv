@@ -57,8 +57,11 @@ std::vector<std::string>		Server::getMethods(void) const { return _methods; }
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 std::map<std::string, Location>& Server::getLocations(void)  { return _locations; } //shouldnt this be a poiter?
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
