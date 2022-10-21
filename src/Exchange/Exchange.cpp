@@ -143,7 +143,14 @@ void Exchange::setHeader(const std::string NewHeader)
 
 void Exchange::addHashMapNode(const std::string NameNode, const std::string ContentNode)
 {
-    _dictHeader[NameNode] = ContentNode;
+    try
+    {
+        _dictHeader[NameNode] = ContentNode;
+    }
+    catch (const std::exception& e)
+    {
+        throw (e.what());
+    }
 }
 
 /* //////////////////////////// */
