@@ -26,11 +26,10 @@ public:
 	std::string getHeader(void) const;
     std::string getBody(void) const;
     uint32_t getStatusCode(void) const;
-    const Server getServer(void) const;
+    Server getServer(void) const;
     int32_t getSocketFD(void) const;
 
     // Setters
-    void setServer(const Server);
     void setHashMap(const HashMap);
     void setHeader(const std::string);
     void setBody(const std::string);
