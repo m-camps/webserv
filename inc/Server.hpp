@@ -44,8 +44,11 @@ class Server
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 		std::map<std::string, Location>&	getLocations(void) ;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 		std::vector<std::string>&			getMethodsReference(void);
