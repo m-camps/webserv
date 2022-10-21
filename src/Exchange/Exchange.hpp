@@ -56,11 +56,12 @@ std::ostream& operator<<(std::ostream&, const Exchange&);
 enum e_statusCode
 {
     e_OK = 200,
-	e_ACCEPTED = 202,
-	e_NOCONTENT = 204,
-    e_REDIR = 301,
-    e_FORBIDDEN = 401,
-    e_NOTFOUND = 404
+	e_Accepted = 202,
+	e_NoContent = 204,
+    e_Redir = 301,
+    e_Forbidden = 401,
+    e_NotFound = 404,
+    e_MethodNotFound = 405
 };
 
 #endif //WEBSERV_EXCHANGE_HPP

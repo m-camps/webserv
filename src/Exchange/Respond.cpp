@@ -96,6 +96,7 @@ void Respond::BuildDelete()
 
         generateStatus();
         _Exchanger.setBody("");
+        generateContentLength(_Exchanger.getBody().length());
         deleteFile(relativePath);
     }
     catch (const std::exception& e)
@@ -181,12 +182,11 @@ struct s_Methods
     void (Respond::*FuncPointer)(void);
 };
 
-bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& ConfMethods)
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods)
 {
-    std::vector<std::string>::iterator it = ConfMethods.begin();
+    std::vector<std::string>::iterator it = AllowedMethods.begin();
 
-    std::cout << "Method: " << Method << std::endl;
-    for (; it != ConfMethods.end(); it++)
+    for (; it != AllowedMethods.end(); it++)
     {
         if (Method == *it)
             return (true);
@@ -200,7 +200,7 @@ void Respond::ResponseBuilder(void)
 {
     void (Respond::*FuncPointer)(void) = nullptr;
 	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
-    std::vector<std::string> ConfMethods = _Exchanger.getServer().getMethods();
+    std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
 
 	const s_Methods CompareMethods [3] = {
 			{ "GET", &Respond::BuildGet },
@@ -208,8 +208,14 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
-//    if (!MethodIsAllowed(Method, ConfMethods))
-//        throw (std::logic_error("Method not allowed"));
+    if (!MethodIsAllowed(Method, AllowedMethods))
+    {
+        _Exchanger.setStatusCode(e_MethodNotFound);
+        generateStatus();
+        _Exchanger.setBody("");
+        generateContentLength(_Exchanger.getBody().length());
+        return ;
+    }
 
 	for (int32_t i = 0; i < 3; i++)
 	{
@@ -229,27 +235,18 @@ void Respond::RespondToClient(void)
 	std::string Header;
     std::string Body;
 
-    try
-    {
-        ResponseBuilder();
+    ResponseBuilder();
 
-        Header = _Exchanger.getHeader();
-        Body = _Exchanger.getBody();
+    Header = _Exchanger.getHeader();
+    Body = _Exchanger.getBody();
 
-        std::string response =
-                Header +
-                "\r\n" +
-                Body;
+    std::string response =
+            Header +
+            "\r\n" +
+            Body;
 
-        std::cout << "Response: \n" << response << std::endl;
-        send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
-    }
-    catch (const std::exception& e)
-    {
-        // This creates a segfault. @mcamps, plz help
-        std::cerr << e.what() << '\n';
-        send(_Exchanger.getSocketFD(), "", 0, MSG_DONTWAIT);
-    }
+    std::cout << "Response: \n" << response << std::endl;
+    send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
 #pragma region "NonClass functions"
@@ -269,11 +266,11 @@ bool isForbidden(const std::string& Path)
 uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 {
     if (isForbidden(Path))
-        return (e_FORBIDDEN);
+        return (e_Forbidden);
 	if ("/" == Path)
-		return (e_REDIR);
+		return (e_Redir);
     if (access(relativePath.c_str(), F_OK) != 0)
-		return (e_NOTFOUND);
+		return (e_NotFound);
 	return (e_OK);
 }
 
@@ -290,9 +287,9 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 			case e_OK:
 				FileContent = readFile(relativePath);
 				break ;
-			case e_REDIR:
+			case e_Redir:
                 break ;
-			case e_NOTFOUND:
+			case e_NotFound:
 				FileContent = readFile(Root + "/Error404.html");
 				break ;
             default:
