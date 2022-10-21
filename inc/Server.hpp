@@ -41,7 +41,13 @@ class Server
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
+<<<<<<< Updated upstream
 		std::map<std::string, Location>&	getLocations(void) ;
+=======
+		std::vector<std::string>&			getMethodsReference(void);
+
+		std::map<std::string, Location>		getLocations(void) const;
+>>>>>>> Stashed changes
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
@@ -52,6 +58,7 @@ class Server
 		void	setRoot(std::string& root);
 		void	setIndex(std::string& index);
 		void	setClientBody(int& client_body_size);
+	
 
 		/* Adders */
 		void	addToName(std::string& name);

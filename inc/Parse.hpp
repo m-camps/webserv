@@ -32,7 +32,7 @@ class Parse
 		void    				parseRoot(Server& server, std::string& currentLine);
 		void    				parseIndex(Server& server, std::string& currentLine);
 		void    				parseClientBodySize(Server& server, std::string& currentLine);
-
+		void					parseAllowedMethods(Server& server, std::string& currentLine);
 
 		void 					openFile(std::ifstream& configStream, std::string configName);
 
