@@ -11,7 +11,7 @@
 #include <sstream> // issstringstream()
 
 #include "Respond.hpp"
-#include "../../inc/Server.hpp" // Server class
+#include "Server.hpp" // Server class
 
 typedef std::map<std::string, std::string> map;
 

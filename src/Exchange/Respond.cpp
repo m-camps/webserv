@@ -120,7 +120,7 @@ std::string getFilename(std::string& MetaData)
     if (found == std::string::npos)
     {
         std::cerr << "File has no name" << std::endl;
-        return ("UserUpload");
+        return ("UserUpload.txt");
     }
 
     std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
@@ -170,6 +170,16 @@ std::string Respond::getDataOfBody(void)
     }
 
     return (ContentFile);
+}
+
+/* //////////////////////////// */
+
+std::string Respond::getBodyDataCurl(void)
+{
+    std::string RequestBody = _Exchanger.getHashMapString("Body");
+
+    std::cout << "BODY: \n" << RequestBody << std::endl;
+    return (RequestBody);
 }
 
 /* //////////////////////////// */
@@ -234,7 +244,8 @@ void Respond::ResponseBuilder(void)
     {
         _Exchanger.setStatusCode(e_MethodNotFound);
         generateStatus();
-        _Exchanger.setBody("");
+        std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
+        _Exchanger.setBody(FileContent);
         generateContentLength(_Exchanger.getBody().length());
         return ;
     }
@@ -267,7 +278,7 @@ void Respond::RespondToClient(void)
             "\r\n" +
             Body;
 
-    std::cout << "Response: \n" << response << std::endl;
+//    std::cout << "Response: \n" << response << std::endl;
     send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
@@ -291,7 +302,7 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
         return (e_Forbidden);
 	if ("/" == Path)
 		return (e_Redir);
-    if (access(relativePath.c_str(), F_OK) != 0)
+    if (access(relativePath.c_str(), R_OK) != 0)
 		return (e_NotFound);
 	return (e_OK);
 }

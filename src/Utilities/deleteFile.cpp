@@ -3,7 +3,6 @@
 //
 
 #include <string>
-#include <cstdio>
 
 void deleteFile(std::string& filePath)
 {
