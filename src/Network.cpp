@@ -50,6 +50,7 @@ void Network::setup(std::string file)
 
 
 /* Poll() loop of the network */
+/* do we need to use select with the bitflags? */
 void Network::run()
 {
 	char buff[BUFF]; //  test buffer (can change later or keep it here)
@@ -86,7 +87,6 @@ void Network::run()
 							;
 						else
 							perror("In recv: ");
-						
 						close(cur.fd);
 						delFromPollFds(i);
 					}

@@ -31,6 +31,5 @@ int32_t	main(int argc, char *argv[])
 
 	network.setup(argv[1]);
 	network.run();
-	
 	return (0);
 }

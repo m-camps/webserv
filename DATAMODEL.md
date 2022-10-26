@@ -46,8 +46,8 @@ parseNetwork
 			parseLocation (std::string from location <name> { to the next } that closes that block)
 			parseLocation (std::string from location <name> { to the next } that closes that block)
 		else
-			parseDirective (std::string till end of line (; in our case))
-			parseDirective (std::string till end of line (; in our case))
+			parseServerDirective (std::string till end of line (; in our case))
+			parseServerDirective (std::string till end of line (; in our case))
 	parseServer  (std::vector<std::string> from server { to the next } that closes that block)
 		if (location)
 			parseLocation (std::string from location <name> { to the next } that closes that block)
@@ -59,5 +59,5 @@ parseNetwork
 			parseLocation (std::string from location <name> { to the next } that closes that block)
 				parseLocationDirective (std::string till end of line (; in our case))
 		else
-			parseDirective (std::string till end of line (; in our case))
-			parseDirective (std::string till end of line (; in our case))
+			parseServerDirective (std::string till end of line (; in our case))
+			parseServerDirective (std::string till end of line (; in our case))

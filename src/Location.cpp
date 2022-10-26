@@ -60,7 +60,6 @@ std::string&	Location::getLocationCgiName(void)
 
 
 /* MUTATORS */
-
 void	Location::setLocationName(std::string& locationNameToAdd)
 {
 	locationNameToAdd.erase(remove(locationNameToAdd.begin(), locationNameToAdd.end(), ';'), locationNameToAdd.end());
@@ -100,17 +99,18 @@ void	Location::setLocationRoot(std::string& locationRootToAdd)
 
 void	Location::setLocationAllowMethod(std::string& locationAllowedMethods)
 {
+
+	char delimit[]= " \t\r\n\v\f";
 	char *remainingLine = const_cast<char *>(locationAllowedMethods.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, " ");
+	char *spaceSeparatedWord = strtok (remainingLine, delimit);
 	while (spaceSeparatedWord != NULL)
 	{
 		std::string methodToAdd(spaceSeparatedWord);
 		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
-		
-		std::vector<std::string>& myvector = _methods;
-		std::vector<std::string>::iterator it = myvector.begin();
-		it = myvector.insert(it, methodToAdd); //does this work now?
-		spaceSeparatedWord = strtok (NULL, " ");
+		_methods.push_back(methodToAdd);
+		//server.getMethodsReference().push_back(methodToAdd);
+		//it = myvector.insert(it, methodToAdd); //does this work now?
+		spaceSeparatedWord = strtok (NULL, delimit);
 	}
 	return ;
 }
@@ -132,7 +132,7 @@ void	Location::setLocationAutoindex(std::string& AutiondexToSet)
 
 std::ostream& operator<<(std::ostream& stream, Location& location)
 {
-	stream << "LocationName: [" << "]\n";
+	stream << "LocationName: [" << location.getLocationName() << "]\n";
 	stream << "\tRoot: [" <<  location.getLocationRoot() << "]\n";
 	stream << "\tIndex: [" <<  location.getLocationIndex() << "]\n";
 	stream << "\tAutoIndex: [" <<  location.getLocationAutoIndex() << "]\n";

@@ -4,7 +4,7 @@
 SERVER DIRECTIVE:
 	MANDATORY: listen (>= 1)
 	MANDATORY: location (>= 1)
-	OPTIONAL: server_name (>= 1)
+	OPTIONAL: server_name (>= 1) //mandatory
 	OPTIONAL: error_page (multiple codes are accepted, one URI)
 	OPTIONAL: client_body_size (one number is accepted)
 
@@ -18,17 +18,27 @@ SERVER DIRECTIVE:
 
 
 ACCEPTEX SYNTAX:
-	- All whitespaces have to be tabs
+	- All whitespaces have to be POSIX standard eg: " \t\r\n\v\f "
 	- If an input is not part of a directive, program will terminate
-	- If the amount of expected inp
 	- Usage of * or any modifier/regex expression will be treated as incorrect input, thus the program will terminate
 	- If a line will have no terminating ; character, the input will be treated incorrect, thus...
-
+	- If anything other than directives or expected braces are present, the input will be treated incorrect, thus...
 
 	//block errors to check for
 	/*
 
 	1, closing braces immediately eg: location /python []
 		fails: location /python []
+	2, closing braces after server eg: -> FIXED
+	 	server
+		{
+		}
 
+	3, already existing port server_name etc...?
+
+	4, server server (more words after server) -> FIXED
+
+	5, what happens if there is no server specified at all
+	6, location location  -> FIXED
+	7, check if we already have some value assigned to the directives, don't allow overwriting?
 	*/
