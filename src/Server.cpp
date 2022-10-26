@@ -20,6 +20,8 @@ Server::Server()
 	this->_root = "/";
 	this->_index = "index.html";
 	this->_socket_fd = 0;
+    this->_listen_set = false;
+    this->_servername_set = false;
 }
 
 Server::~Server() { return; }
@@ -59,7 +61,7 @@ void	Server::setClientBody(int& client_body_size) { _client_body_size = client_b
 void	Server::setListenFlag(void) { _listen_set = true; }
 void	Server::setServerNameFlag(void) { _servername_set = true; }
 
-bool	Server::minimumRequiredAttributesProvided(void) { return (_listen_set == true && _servername_set == true); }
+bool	Server::minimumRequiredAttributesProvided(void) { return (_listen_set == true && _servername_set == true); } //maybe i dont set them to false at init?
 
 /* Adders */
 void	Server::addToName(std::string& name) { _names.push_back(name); }

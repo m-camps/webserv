@@ -41,4 +41,16 @@ ACCEPTEX SYNTAX:
 	5, what happens if there is no server specified at all
 	6, location location  -> FIXED
 	7, check if we already have some value assigned to the directives, don't allow overwriting?
+    8. location
+       {
+       }
+
+       Is valid and does not create a "location"
+
+	^
+	|
+
+	You can add your own stuff.
+
+
 	*/

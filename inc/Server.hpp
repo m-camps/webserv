@@ -28,7 +28,7 @@
 
 typedef std::map<std::string, Location>::iterator locIt;
 typedef std::map<std::vector<int>, std::string>::iterator errorIt;
-
+typedef std::map<std::vector<int>, std::string> ErrorMap;
 
 class Server
 {
@@ -51,8 +51,8 @@ class Server
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
-		std::map<std::vector<int>, std::string>&	getErrorPageRef(void); //reference?
-		std::map<std::vector<int>, std::string>		getErrorPage(void) const; //reference?
+		ErrorMap&	                        getErrorPageRef(void); //reference?
+		ErrorMap                          	getErrorPage(void) const; //reference?
 
 		/* Setters */
 		//void	setPort(int& port);
