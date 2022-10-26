@@ -44,6 +44,16 @@ Respond& Respond::operator=(const Respond& ref)
 
 //////////// Responder ////////////
 
+void Respond::BuildGet_Redir(void)
+{
+    const std::string NewLocation = _Exchanger.getServer().getIndex();
+
+    generateStatus();
+    generateLocation(NewLocation);
+    _Exchanger.setBody("");
+    generateContentLength(0);
+}
+
 void Respond::BuildGet(void)
 {
 	std::string FileContent;
@@ -59,12 +69,9 @@ void Respond::BuildGet(void)
 		_Exchanger.setStatusCode(StatusCode);
 
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
-        if (StatusCode == 301)
+        if (StatusCode == e_Redir)
         {
-            const std::string NewLocation = _Exchanger.getServer().getIndex();
-
-            generateStatus();
-            generateLocation(NewLocation);
+            BuildGet_Redir();
             return ;
         }
 
@@ -96,7 +103,7 @@ void Respond::BuildDelete()
 
         generateStatus();
         _Exchanger.setBody("");
-        generateContentLength(_Exchanger.getBody().length());
+        generateContentLength(0);
         deleteFile(relativePath);
     }
     catch (const std::exception& e)
@@ -108,13 +115,32 @@ void Respond::BuildDelete()
 
 /* //////////////////////////// */
 
+/*
+ * Gonna make this a bit more elegant.
+ */
+std::string getFilename(std::string& MetaData)
+{
+    std::string line;
+    std::size_t found = MetaData.find("filename=");
+    if (found == std::string::npos)
+    {
+        std::cerr << "File has no name" << std::endl;
+        return ("UserUpload.txt");
+    }
+
+    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
+    std::getline(issFile, line);
+
+    line = line.substr(0, line.length() - 1);
+    return (line);
+}
+
 void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
     std::string ContentType;
-    std::size_t found = MetaData.find("Content-Type:");
-    std::ofstream File("data/www/test.html");
+    std::string Root = _Exchanger.getServer().getRoot();
+    std::ofstream File(Root + "/" + getFilename(MetaData));
 
-    (void) found;
     File << Body;
 }
 
@@ -125,12 +151,14 @@ std::string Respond::getDataOfBody(void)
     std::size_t found;
     std::string ContentFile;
     std::string RequestBody = _Exchanger.getHashMapString("Body");
+
     try
     {
         std::string Boundry = generateBoundry();
-        RequestBody = RequestBody.substr(Boundry.length() + 8,
-                                         RequestBody.length() - (Boundry.length() * 2) - 16);
+        RequestBody = RequestBody.substr(Boundry.length(),
+                                         RequestBody.length() - (Boundry.length() * 2) - 13);
 
+        std::cout << RequestBody << std::endl;
         while ((found = RequestBody.find(CRLF)) != std::string::npos)
         {
             _MetaData += RequestBody.substr(0, found) + "\n";
@@ -153,6 +181,16 @@ std::string Respond::getDataOfBody(void)
 
 /* //////////////////////////// */
 
+std::string Respond::getBodyDataCurl(void)
+{
+    std::string RequestBody = _Exchanger.getHashMapString("Body");
+
+    std::cout << "BODY: \n" << RequestBody << std::endl;
+    return (RequestBody);
+}
+
+/* //////////////////////////// */
+
 void Respond::BuildPost()
 {
     std::string MetaData;
@@ -166,6 +204,7 @@ void Respond::BuildPost()
 
         putBodyInFile(_MetaData, Body);
         _Exchanger.setBody(Body);
+        generateContentLength(_Exchanger.getBody().length());
     }
     catch (const std::exception& e)
     {
@@ -212,7 +251,8 @@ void Respond::ResponseBuilder(void)
     {
         _Exchanger.setStatusCode(e_MethodNotFound);
         generateStatus();
-        _Exchanger.setBody("");
+        std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
+        _Exchanger.setBody(FileContent);
         generateContentLength(_Exchanger.getBody().length());
         return ;
     }
@@ -245,7 +285,7 @@ void Respond::RespondToClient(void)
             "\r\n" +
             Body;
 
-    std::cout << "Response: \n" << response << std::endl;
+//    std::cout << "Response: \n" << response << std::endl;
     send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
@@ -269,7 +309,7 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
         return (e_Forbidden);
 	if ("/" == Path)
 		return (e_Redir);
-    if (access(relativePath.c_str(), F_OK) != 0)
+    if (access(relativePath.c_str(), R_OK) != 0)
 		return (e_NotFound);
 	return (e_OK);
 }

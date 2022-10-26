@@ -14,16 +14,15 @@ Exchange::Exchange(void)
 /* //////////////////////////// */
 
 Exchange::Exchange(Server NewSever, int32_t NewSocketFD)
-    : _server(NewSever), _body(""),
-        _statusCode(200), _SocketFD(NewSocketFD)
+    : _body(""), _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
 {
 }
 
 /* //////////////////////////// */
 
 Exchange::Exchange(const Exchange &ref)
-    : _server(ref._server), _dictHeader(ref._dictHeader),
-        _body(ref._body), _statusCode(ref._statusCode), _SocketFD(ref._SocketFD)
+    : _dictHeader(ref._dictHeader), _body(ref._body),
+        _statusCode(ref._statusCode), _server(ref._server), _SocketFD(ref._SocketFD)
 {
 }
 
@@ -94,13 +93,6 @@ uint32_t Exchange::getStatusCode(void) const
 int32_t Exchange::getSocketFD(void) const
 {
     return (_SocketFD);
-}
-
-/* //////////////////////////// */
-
-void Exchange::setServer(const Server NewServer)
-{
-    _server = NewServer;
 }
 
 /* //////////////////////////// */

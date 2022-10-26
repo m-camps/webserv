@@ -54,7 +54,7 @@ void Network::setup(std::string file)
 void Network::run()
 {
 	char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::string request;
+	std::string RequestStr;
 	//check if both location is seen here
 	while (true)
 	{
@@ -82,7 +82,7 @@ void Network::run()
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
 					if (ret <= 0)
 					{
-						request.clear();
+						RequestStr.clear();
 						if (ret == 0)
 							;
 						else
@@ -90,14 +90,14 @@ void Network::run()
 						close(cur.fd);
 						delFromPollFds(i);
 					}
-					request.append(buff);
+					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-						// std::cout << "POLLING\n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-						Request request(buff, exchange);
+						Request request(RequestStr, exchange);
+                        RequestStr.erase();
 					}
-					bzero(buff, '\0');
+//					bzero(buff, 10); // lol size is zero
 				}
 			}
 		}

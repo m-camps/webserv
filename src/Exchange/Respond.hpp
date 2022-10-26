@@ -43,6 +43,7 @@ private:
 	std::size_t getBodySize(std::string&) const;
 
     void ResponseBuilder(void);
+    void BuildGet_Redir(void);
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);
@@ -50,6 +51,7 @@ private:
 	void RespondToClient(void);
     void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
+    std::string getBodyDataCurl(void);
 
     // Generate
     void generateStatus(void);

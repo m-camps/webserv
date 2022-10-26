@@ -21,16 +21,15 @@ public:
     Exchange& operator=(const Exchange&);
 
     // Getters
-    Server getServer(void) const;
     HashMap getHashMap(void) const;
     std::string getHashMapString(const std::string&) const;
 	std::string getHeader(void) const;
     std::string getBody(void) const;
     uint32_t getStatusCode(void) const;
+    Server getServer(void) const;
     int32_t getSocketFD(void) const;
 
     // Setters
-    void setServer(const Server);
     void setHashMap(const HashMap);
     void setHeader(const std::string);
     void setBody(const std::string);
@@ -43,11 +42,11 @@ public:
 private:
     Exchange(void);
 
-    Server _server;
     HashMap _dictHeader;
     std::string _header;
     std::string _body;
     uint32_t _statusCode;
+    const Server _server;
     const int32_t _SocketFD;
 };
 
