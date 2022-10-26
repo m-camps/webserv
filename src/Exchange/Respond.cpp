@@ -44,6 +44,16 @@ Respond& Respond::operator=(const Respond& ref)
 
 //////////// Responder ////////////
 
+void Respond::BuildGet_Redir(void)
+{
+    const std::string NewLocation = _Exchanger.getServer().getIndex();
+
+    generateStatus();
+    generateLocation(NewLocation);
+    _Exchanger.setBody("");
+    generateContentLength(0);
+}
+
 void Respond::BuildGet(void)
 {
 	std::string FileContent;
@@ -59,14 +69,9 @@ void Respond::BuildGet(void)
 		_Exchanger.setStatusCode(StatusCode);
 
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
-        if (StatusCode == 301)
+        if (StatusCode == e_Redir)
         {
-            const std::string NewLocation = _Exchanger.getServer().getIndex();
-
-            generateStatus();
-            generateLocation(NewLocation);
-            _Exchanger.setBody("");
-            generateContentLength(0);
+            BuildGet_Redir();
             return ;
         }
 
@@ -98,7 +103,7 @@ void Respond::BuildDelete()
 
         generateStatus();
         _Exchanger.setBody("");
-        generateContentLength(_Exchanger.getBody().length());
+        generateContentLength(0);
         deleteFile(relativePath);
     }
     catch (const std::exception& e)
@@ -146,12 +151,14 @@ std::string Respond::getDataOfBody(void)
     std::size_t found;
     std::string ContentFile;
     std::string RequestBody = _Exchanger.getHashMapString("Body");
+
     try
     {
         std::string Boundry = generateBoundry();
-        RequestBody = RequestBody.substr(Boundry.length() + 8,
-                                         RequestBody.length() - (Boundry.length() * 2) - 16);
+        RequestBody = RequestBody.substr(Boundry.length(),
+                                         RequestBody.length() - (Boundry.length() * 2) - 13);
 
+        std::cout << RequestBody << std::endl;
         while ((found = RequestBody.find(CRLF)) != std::string::npos)
         {
             _MetaData += RequestBody.substr(0, found) + "\n";

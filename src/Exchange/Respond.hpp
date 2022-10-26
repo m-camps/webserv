@@ -12,9 +12,9 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
-#include "Macros.hpp" // Macros
-#include "Server.hpp" // Server class
-#include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+#include "../../inc/Macros.hpp" // Macros
+#include "../../inc/Server.hpp" // Server class
+#include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 
 #define CRLF "\r\n"
 
@@ -43,6 +43,7 @@ private:
 	std::size_t getBodySize(std::string&) const;
 
     void ResponseBuilder(void);
+    void BuildGet_Redir(void);
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);

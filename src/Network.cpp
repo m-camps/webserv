@@ -95,6 +95,7 @@ void Network::run()
 					{
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
 						Request request(RequestStr, exchange);
+                        RequestStr.erase();
 					}
 //					bzero(buff, 10); // lol size is zero
 				}

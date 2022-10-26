@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "Server.hpp" // Server class
+#include "../../inc/Server.hpp" // Server class
 
 typedef std::map<std::string, std::string> HashMap;
 
