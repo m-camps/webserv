@@ -1,0 +1,9 @@
+/Users/xvoorvaa/Desktop/webserv/tester/build/CMakeFiles/custom-main-tests.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/CMakeFiles/edit_cache.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/CMakeFiles/rebuild_cache.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/CMakeFiles/edit_cache.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/CMakeFiles/rebuild_cache.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/src/CMakeFiles/Catch2.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/src/CMakeFiles/Catch2WithMain.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/src/CMakeFiles/edit_cache.dir
+/Users/xvoorvaa/Desktop/webserv/tester/build/lib/Catch2-3.1.1/src/CMakeFiles/rebuild_cache.dir

@@ -64,7 +64,14 @@ HashMap Exchange::getHashMap(void) const
 
 std::string Exchange::getHashMapString(const std::string& RequestedMap) const
 {
-    return (_dictHeader.find(RequestedMap)->second);
+    try
+    {
+        return (_dictHeader.find(RequestedMap)->second);
+    }
+    catch (const std::exception& e)
+    {
+        throw (e);
+    }
 }
 
 /* //////////////////////////// */
