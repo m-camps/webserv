@@ -3,13 +3,10 @@ project(custom-main-tests)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED(true))
 
-include_directories(inc/Parse.hpp)
-include_directories(inc/Server.hpp)
-include_directories(inc/Utilities.hpp)
+target_include_directories(${PROJECT_NAME} PRIVATE ${YOUR_DIRECTORY}/inc)
+include_directories(${YOUR_DIRECTORY}/inc)
 
-include_directories(src/Exchange/Exchange.hpp)
-include_directories(src/Exchange/Request.hpp)
-include_directories(src/Exchange/Respond.hpp)
+include_directories(inc/webserv.h)
 
 add_subdirectory(lib/Catch2-3.1.1)
 add_executable(${PROJECT_NAME}

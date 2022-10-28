@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/25 13:18:45 by bmajor        ########   odam.nl          #
+#    Updated: 2022/10/28 13:30:28 by xvoorvaa      ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -86,6 +86,9 @@ rerun: fclean all
 test: all
 	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)\n"
 	@./$(NAME) conf/basic.conf
+
+lib: $(OBJ)
+	@ar rcs tester/lib/webserv.a $(OBJ)
 
 # Colors
 RED=\x1b[1;31m
