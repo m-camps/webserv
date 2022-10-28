@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/10/17 12:23:06 by mcamps        ########   odam.nl          #
+#    Updated: 2022/10/25 13:18:45 by bmajor        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 CONFIG := data/conf/basic.conf
 
 INC := -Iinc -Isrc
-CFLAGS := -Wall -Werror -Wextra -pedantic $(INC)
+CFLAGS :=  -pedantic $(INC)
 CC	:= c++
 EXTRA := -std=c++98
 SHELL := /bin/bash

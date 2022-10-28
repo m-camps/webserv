@@ -25,6 +25,7 @@ std::string readFile(const std::string& RespondedFile)
 {
     int64_t len;
     std::ifstream File;
+    std::string FileContentStr;
 
     File.open(RespondedFile);
     if (!File.is_open())
@@ -40,11 +41,10 @@ std::string readFile(const std::string& RespondedFile)
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        std::exit(1);
+        std::exit(EXIT_FAILURE);
     }
     File.close();
 
-    std::string FileContentStr;
     FileContentStr.append(FileContent, len);
     delete [] FileContent;
     return (FileContentStr);

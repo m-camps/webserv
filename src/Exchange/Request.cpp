@@ -4,8 +4,6 @@
 
 #include "Request.hpp"
 
-typedef std::map<std::string, std::string> map;
-
 ////////////// Ctor & Dtor //////////////
 
 /**
@@ -14,16 +12,27 @@ typedef std::map<std::string, std::string> map;
 Request::Request(const std::string Request, Exchange NewExchanger)
 		: _Exchanger(NewExchanger)
 {
-	const std::string Header = AppendRequest(Request);
+    try
+    {
+	    const std::string Header = AppendRequest(Request);
 
-	HeaderToMap(Header);
-	Respond Responder(_Exchanger);
+        HeaderToMap(Header);
+	    Respond Responder(_Exchanger);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
+
+/* //////////////////////////// */
 
 Request::Request(const Request& ref)
 		: _Exchanger(ref._Exchanger)
 {
 }
+
+/* //////////////////////////// */
 
 Request::~Request(void)
 {
@@ -44,7 +53,7 @@ Request &Request::operator=(const Request& ref)
 
 /**
  * I look for the "\\r\\n\\r\\n" seperator by using std::find.
- * Which I will then append to the Header string.
+ * Which I will then append to the Header string & the Body string.
  */
 std::string Request::AppendRequest(const std::string& Request)
 {
@@ -53,9 +62,8 @@ std::string Request::AppendRequest(const std::string& Request)
 
 	std::size_t found = Request.find("\r\n\r\n");
 	if (found == std::string::npos)
-	{
-		std::cerr << "No separator found" << std::endl;
-	}
+		throw (std::invalid_argument("No seperator found"));
+
 	Header.append(Request, 0, found);
 
     Body.append(Request, found, Request.length() - found);
@@ -73,14 +81,17 @@ std::string Request::AppendRequest(const std::string& Request)
  */
 void Request::splitMethod(std::string line)
 {
+    int32_t last_it;
 	std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
 	std::vector<int>::iterator it = AllSpaceLocations.begin();
 
 	try
 	{
         _Exchanger.addHashMapNode("HTTPMethod", line.substr(0, *it));
-        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - 4));
-        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length()));
+        last_it = *it + 1;
+        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
+        last_it = *it;
+        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it));
 	}
 	catch(const std::exception& e)
 	{

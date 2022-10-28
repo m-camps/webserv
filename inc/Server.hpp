@@ -27,6 +27,8 @@
 #define ERROR 1
 
 typedef std::map<std::string, Location>::iterator locIt;
+typedef std::map<std::vector<int>, std::string>::iterator errorIt;
+typedef std::map<std::vector<int>, std::string> ErrorMap;
 
 class Server
 {
@@ -36,23 +38,33 @@ class Server
 		Server(const Server& src);
 
 		/* Getters */
-		int									getPort(void) const;
+		//int								getPort(void) const;
+		std::vector<int>					getPorts(void) const;
+
 		std::vector<std::string>			getNames(void) const;
 		std::string							getRoot(void) const;
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
+		std::vector<std::string>&			getMethodsReference(void);
 		std::map<std::string, Location>		getLocations(void) const;
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
-		std::string							getErrorPage(int statuscode) const;
+		ErrorMap&	                        getErrorPageRef(void); //reference?
+		ErrorMap                          	getErrorPage(void) const; //reference?
 
 		/* Setters */
+		//void	setPort(int& port);
 		void	setPort(int& port);
 		void	setRoot(std::string& root);
 		void	setIndex(std::string& index);
 		void	setClientBody(int& client_body_size);
+
+		void	setListenFlag(void); //new setters for minimum required flags
+		void	setServerNameFlag(void); //new setters for minimum required flags
+		bool	minimumRequiredAttributesProvided(void);
+
 
 		/* Adders */
 		void	addToName(std::string& name);
@@ -68,20 +80,23 @@ class Server
 		int		acceptConnection();
 		bool	isClientFdInServer(int fd);
 
+
 	private:
+		std::vector<int>							_port;
+		std::vector<std::string>					_names; 					// can be searching for multiple names
+		std::string									_root; 						// default = "/"
+		std::string									_index; 					// default = "index.html"
+		int											_client_body_size;			// default = 10;
+		std::vector<std::string>					_methods;					// default = ["GET", "POST", "DELETE"]
+		struct sockaddr_in*							_address_in; 				// Optional can be deleted
+		int											_socket_fd; 				// Socket FD the server is running on
+		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
+		std::map<std::string, Location>				_locations;					// All locations of the Server
+		std::map<std::vector<int>, std::string>		_error_pages;				//should be vector of ints as the first part of the map?
+		bool										_listen_set; 				//setters for these?
+		bool										_servername_set;  			//setters for these?
 
-		int								_port; 						// The port server is running on, can maybe be multiple ports?
-		std::vector<std::string>		_names; 					// can be searching for multiple names
-		std::string						_root; 						// default = "/"
-		std::string						_index; 					// default = "index.html"
-		int								_client_body_size;			// default = 10;
-		std::vector<std::string>		_methods;					// default = ["GET", "POST", "DELETE"]
-		struct sockaddr_in*				_address_in; 				// Optional can be deleted
-		int								_socket_fd; 				// Socket FD the server is running on
-		std::vector<int>				_client_fds;				// Client FD's currently associated to this server
-		std::map<std::string, Location>	_locations;					// All locations of the Server
-		std::map<int, std::string>		_erorr_pages;				//
-
+		//struct to check if all flags etc was correct?
 		/* Helper Functions */
 		void	makeSocketAddr();
 		void	createSocket();

@@ -12,12 +12,15 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
+#include "../../inc/Macros.hpp" // Macros
 #include "../../inc/Server.hpp" // Server class
-#include "../../inc/Utilities.hpp" // findCharLocation
+#include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+
+#define CRLF "\r\n"
 
 typedef std::map<std::string, std::string> HashMap;
 
-uint32_t modifyStatusCode(HashMap, const std::string&);
+uint32_t modifyStatusCode(std::string, const std::string&);
 std::string getValidFile(std::string, std::string, uint32_t);
 
 class Respond
@@ -34,17 +37,21 @@ private:
 
     Exchange _Exchanger;
 
+    // Tijdelijk
+    std::string _MetaData;
+
 	std::size_t getBodySize(std::string&) const;
 
     void ResponseBuilder(void);
+    void BuildGet_Redir(void);
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);
 
 	void RespondToClient(void);
-	bool CheckConnectionStatus(void);
-    void putBodyInFile(std::string&);
+    void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
+    std::string getBodyDataCurl(void);
 
     // Generate
     void generateStatus(void);

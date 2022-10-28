@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/21 17:56:43 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/28 16:05:55 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,12 @@ void Network::setup(std::string file)
 }
 
 /* Poll() loop of the network */
+/* do we need to use select with the bitflags? */
 void Network::run()
 {
-	char buff[BUFF];
-	// std::string newbuff = "";
-
+	char buff[BUFF]; //  test buffer (can change later or keep it here)
+	std::string RequestStr;
+	//check if both location is seen here
 	while (true)
 	{
 		if (poll(_fds, _total_fd, -1) == -1)
@@ -85,8 +86,7 @@ void Network::run()
 					std::cout << "\nret = " << ret;
 					if (ret <= 0)
 					{
-						_buffer.erase(cur.fd);
-						std::cout << _buffer.size() << "size is "  << std::endl;
+						RequestStr.clear();
 						if (ret == 0)
 							;
 						else
@@ -94,17 +94,14 @@ void Network::run()
 						close(cur.fd);
 						delFromPollFds(i);
 					}
-					else
-						_buffer.find(cur.fd)->second.append(buff, 0, BUFF);
-					// std::cout << buff << "\n";
+					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-						// std::cout << _buffer.find(cur.fd)->second << "buffer \n";
 						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-						Request request(_buffer.find(cur.fd)->second, exchange);
-						// _buffer.erase(cur.fd) // This should be added
+						Request request(RequestStr, exchange);
+                        RequestStr.erase();
 					}
-					
+//					bzero(buff, 10); // lol size is zero
 				}
 				cur.revents = 0;
 			}

@@ -20,17 +20,16 @@ public:
 
     Exchange& operator=(const Exchange&);
 
-    // Geters
-    Server getServer(void) const;
+    // Getters
     HashMap getHashMap(void) const;
     std::string getHashMapString(const std::string&) const;
 	std::string getHeader(void) const;
     std::string getBody(void) const;
     uint32_t getStatusCode(void) const;
+    Server getServer(void) const;
     int32_t getSocketFD(void) const;
 
-    // Seters
-    void setServer(const Server);
+    // Setters
     void setHashMap(const HashMap);
     void setHeader(const std::string);
     void setBody(const std::string);
@@ -43,11 +42,11 @@ public:
 private:
     Exchange(void);
 
-    Server _server;
     HashMap _dictHeader;
     std::string _header;
     std::string _body;
     uint32_t _statusCode;
+    const Server _server;
     const int32_t _SocketFD;
 };
 
@@ -56,10 +55,12 @@ std::ostream& operator<<(std::ostream&, const Exchange&);
 enum e_statusCode
 {
     e_OK = 200,
-	e_ACCEPTED = 202,
-	e_NOCONTENT = 204,
-    e_REDIR = 301,
-    e_NOTFOUND = 404
+	e_Accepted = 202,
+	e_NoContent = 204,
+    e_Redir = 301,
+    e_Forbidden = 401,
+    e_NotFound = 404,
+    e_MethodNotFound = 405
 };
 
 #endif //WEBSERV_EXCHANGE_HPP
