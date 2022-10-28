@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 17:54:12 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/28 16:23:10 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,24 +26,34 @@ Server::Server()
 
 Server::~Server() { return; }
 
+
+Server::Server(const Server& src)
+{
+    *this = src;
+    return;
+}
+
 /* Getters */
-//int								Server::getPort(void) const { return _port; } // Do we need to listen on multiple ports?
+//int								Server::getPort(void) const { return _port; }
 std::vector<int>								Server::getPorts(void)  const { return _port; }
 std::vector<std::string>						Server::getNames(void) const { return _names; }
 std::string										Server::getRoot(void) const { return _root; }
 std::string  									Server::getIndex(void) const { return _index; }
 int												Server::getClientBodySize(void) const { return _client_body_size; }
 std::vector<std::string>						Server::getMethods(void) const { return _methods; }
-std::map<std::string, Location> 				Server::getLocations(void) const { return _locations; }
+std::vector<std::string>&						Server::getMethodsReference(void) { return _methods; }
+std::map<std::string, Location> 				Server::getLocations(void) const { return _locations; } //shouldnt this be a poiter?
 int												Server::getSocketFd(void) const { return _socket_fd; }
 struct sockaddr_in*       						Server::getSockAddr(void) const { return _address_in; }
 std::vector<int>								Server::getClientFds(void) const { return _client_fds; }
-std::map<int, std::string> 						Server::getErrorPage(void) const { return _error_pages; }
+std::map<std::vector<int>, std::string> 		Server::getErrorPage(void) const { return _error_pages; }
+std::map<std::vector<int>, std::string>& 		Server::getErrorPageRef(void) { return _error_pages; }
 
 
 /* Setters */
 //void	Server::setPort(int& port) { _port = port; }
 void	Server::setPort(int& port) { _port.push_back(port); }
+
 void	Server::setRoot(std::string& root) { _root = root; }
 void	Server::setIndex(std::string& index) { _index = index; }
 void	Server::setClientBody(int& client_body_size) { _client_body_size = client_body_size; }
@@ -56,8 +66,9 @@ bool	Server::minimumRequiredAttributesProvided(void) { return (_listen_set == tr
 /* Adders */
 void	Server::addToName(std::string& name) { _names.push_back(name); }
 void	Server::addToMethod(std::string& method) {_methods.push_back(method); }
-void	Server::addToLocations(std::string& name, Location& location)
+void	Server::addToLocations(std::string &name, Location& location)
 {
+	location.setLocationName(name);
 	_locations.insert(std::pair<std::string, Location>(name, location));
 }
 

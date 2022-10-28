@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/12 14:31:12 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/28 17:41:00 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,125 +22,38 @@ Location::Location()
 
 Location::~Location(){}
 
-/* ACCESSORS */
-std::string&				Location::getLocationName(void)
-{
-		return _name;
-}
-
-std::string&	Location::getLocationRoot(void)
-{
-	return _root;
-}
-
-std::string&	Location::getLocationIndex(void)
-{
-	return _index;
-}
-
-bool&		Location::getLocationAutoIndex(void)
-{
-	return _autoindex;
-}
-
-std::vector<std::string>&	Location::getLocationAllowMethods(void)
-{
-	return _methods;
-}
-
-std::string&	Location::getLocationCgiFileExtension(void)
-{
-	return _cgi_ext;
-}
-
-std::string&	Location::getLocationCgiName(void)
-{
-	return _cgi_name;
-}
+/* Getters */
+std::string					Location::getName(void) const{ return _name; }
+std::string					Location::getRoot(void) const { return _root; }
+std::string					Location::getIndex(void) const { return _index; }
+bool						Location::getAutoIndex(void) const { return _autoindex; }
+std::vector<std::string>	Location::getAllowMethods(void) const { return _methods; }
+std::string					Location::getCgiFileExtension(void) const { return _cgi_ext; }
+std::string					Location::getCgiName(void) const { return _cgi_name; }
 
 
-/* MUTATORS */
-void	Location::setLocationName(std::string& locationNameToAdd)
-{
-	locationNameToAdd.erase(remove(locationNameToAdd.begin(), locationNameToAdd.end(), ';'), locationNameToAdd.end());
-	_name = locationNameToAdd;
-	return ;
-}
+/* Setters */
+void						Location::setName(std::string& name) { _name = name; }
+void						Location::setRoot(std::string& root) { _root = root; }
+void						Location::setIndex(std::string& index) { _index = index; }
+void						Location::setAutoIndex(bool& autoindex) { _autoindex = autoindex; }
+void						Location::setCgiName(std::string& cgiName) { _cgi_name = cgiName; }
+void						Location::setCgiExt(std::string& cgiExt) { _cgi_ext = cgiExt; }
 
-
-void	Location::setLocationIndex(std::string& LocationIndexToAdd)
-{
-	LocationIndexToAdd.erase(remove(LocationIndexToAdd.begin(), LocationIndexToAdd.end(), ';'), LocationIndexToAdd.end());
-	_index = LocationIndexToAdd;
-	return ;
-}
-
-
-void	Location::setCgiName(std::string& cgiName)
-{
-	cgiName.erase(remove(cgiName.begin(), cgiName.end(), ';'), cgiName.end());
-	_cgi_name = cgiName;
-	return ;
-}
-
-void	Location::setCgiFileExtension(std::string& cgiFileExtension)
-{
-	cgiFileExtension.erase(remove(cgiFileExtension.begin(), cgiFileExtension.end(), ';'), cgiFileExtension.end());
-	_cgi_ext = cgiFileExtension;
-	return ;
-}
-
-void	Location::setLocationRoot(std::string& locationRootToAdd)
-{
-	locationRootToAdd.erase(remove(locationRootToAdd.begin(), locationRootToAdd.end(), ';'), locationRootToAdd.end());
-	_root = locationRootToAdd;
-	return ;
-}
-
-void	Location::setLocationAllowMethod(std::string& locationAllowedMethods)
-{
-
-	char delimit[]= " \t\r\n\v\f";
-	char *remainingLine = const_cast<char *>(locationAllowedMethods.c_str());
-	char *spaceSeparatedWord = strtok (remainingLine, delimit);
-	while (spaceSeparatedWord != NULL)
-	{
-		std::string methodToAdd(spaceSeparatedWord);
-		methodToAdd.erase(remove(methodToAdd.begin(), methodToAdd.end(), ';'), methodToAdd.end());
-		_methods.push_back(methodToAdd);
-		//server.getMethodsReference().push_back(methodToAdd);
-		//it = myvector.insert(it, methodToAdd); //does this work now?
-		spaceSeparatedWord = strtok (NULL, delimit);
-	}
-	return ;
-}
-
-void	Location::setLocationAutoindex(std::string& AutiondexToSet)
-{
-	AutiondexToSet.erase(remove(AutiondexToSet.begin(), AutiondexToSet.end(), ';'), AutiondexToSet.end());
-	if (AutiondexToSet == "off")
-	{
-		_autoindex = false;
-	}
-	else
-	{
-		_autoindex = true;
-	}
-	return ;
-}
-
+/* Adders */
+void 						Location::addToAllowedMethod(std::string& method) { _methods.push_back(method); }
 
 std::ostream& operator<<(std::ostream& stream, Location& location)
 {
-	stream << "LocationName: [" << location.getLocationName() << "]\n";
-	stream << "\tRoot: [" <<  location.getLocationRoot() << "]\n";
-	stream << "\tIndex: [" <<  location.getLocationIndex() << "]\n";
-	stream << "\tAutoIndex: [" <<  location.getLocationAutoIndex() << "]\n";
+	stream << "LocationName: [" << location.getName() << "]\n";
+	stream << "\tRoot: [" <<  location.getRoot() << "]\n";
+	stream << "\tIndex: [" <<  location.getIndex() << "]\n";
+	stream << "\tAutoIndex: [" <<  location.getAutoIndex() << "]\n";
 	stream << "\tMethods: [";
-	for (size_t i = 0; i < location.getLocationAllowMethods().size(); i++)
-		stream << location.getLocationAllowMethods().at(i) << " ";
+	for (size_t i = 0; i < location.getAllowMethods().size(); i++)
+		stream << location.getAllowMethods().at(i) << " ";
 	stream << "]\n";
-	stream << "\tCgiName: [" <<  location.getLocationCgiName() << "]\n";
-	stream << "\tCgiExtension: [" <<  location.getLocationCgiFileExtension() << "]\n";
+	stream << "\tCgiName: [" <<  location.getCgiName() << "]\n";
+	stream << "\tCgiExtension: [" <<  location.getCgiFileExtension() << "]\n";
 	return (stream);
 }

@@ -6,11 +6,12 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 17:49:22 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/28 16:23:17 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef SERVER_H
+#define SERVER_H
 
 #include "Location.hpp"
 #include <string>
@@ -34,6 +35,7 @@ class Server
 	public:
 		Server();
 		~Server();
+		Server(const Server& src);
 
 		/* Getters */
 		//int								getPort(void) const;
@@ -44,11 +46,13 @@ class Server
 		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
+		std::vector<std::string>&			getMethodsReference(void);
 		std::map<std::string, Location>		getLocations(void) const;
 		int									getSocketFd(void) const;
 		struct sockaddr_in*					getSockAddr(void) const;
 		std::vector<int>					getClientFds(void) const;
-		std::map<int, std::string>          getErrorPage(void) const;
+		ErrorMap&	                        getErrorPageRef(void); //reference?
+		ErrorMap                          	getErrorPage(void) const; //reference?
 
 		/* Setters */
 		//void	setPort(int& port);
@@ -65,8 +69,7 @@ class Server
 		/* Adders */
 		void	addToName(std::string& name);
 		void	addToMethod(std::string& method);
-		void	addToLocations(std::string& name, Location& location);
-		void	addToErrorPages(int& error_nb, std::string& error_page);
+		void	addToLocations(std::string &name, Location& location);
 
 		/* Delete */
 		void	removeFromClientFds(int fd);
@@ -89,7 +92,7 @@ class Server
 		int											_socket_fd; 				// Socket FD the server is running on
 		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
 		std::map<std::string, Location>				_locations;					// All locations of the Server
-		std::map<int, std::string>					_error_pages;				//should be vector of ints as the first part of the map?
+		std::map<std::vector<int>, std::string>		_error_pages;				//should be vector of ints as the first part of the map?
 		bool										_listen_set; 				//setters for these?
 		bool										_servername_set;  			//setters for these?
 
@@ -102,3 +105,5 @@ class Server
 
 /* Stream overload */
 std::ostream& operator<<(std::ostream& stream, const Server& Server);
+
+#endif

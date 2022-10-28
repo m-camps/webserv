@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 17:41:12 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/28 16:22:21 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,25 +31,27 @@ class Location {
 		Location();
 		~Location();
 
-		/* Getters */
-		std::string					getName(void) const;
-		std::string					getRoot(void) const;
-		std::string					getIndex(void) const;
-		bool						getAutoIndex(void) const;
-		std::vector<std::string>	getAllowMethods(void) const;
-		std::string					getCgiFileExtension(void) const;
-		std::string					getCgiName(void) const;
+		std::string&				getLocationName(void);
+		std::string&				getLocationRoot(void);
+		std::string&				getLocationIndex(void);
+		bool&						getLocationAutoIndex(void);
+		std::vector<std::string>&	getLocationAllowMethods(void);
+		std::string&				getLocationCgiFileExtension(void);
+		std::string&				getLocationCgiName(void);
 
-		/* Setters */
-		void						setName(std::string& name);
-		void 						setRoot(std::string& root);
-		void						setIndex(std::string& index);
-		void						setAutoIndex(bool& autoindex);
-		void						setCgiName(std::string& cgiName);
-		void						setCgiExt(std::string& cgiExt);
-		
-		/* Adders */
-		void						addToAllowedMethod(std::string& method);
+		void						setLocationName(std::string& locationNameToAdd);
+		 void						setLocationRoot(std::string& locationRootToAdd);
+		 void						setLocationIndex(std::string& LocationIndexToAdd);
+		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
+		 void						setLocationAutoindex(std::string& AutiondexToSet);
+		 void						setCgiName(std::string& cgiName);
+		 void						setCgiFileExtension(std::string& cgiFileExtension);
 };
 
 std::ostream& operator<<(std::ostream& stream, Location& location);
+
+typedef struct selectParsing
+{
+	std::string		_name;
+	void			(Location::*pointerToLocation)(std::string&);
+}				t_selectLocation;
