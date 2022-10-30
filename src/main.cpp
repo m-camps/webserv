@@ -18,6 +18,7 @@
 #include "../inc/Server.hpp"
 #include "../inc/Parse.hpp"
 #include "../inc/Network.hpp"
+#include "../inc/Cgi.hpp"
 
 int32_t	main(int argc, char *argv[])
 {
@@ -28,7 +29,10 @@ int32_t	main(int argc, char *argv[])
 	}
 
 	Network network;
-
+	Cgi cgi;
+	cgi.printEnv();
+	cgi.createCgiResponse();
+	
 	network.setup(argv[1]);
 	network.run();
 	return (0);
