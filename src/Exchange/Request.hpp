@@ -11,26 +11,20 @@
 #include <sstream> // issstringstream()
 
 #include "Respond.hpp"
-#include "../../inc/Server.hpp" // Server class
+#include "Server.hpp" // Server class
 
 typedef std::map<std::string, std::string> map;
 
 class Request
 {
 public:
-    typedef std::map<std::string, std::string> map;
-
-    // Ctor & Dtor
     explicit Request(std::string, Exchange);
     Request(const Request&);
     ~Request(void);
 
-    // Operators
-    Request& operator=(const Request& ref);
-
-    // Functions
 private:
     Request(void);
+    Request& operator=(const Request& ref);
 
     Exchange _Exchanger;
 

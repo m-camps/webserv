@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "../../inc/Server.hpp" // Server class
+#include "Server.hpp" // Server class
 
 typedef std::map<std::string, std::string> HashMap;
 
@@ -18,7 +18,6 @@ public:
     Exchange(const Exchange&);
     ~Exchange(void);
 
-    Exchange& operator=(const Exchange&);
 
     // Getters
     HashMap getHashMap(void) const;
@@ -41,6 +40,7 @@ public:
 
 private:
     Exchange(void);
+    Exchange& operator=(const Exchange&);
 
     HashMap _dictHeader;
     std::string _header;

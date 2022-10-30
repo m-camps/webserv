@@ -14,11 +14,7 @@
 #include <fcntl.h>
 #define DEBUG false
 
-#include "Exchange/Request.hpp"
-#include "Server.hpp"
-#include "../inc/Parse.hpp"
-#include "../inc/Network.hpp"
-#include "../inc/Cgi.hpp"
+#include "Network.hpp"
 
 int32_t	main(int argc, char *argv[])
 {

@@ -12,9 +12,9 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
-#include "../../inc/Macros.hpp" // Macros
-#include "../../inc/Server.hpp" // Server class
-#include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+#include "Macros.hpp" // Macros
+#include "Server.hpp" // Server class
+#include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 
 #define CRLF "\r\n"
 
@@ -31,10 +31,9 @@ public:
 	Respond(const Respond&);
 	~Respond(void);
 
-	Respond& operator=(const Respond&);
-
 private:
 	Respond(void);
+	Respond& operator=(const Respond&);
 
     Exchange _Exchanger;
 
@@ -52,7 +51,6 @@ private:
 	void RespondToClient(void);
     void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
-    std::string getBodyDataCurl(void);
 
     // Generate
     void generateStatus(void);

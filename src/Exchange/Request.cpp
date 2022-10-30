@@ -38,17 +38,6 @@ Request::~Request(void)
 {
 }
 
-////////////// Operators //////////////
-
-Request &Request::operator=(const Request& ref)
-{
-	if (this != &ref)
-	{
-		_Exchanger = ref._Exchanger;
-	}
-	return (*this);
-}
-
 ////////////// Functions //////////////
 
 /**

@@ -168,25 +168,10 @@ std::string Respond::getDataOfBody(void)
     }
     catch (const std::exception& e)
     {
-        while ((found = RequestBody.find(CRLF)) != std::string::npos)
-        {
-            _MetaData += RequestBody.substr(0, found) + "\n";
-            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
-        }
-        ContentFile = RequestBody.substr(0, RequestBody.length());
+        throw(std::logic_error("POST could not be handled"));
     }
 
     return (ContentFile);
-}
-
-/* //////////////////////////// */
-
-std::string Respond::getBodyDataCurl(void)
-{
-    std::string RequestBody = _Exchanger.getHashMapString("Body");
-
-    std::cout << "BODY: \n" << RequestBody << std::endl;
-    return (RequestBody);
 }
 
 /* //////////////////////////// */
@@ -348,17 +333,6 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 }
 
 #pragma endregion "NonClass functions"
-
-#pragma region Getter
-
-////////////// Getter //////////////
-
-std::size_t Respond::getBodySize(std::string& Body) const
-{
-	return (Body.length());
-}
-
-#pragma endregion Getter
 
 #pragma region generators
 

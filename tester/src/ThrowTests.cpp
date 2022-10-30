@@ -6,19 +6,18 @@
 /*   By: xvoorvaa <xvoorvaa@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 13:40:28 by xvoorvaa      #+#    #+#                 */
-/*   Updated: 2022/10/30 14:06:00 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/30 16:22:39 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <catch2/catch_test_macros.hpp>
-
-#include "../../inc/Server.hpp"
-#include "../../inc/Network.hpp"
-#include "../../src/Exchange/Exchange.hpp"
-#include "../../src/Exchange/Respond.hpp"
-#include "../../src/Exchange/Request.hpp"
-
 #include <string>
+
+#include "Server.hpp"
+#include "Network.hpp"
+#include "Exchange/Exchange.hpp"
+#include "Exchange/Respond.hpp"
+#include "Exchange/Request.hpp"
 
 TEST_CASE("Using a string that does not exist in getHashMapstring")
 {
