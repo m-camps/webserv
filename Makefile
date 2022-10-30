@@ -87,8 +87,8 @@ test: all
 	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)\n"
 	@./$(NAME) conf/basic.conf
 
-lib: $(OBJ)
-	@ar rcs tester/lib/webserv.a $(OBJ)
+unit_tester:
+	cmake -S tester/ -B tester/build
 
 # Colors
 RED=\x1b[1;31m

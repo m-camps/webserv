@@ -75,7 +75,7 @@ std::string Request::AppendRequest(const std::string& Request)
 /**
  * splitMethod splits the HTTPMethod to the following std::map
  *
- * HTTPMethod <- The request
+ * HTTPMethod <- The request method
  * Path <- Path of the page being requested
  * HTTPVersion <- Speaks for itself
  */
@@ -102,18 +102,7 @@ void Request::splitMethod(std::string line)
 
 /*
  * I created a HashMap by using std::map.
- * You can use std::map::at() to find the data you are looking for. \n
- *
- * For example:
- * std::cout << std::map::at("HTTPMethod") << std::endl;
- *
- * Output:
- * GET / HTTP/1.1
- *
- * The following keywords are important:
- * Host <-- What is the hostname
- * Connection <-- To check connection
- * User-Agent <-- Information of the user
+ * You can use std::map::find() to find the data you are looking for. \n
  */
 void Request::HeaderToMap(const std::string& Header)
 {

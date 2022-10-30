@@ -1,6 +1,7 @@
 .DS_Store
 webserv
-build/*
+build/
+tester/build/
 .idea
 
 # Prerequisites

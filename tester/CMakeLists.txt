@@ -3,8 +3,8 @@ project(custom-main-tests)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED(true))
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${YOUR_DIRECTORY}/inc)
-include_directories(${YOUR_DIRECTORY}/inc)
+#target_include_directories(${PROJECT_NAME} PRIVATE ${YOUR_DIRECTORY})
+#include_directories(${YOUR_DIRECTORY}/inc)
 
 include_directories(inc/webserv.h)
 

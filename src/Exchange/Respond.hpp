@@ -22,6 +22,7 @@ typedef std::map<std::string, std::string> HashMap;
 
 uint32_t modifyStatusCode(std::string, const std::string&);
 std::string getValidFile(std::string, std::string, uint32_t);
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
 
 class Respond
 {
