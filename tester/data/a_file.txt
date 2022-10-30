@@ -1,0 +1,3 @@
+hello I am a file.
+I am 46 bytes long.
+Bye Bye

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 14:08:08 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/30 13:33:57 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Server
 		Server(const Server& src);
 
 		/* Getters */
-		//int								getPort(void) const;
+		// int								getPort(void) const;
 		std::vector<int>					getPorts(void) const;
 
 		std::vector<std::string>			getNames(void) const;
@@ -55,7 +55,6 @@ class Server
 		ErrorMap                          	getErrorPage(void) const; //reference?
 
 		/* Setters */
-		//void	setPort(int& port);
 		void	setPort(int& port);
 		void	setRoot(std::string& root);
 		void	setIndex(std::string& index);

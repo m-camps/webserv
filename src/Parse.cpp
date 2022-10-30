@@ -47,24 +47,26 @@ Parse::~Parse()
 void Parse::openFile(std::ifstream& configStream, std::string configName)
 {
 	configStream.open(configName);
-	if (configStream.is_open())
-	{
-		std::cout << "Config file opened." << std::endl;
-	}
-	else
+	if (!configStream.is_open())
 	{
 		std::cout << "Failed to open config file." << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
+	std::cout << "Config file opened." << std::endl;
 }
 
 std::vector<std::string> splitLineWithStrtok(std::string& line)
 {
-	char	*c_line = strdup(const_cast<char *>(line.c_str()));
-	char	*word;
-	std::vector<std::string> ret;
-	char delimit[]= " \t\r\n\v\f";
+	char						*word;
+	std::vector<std::string>	ret;
+	char						delimit[]= " \t\r\n\v\f";
+	char						*c_line = strdup(line.c_str());
 
+	if (!c_line)
+	{
+		std::perror("malloc: ");
+		std::exit(EXIT_FAILURE);
+	}
 	word = strtok(c_line, delimit);
 	while (word != NULL)
 	{

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/19 18:06:40 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/30 13:53:14 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,7 @@ void Network::setup(std::string file)
 {
 	Parse				parser;
 	std::vector<Server> tmp;
-	
-	// (void)file;
+
 	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
 
 	for (size_t i = 0; i < _servers.size(); i++)
@@ -135,7 +134,7 @@ void	Network::addToPollFds(int fd)
 	{
 		_max_fd *= 2;
 		struct pollfd *tmp = (pollfd*)realloc(_fds, _max_fd * sizeof(pollfd));
-		if (tmp == NULL)
+		if (!tmp)
 			exit(ERROR);
 		_fds = tmp;
 	}
