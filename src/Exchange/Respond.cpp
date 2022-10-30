@@ -275,7 +275,10 @@ void Respond::RespondToClient(void)
 	std::string Header;
     std::string Body;
 
-    ResponseBuilder();
+    // if (!CGI)
+        ResponseBuilder();
+    // else
+    //     class CGI
 
     Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
