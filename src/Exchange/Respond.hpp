@@ -17,6 +17,7 @@
 #include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 
 #define CRLF "\r\n"
+#define MAXBYTES 15000 /* Sweet spot is between 20K - 25K */
 
 typedef std::map<std::string, std::string> HashMap;
 
@@ -40,8 +41,6 @@ private:
     // Tijdelijk
     std::string _MetaData;
 
-	std::size_t getBodySize(std::string&) const;
-
     void ResponseBuilder(void);
     void BuildGet_Redir(void);
 	void BuildGet(void);
@@ -52,11 +51,15 @@ private:
     void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
 
+    void sendAsChunked(void);
+
     // Generate
     void generateStatus(void);
     void generateContentLength(std::size_t);
 	void generateLocation(const std::string);
 	void generateContentType(void);
+    void generateTransferEncoding(void);
+    std::string generateChunk(void);
     std::string generateBoundry(void);
 };
 

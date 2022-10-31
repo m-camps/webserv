@@ -22,6 +22,7 @@ Request::Request(const std::string Request, Exchange NewExchanger)
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
+        throw (std::out_of_range(e.what()));
     }
 }
 
@@ -51,7 +52,7 @@ std::string Request::AppendRequest(const std::string& Request)
 
 	std::size_t found = Request.find("\r\n\r\n");
 	if (found == std::string::npos)
-		throw (std::invalid_argument("No seperator found"));
+		throw (std::out_of_range("No seperator found"));
 
 	Header.append(Request, 0, found);
 

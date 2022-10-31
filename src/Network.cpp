@@ -92,9 +92,16 @@ void Network::run()
 					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-						Request request(RequestStr, exchange);
-                        RequestStr.erase();
+                        try
+                        {
+                            Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
+                            Request request(RequestStr, exchange);
+                            RequestStr.erase();
+                        }
+                        catch (const std::exception& e)
+                        {
+                            RequestStr.erase();
+                        }
 					}
 //					bzero(buff, 10); // lol size is zero
 				}

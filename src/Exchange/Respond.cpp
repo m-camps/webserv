@@ -255,26 +255,74 @@ void Respond::ResponseBuilder(void)
 
 /* //////////////////////////// */
 
+void Respond::sendAsChunked(void)
+{
+    ssize_t ret;
+    std::string Body = generateChunk();
+
+    while (Body.length() > 7)
+    {
+
+        ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
+        if (ret < 0)
+        {
+            Body = "0\r\n\r\n";
+            ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
+            if (ret < 0)
+            {
+                std::string StrError = std::strerror(errno);
+                throw (std::runtime_error(StrError));
+            }
+            std::string StrError = std::strerror(errno);
+            throw (std::runtime_error(StrError));
+        }
+        Body = generateChunk();
+    }
+    Body = "0\r\n\r\n";
+    ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
+    if (ret < 0)
+    {
+        std::string StrError = std::strerror(errno);
+        throw (std::runtime_error(StrError));
+    }
+}
+
 void Respond::RespondToClient(void)
 {
+    bool IsChunked = false;
+    std::string response;
 	std::string Header;
     std::string Body;
 
-    // if (!CGI)
-        ResponseBuilder();
-    // else
-    //     class CGI
+    ResponseBuilder();
 
-    Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
 
-    std::string response =
+    if (Body.length() > MAXBYTES)
+    {
+        generateTransferEncoding();
+        IsChunked = true;
+        Header = _Exchanger.getHeader();
+        response = Header + "\r\n";
+    }
+    else
+    {
+        Header = _Exchanger.getHeader();
+
+        response =
             Header +
             "\r\n" +
             Body;
+    }
 
-//    std::cout << "Response: \n" << response << std::endl;
-    send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
+    ssize_t ret = send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
+    if (ret < 0)
+    {
+        std::string StrError = std::strerror(errno);
+        throw (std::runtime_error(StrError));
+    }
+    if (IsChunked == true)
+        sendAsChunked();
 }
 
 #pragma region "NonClass functions"
@@ -354,10 +402,51 @@ void Respond::generateStatus(void)
 
 /* //////////////////////////// */
 
+void Respond::generateTransferEncoding(void)
+{
+    std::string TransferEncoding = "Transfer-Encoding: chunked\r\n";
+    _Exchanger.addLineToHeader(TransferEncoding);
+}
+
+/* //////////////////////////// */
+
 void Respond::generateContentLength(std::size_t BodyLength)
 {
     std::string ContentLength = "Content-Length: " + TOSTRING(BodyLength) + "\r\n";
 	_Exchanger.addLineToHeader(ContentLength);
+}
+
+/* //////////////////////////// */
+
+std::string ConvertDecimalToHex(size_t decimal)
+{
+    std::stringstream ss;
+
+    ss << std::hex << decimal;
+    return (ss.str());
+}
+
+std::string Respond::generateChunk(void)
+{
+    std::string Chunk;
+    std::string Body = _Exchanger.getBody();
+
+    if (Body.length() > MAXBYTES)
+    {
+        Chunk = ConvertDecimalToHex(MAXBYTES) + "\r\n";
+        Chunk += Body.substr(0, MAXBYTES) + "\r\n\r\n";
+        Body = Body.substr(MAXBYTES, Body.length() - MAXBYTES);
+        _Exchanger.setBody(Body);
+    }
+    else
+    {
+        Chunk = ConvertDecimalToHex(Body.length()) + "\r\n";
+        Chunk += Body.substr(0, Body.length()) + "\r\n\r\n";
+        _Exchanger.setBody("");
+    }
+
+//    std::cout << "-------------CHUNK: ------------\n" << Chunk << std::endl;
+    return (Chunk);
 }
 
 /* //////////////////////////// */

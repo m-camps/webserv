@@ -34,16 +34,6 @@ Exchange::~Exchange(void)
 
 #pragma endregion ctoranddtor
 
-/* //////////////////////////// */
-
-Exchange& Exchange::operator=(const Exchange& ref)
-{
-    if (this != &ref)
-    {
-    }
-    return (*this);
-}
-
 #pragma region getter
 
 /* ////////// Getter //////////// */
