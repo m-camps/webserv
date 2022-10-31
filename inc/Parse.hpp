@@ -20,6 +20,7 @@ typedef std::vector<std::string>::iterator vecIt;
 typedef std::vector<std::string>	Line;
 typedef std::vector<Line>			LocationBlock;
 typedef std::vector<Line>			ServerBlock;
+typedef std::vector<Line>			File;
 
 #define NR_OF_SERVER_DIRECTIVES 7 //will be more later
 #define NR_OF_LOCATION_DIRECTIVES 6 //will be more later

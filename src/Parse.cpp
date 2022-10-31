@@ -28,7 +28,33 @@ void Parse::openFile(std::ifstream& configStream, std::string configName)
 	}
 }
 
-std::vector<std::string> splitLineWithStrtok(std::string& line)
+std::vector<Line>	extractFile(std::string& file)
+{
+	File				file;
+	std::string			line;
+	std::ifstream		stream;
+
+	openFile(stream, file);
+	while(!stream.eof())
+	{
+		getline(stream, line);
+		if (stream.good())
+		{
+			Line	tokLine = splitLineWithStrtok(line);
+			if (tokLine.empty())
+			{
+				continue ;
+			}
+			else
+			{
+				file.push_back(tokLine);
+			}
+		}
+	}
+	return (file);
+}
+
+Line 		splitLineWithStrtok(std::string& line)
 {
 	char	*c_line = strdup(const_cast<char *>(line.c_str()));
 	char	*word;
@@ -50,131 +76,138 @@ std::vector<std::string> splitLineWithStrtok(std::string& line)
 	return ret;
 }
 
-/***
- * Parse the configFile into individual Server Blocks // Server Block type vector<std::string>
- * 
- * @return value right now is a vector of Server blocks. In the future should just return a std::vector<Server>
- * instantiated by calling Server(std::vector<std::string>)
-***/
 std::vector<Server>&	Parse::parseNetwork(std::string& file, std::vector<Server>& servers) //parse whole config, puts it into blocks
-{	
-	std::vector<std::vector<std::string> >	buff;
-	std::string								currentLine;
-	std::ifstream							configStream;
-	std::stack<char> 						stack;
+{
+	File				file = extractFile(file);
+	ServerBlock			buff;
+	std::stack<char> 	stack;
 
-	openFile(configStream, file);
-	while(!configStream.eof())
+	for (File::iterator it = file.begin(); it != file.end(); it++)
 	{
-		getline(configStream, currentLine);
-		if (configStream.good())
+		Line line = *it;
+		if (line[0] == "server" && line.size() == 1)
 		{
-			std::vector<std::string>	tokenizedLine = splitLineWithStrtok(currentLine);
-			bool						isLineEmpty = tokenizedLine.empty();
-
-			if (isLineEmpty == false && tokenizedLine[0] == "server" && tokenizedLine.size() != 1) //server server server
+			buff.clear();
+		}
+		else if (line[0] == "{" && line.size() == 1)
+		{
+			stack.push("{")
+		}
+		else if (line[0] == "}" && line.size() == 1)
+		{
+			if (!stack.empty())
 			{
-				std::cout << "Incorrect input, exciting program." << std::endl;
-				std::exit(ERROR);
+				throw std::exception("Closing bracket before opening bracket");
 			}
-
-			else if (isLineEmpty == false && tokenizedLine[0] != "server") //this check is too costly every time, use flag once server was found?
+			stack.pop();
+			if (stack.empty())
 			{
-				buff.push_back(tokenizedLine);
+				Server server;
+				servers.push_back(parseServer(buff, server))
+				buff.clear();
 			}
-			checkWordByWord(servers, tokenizedLine, buff, stack);
+		}
+		else
+		{
+			buff.push_back(*line);
 		}
 	}
 	if (stack.empty() == false) //check if the amount of brackets were correct
 	{
-		std::cout << "Incorrect input, exciting program." << std::endl;
-		std::exit(ERROR);
+		throw std::exception("Brackets incorrect");
 	}
-
-	return(servers);
+	return servers;
 }
 
 Server&		Parse::parseServer(ServerBlock& server_block, Server& server)
 {
-	std::stack<char> 									stack;
-	std::vector<std::vector<std::string> >::iterator	currentPosInLines = server_block.begin();
-	std::vector<std::vector<std::string> >::iterator	endPosOfLines = server_block.end();
+	ServerBlock::iterator it = server_block.begin();
 
-	while(currentPosInLines != endPosOfLines)
+	while(it != server_block.end())
 	{
-		bool					isLineEmpty = currentPosInLines->front().empty();
-
-		for (vecIt currentWord = currentPosInLines->begin(); currentWord != currentPosInLines->end(); currentWord++)
+		Line line = *it;
+		if (isServerDirective(line[0]))
 		{
-			if (isLineEmpty == false && isServerDirective(*currentWord))
-			{
-				parseServerDirective(*currentPosInLines, server);
-				break ;
-			}
-			else if (isLineEmpty == false && *currentWord == "location")
-			{
-				currentWord++; //the next word after location in the line
-				parseLocationDirectiveBlock(server, currentPosInLines, endPosOfLines, *currentWord);
-				break ;
-			}
-			else
-			{
-				if (isLineEmpty == false && *currentWord != "{" && *currentWord != "}")
-				{
-					std::cout << "Input is incorrect inside block of: " << *currentWord << std::endl;
-					std::exit(ERROR);
-				}
-			}
+			parseServerDirective(line, server);
 		}
-		currentPosInLines++;
-	}
-	if (server.minimumRequiredAttributesProvided() == false) //minimum is server_name, listen(port)
-	{
-		std::cout << "Minimum required input is not or incorrectly provided." << std::endl;
-		std::exit(ERROR);
+		else if (line[0] == "location")
+		{
+			parseLocationBlock(server, line, server_block);
+		}
+		else
+		{
+			throw std::exception("Error in server block" + convertFromVector(line)); // Add global line number var
+		}
+		it++;
 	}
 	return server;
 }
 
+
+LocationBlock	extractLocationBlock(ServerBlock::iterator&	it, ServerBlock::iterator& end)//, std::vector<std::string>::iterator&	ite)//std::vector<std::string>& server_block)//, std::vector<std::string>::iterator& separatedWords)
+{
+	LocationBlock 				ret;
+	std::stack<char> 			stack;
+
+	it++;
+	while (it != end)
+	{
+		Line line = *it;
+		if (line[0] == "[" && line.size() == 1)
+		{
+			stack.push('[');
+		}
+		else if (line[0] == "]" && line.size() == 1)
+		{
+			if (!stack.empty())
+			{
+				throw std::exception("Closing bracket before opening bracket");
+			}
+			stack.pop();
+			if (stack.empty())
+			{
+				return ret;
+			}
+		}
+		else
+		{
+			ret.push_back(line);
+		}
+		it++;
+	}
+	return ret;
+}
+
+void		Parse::parseLocationBlock(Server& server, ServerBlock::iterator& line, ServerBlock& server_block)
+{
+	if (line.size() != 2)
+	{
+		throw std::exception("Incorrect location name" + convertFromVector(line));
+	}
+
+	Location		location;
+	LocationBlock 	location_block = extractLocationBlock(line, server_block.end());
+
+	server.addToLocations("TODO ADD LOCATION NAME", parseLocation(location_block, location));
+}
+
+
 Location&	Parse::parseLocation(LocationBlock& location_block, Location& location)
 {
-	LocationBlock::iterator block = location_block.begin();
-
-	std::stack<char>				  stack;
+	LocationBlock::iterator it = location_block.begin();
 	
-	while(block != location_block.end()) //currentWordInLocationBlock here is just separate words in the location blocks
+	while(it != location_block.end())
 	{
-		Line line = *block;
+		Line line = *it;
 		if (isLocationDirective(line[0]))
 		{
 			parseLocationDirective(line, location);
 		}
-		else if (line[0] == "[")
+		else 
 		{
-			stack.push('[');
+			throw std::exception("Error in LocationBlock" + convertFromVector(line));
 		}
-		else if (line[0] == "]") //what happens if its in the same line?
-		{
-			stack.pop();
-			if (stack.empty() == true)
-			{
-				return location;
-			}
-			else
-			{
-				std::cout << "Input is incorrect inside block of location, cuz not empty: ";
-				printLine(line);
-				std::exit(ERROR);
-			}
-		}
-		/*
-		else if (*it != "location")
-		{
-			std::cout << "Input is incorrect inside block of location: " << *it << std::endl;
-			std::exit(ERROR);
-		}
-		*/
-		block++;
+		it++;
 	}
 	return location;
 }
@@ -186,87 +219,6 @@ void	printLine(Line line)
 		std::cout << *it << " ";
 	std::cout << std::endl;
 }
-
-LocationBlock	extractLocationBlock(std::vector<std::vector<std::string> >::iterator&	it, std::vector<std::vector<std::string> >::iterator&	ite)//, std::vector<std::string>::iterator&	ite)//std::vector<std::string>& server_block)//, std::vector<std::string>::iterator& separatedWords)
-{
-	LocationBlock 				ret;
-	std::stack<char> 			stack;
-
-	while (it != ite)
-	{	
-		std::vector<std::string>::iterator	smallIt = it->begin();
-		std::vector<std::string>::iterator	smallIte = it->end();
-
-		for (vecIt itLine = smallIt; itLine != smallIte; itLine++)
-		{
-			if (*itLine == "[")
-			{
-				stack.push('[');
-			}
-			else if (*itLine == "]")
-			{
-				stack.pop();
-				if (stack.empty())
-				{
-					return ret;
-				}
-				else
-				{
-					//error
-				}
-			}
-			ret.push_back(*itLine);
-		}
-		it++;
-	}
-	return ret;
-}
-
-void		Parse::parseLocationDirectiveBlock(Server& server, std::vector<std::vector<std::string> >::iterator& currentPosInLines, std::vector<std::vector<std::string> >::iterator& endPosOfLines, std::string& locationName)
-{
-	Location		location;
-	size_t			sizeOfLocationLine = currentPosInLines->size();
-
-	if (sizeOfLocationLine > 2)
-	{
-		std::cout << "Input is incorrect, expected maximum one name for location block inside block."  << std::endl;
-		std::exit(ERROR);
-	}
-	std::string nameLocation = (locationName == "" ? "/" : locationName);
-	LocationBlock location_block = extractLocationBlock(currentPosInLines, endPosOfLines);
-	server.addToLocations(nameLocation, parseLocation(location_block, location));
-	return ;
-}
-
-/* 	Function to check a tokenized line word by word, if we find the correct amount of opening/closing curly brackets, 
-***	we proceed to parse the server block.
-*/
-void Parse::checkWordByWord(std::vector<Server>& servers, std::vector<std::string>& line, std::vector<std::vector<std::string> >& buff, std::stack<char>& stack)
-{
-	for (vecIt currentWord = line.begin(); currentWord != line.end(); currentWord++)
-	{
-		if (*currentWord == "{")
-		{
-			stack.push('{');
-		}
-		else if (*currentWord == "}")
-		{
-			stack.pop();
-			if (stack.empty())
-			{
-				Server server;
-				servers.push_back(parseServer(buff, server));
-				buff.clear();
-			}
-		}
-		else
-		{
-			//error?
-		}
-	}
-	return ;
-}
-
 
 /* GONNA BE OBSOLETE WITH NEW IMPLEMENTATION*/
 std::string convertFromVectorServerBlock(std::vector<std::string>& line)
@@ -304,13 +256,6 @@ bool is_number(const std::string& s)
     return (!s.empty() && it == s.end());
 }
 
-
-
-/*** 
- * Based on the currentWord, an associated parsing function will be called
- * The parsing function will start to look for input after the currentWord in the currentLine
- * This is skipping location for now entirely, have to alter struct a bit
-***/
 void    Parse::parseServerDirective(Line& line, Server& server)
 {
 
@@ -337,12 +282,8 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 		{
 			restOfLine = convertFromVectorServerBlock(line);
 			ServerDirectiveFunction = dTable[i].ServerDirectiveFunction;
-			break ;
+			(this->*ServerDirectiveFunction)(server, line);
 		}
-	}
-	if (ServerDirectiveFunction)
-	{
-		(this->*ServerDirectiveFunction)(server, line);
 	}
 }
 
@@ -350,7 +291,7 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 {
 	void	(Parse::*LocationDirectiveFunction)(Location&, Line&) = NULL;
 
-	const t_dTableLocation myDispatch[] = //map instead, name of the table typedef is not descriptive enough
+	const t_dTableLocation dTable[] = //map instead, name of the table typedef is not descriptive enough
 	{
 			{"root", &Parse::parseLocationRoot},
 			{"index", &Parse::parseLocationIndex},
@@ -362,9 +303,9 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 
 	for (int i = 0; i < NR_OF_LOCATION_DIRECTIVES; i++)
 	{
-		if (line[0] == myDispatch[i]._name)
+		if (line[0] == dTable[i]._name)
 		{
-			LocationDirectiveFunction = myDispatch[i].LocationDirectiveFunction;
+			LocationDirectiveFunction = dTable[i].LocationDirectiveFunction;
 			(this->*LocationDirectiveFunction)(location, line);
 		}
 	}
