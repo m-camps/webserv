@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 17:49:22 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/31 16:05:54 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@
 #define ERROR 1
 
 typedef std::map<std::string, Location>::iterator locIt;
-typedef std::map<std::vector<int>, std::string>::iterator errorIt;
-typedef std::map<std::vector<int>, std::string> ErrorMap;
 
 class Server
 {
@@ -36,9 +34,7 @@ class Server
 		~Server();
 
 		/* Getters */
-		//int								getPort(void) const;
 		std::vector<int>					getPorts(void) const;
-
 		std::vector<std::string>			getNames(void) const;
 		std::string							getRoot(void) const;
 		std::string							getIndex(void) const;
@@ -51,20 +47,14 @@ class Server
 		std::map<int, std::string>          getErrorPage(void) const;
 
 		/* Setters */
-		//void	setPort(int& port);
-		void	setPort(int& port);
 		void	setRoot(std::string& root);
 		void	setIndex(std::string& index);
 		void	setClientBody(int& client_body_size);
 
-		void	setListenFlag(void); //new setters for minimum required flags
-		void	setServerNameFlag(void); //new setters for minimum required flags
-		bool	minimumRequiredAttributesProvided(void);
-
-
 		/* Adders */
-		void	addToName(std::string& name);
-		void	addToMethod(std::string& method);
+		void	addToPorts(int &port);
+		void	addToNames(std::string& name);
+		void	addToMethods(std::string& method);
 		void	addToLocations(std::string& name, Location& location);
 		void	addToErrorPages(int& error_nb, std::string& error_page);
 
@@ -79,7 +69,7 @@ class Server
 
 
 	private:
-		std::vector<int>							_port;
+		std::vector<int>							_ports;
 		std::vector<std::string>					_names; 					// can be searching for multiple names
 		std::string									_root; 						// default = "/"
 		std::string									_index; 					// default = "index.html"
@@ -93,7 +83,6 @@ class Server
 		bool										_listen_set; 				//setters for these?
 		bool										_servername_set;  			//setters for these?
 
-		//struct to check if all flags etc was correct?
 		/* Helper Functions */
 		void	makeSocketAddr();
 		void	createSocket();

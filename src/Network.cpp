@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 16:05:55 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/31 14:28:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,16 @@ void Network::setup(std::string file)
 	Parse				parser;
 	std::vector<Server> tmp;
 	
-	// (void)file;
-	_servers = parser.parseNetwork(file, tmp); // Parse config file into server Blocks
+	try
+	{
+		_servers = parser.parseNetwork(file, tmp);
+		std::cout << "----PARSING COMPLETE----" << std::endl;
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		std::exit(0);
+	}
 
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
@@ -76,7 +84,6 @@ void Network::run()
 					Server *server = getServerBySocketFd(cur.fd);
 					int newFd = server->acceptConnection();
 					addToPollFds(newFd);
-					// std::cout << *server << std::endl;
 					std::cout << "On FD " << newFd << std::endl;
 				}
 				else
@@ -101,7 +108,6 @@ void Network::run()
 						Request request(RequestStr, exchange);
                         RequestStr.erase();
 					}
-//					bzero(buff, 10); // lol size is zero
 				}
 				cur.revents = 0;
 			}

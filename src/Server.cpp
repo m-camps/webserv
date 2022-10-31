@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/28 17:54:12 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/10/31 16:07:15 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 
 Server::Server()
 {
-	this->_root = "/";
-	this->_index = "index.html";
+	this->_root = "";
+	this->_index = "";
 	this->_socket_fd = 0;
     this->_listen_set = false;
     this->_servername_set = false;
@@ -27,8 +27,7 @@ Server::Server()
 Server::~Server() { return; }
 
 /* Getters */
-//int								Server::getPort(void) const { return _port; } // Do we need to listen on multiple ports?
-std::vector<int>								Server::getPorts(void)  const { return _port; }
+std::vector<int>								Server::getPorts(void)  const { return _ports; }
 std::vector<std::string>						Server::getNames(void) const { return _names; }
 std::string										Server::getRoot(void) const { return _root; }
 std::string  									Server::getIndex(void) const { return _index; }
@@ -42,27 +41,26 @@ std::map<int, std::string> 						Server::getErrorPage(void) const { return _erro
 
 
 /* Setters */
-//void	Server::setPort(int& port) { _port = port; }
-void	Server::setPort(int& port) { _port.push_back(port); }
 void	Server::setRoot(std::string& root) { _root = root; }
 void	Server::setIndex(std::string& index) { _index = index; }
 void	Server::setClientBody(int& client_body_size) { _client_body_size = client_body_size; }
 
-void	Server::setListenFlag(void) { _listen_set = true; }
-void	Server::setServerNameFlag(void) { _servername_set = true; }
-
-bool	Server::minimumRequiredAttributesProvided(void) { return (_listen_set == true && _servername_set == true); } //maybe i dont set them to false at init?
-
 /* Adders */
-void	Server::addToName(std::string& name) { _names.push_back(name); }
-void	Server::addToMethod(std::string& method) {_methods.push_back(method); }
+void	Server::addToNames(std::string& name) { _names.push_back(name); }
+void	Server::addToMethods(std::string& method) {_methods.push_back(method); }
+void	Server::addToPorts(int &port) { _ports.push_back(port); }
+
 void	Server::addToLocations(std::string& name, Location& location)
 {
 	_locations.insert(std::pair<std::string, Location>(name, location));
 }
 
-/* Delete */
+void	Server::addToErrorPages(int& status, std::string& page)
+{
+	_error_pages.insert(std::pair<int, std::string>(status, page));
+}
 
+/* Delete */
 void	Server::removeFromClientFds(int fd) 
 {
 	std::vector<int>::iterator it = _client_fds.begin();
@@ -80,7 +78,6 @@ void	Server::setup()
 	createSocket();
 	setupSocket();
 	fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
-	std::cout << "Server configured at: " << _names.at(0) << ":" << _port.back() << "\n"; //previously used with _port instead of +.back()
 }
 
 int		Server::acceptConnection()
@@ -92,7 +89,7 @@ int		Server::acceptConnection()
 	int	clientFd = accept(_socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
 	if (clientFd != -1 && DEBUG)
 	{
-		std::cout << "["<<_names.back() << ":" << _port.back() <<   "] "; //previously used with _port instead of +.back()
+		std::cout << "["<<_names.back() << ":" << _ports.front() <<   "] "; //previously used with _port instead of +.back()
 		std::cout << "Accepted connection from adress: " << client_addr.sin_addr.s_addr <<  "\n";
 	}
 	_client_fds.push_back(clientFd);
@@ -141,12 +138,12 @@ void	Server::createSocket(void)
 *** For now I use _port.back() instead of previously used _port,
 *** but we might have to use a loop outside to make sockets for all ports attached.
 */
-void	Server::makeSocketAddr()
+void	Server::makeSocketAddr() 
 {
 	struct sockaddr_in *address = new sockaddr_in();
 
 	address->sin_family = AF_INET;
-	address->sin_port = htons(_port.back()); // <- Converts from host byte order to network byte order.
+	address->sin_port = htons(_ports.front()); // <- Converts from host byte order to network byte order.
 	address->sin_addr.s_addr = INADDR_ANY;
 	memset(address->sin_zero, 0, sizeof(address->sin_zero));
 	_address_in = address;
@@ -176,19 +173,16 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
 	for(size_t i = 0; i < server.getClientFds().size(); i++) 
         stream << server.getClientFds().at(i) << " ";
 	stream << "]\n";
+	stream << "Error Pages: [";
 
-	/* have to check the syntax, it sees that smth is working but not 100% sure
-	stream << "Error Pages: [\n";
+	std::map<int, std::string> error_pages = server.getErrorPage(); 
+	
+	for (std::map<int, std::string>::iterator it = error_pages.begin(); it != error_pages.end(); it++)
+		stream << "{"<< it->first << ", " << it->second << "} ";
+	stream << "]\n";
+	
+	std::map<std::string, Location> locations = server.getLocations();
 
-	std::map<std::vector<int>, std::string> error_pages = server.getErrorPage(); //this will be deleted here
-	for (auto it = error_pages.cbegin(); it != error_pages.cend(); ++it) 
-	{
-		std::cout << "{" << (*it).first.back() << ": " << (*it).second.back() << "}\n";
-	}
-	stream << "Error Pages: ]\n";
-	*/
-	std::map<std::string, Location> locations = server.getLocations(); //this will be deleted here
-	std::cout << locations.size() << " locsize\n";
 	for (locIt it = locations.begin(); it != locations.end(); it++)
 		stream << it->second << "\n";
 
