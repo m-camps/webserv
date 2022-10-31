@@ -74,11 +74,9 @@ void Network::run()
 					int newFd = server->acceptConnection();
 					addToPollFds(newFd);
 				}
-				else // Else normal connection 
-				// xander this is where the exchange starts fd = cur.fd
-				// RIGHT NOW DOESNT WORK AS INTENDED 
+				else
 				{
-					int ret = recv(cur.fd, buff, sizeof(buff), 0);
+					ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
 					if (ret <= 0)
 					{
 						RequestStr.clear();
@@ -92,22 +90,14 @@ void Network::run()
 					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-                        try
-                        {
-                            Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-                            Request request(RequestStr, exchange);
-                            RequestStr.erase();
-                        }
-                        catch (const std::exception& e)
-                        {
-                            RequestStr.erase();
-                        }
-					}
-//					bzero(buff, 10); // lol size is zero
-				}
-			}
-		}
-	}
+                        Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
+                        Request request(RequestStr, exchange);
+                        RequestStr.erase();
+                    }
+                }
+            }
+        }
+    }
 }
 
 void	Network::createFds(void)

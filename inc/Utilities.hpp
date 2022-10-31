@@ -26,3 +26,6 @@ int64_t getLength(std::ifstream& File);
 std::string readFile(const std::istringstream& Body);
 
 void deleteFile(std::string& filePath);
+
+template <typename T>
+std::string TOSTRING(T Number);

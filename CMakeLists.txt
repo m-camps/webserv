@@ -12,7 +12,6 @@ include_directories(${EXCHANGE_HEADERS})
 set(SOURCES
 ${INC_HEADERS}/Constants.hpp
 ${INC_HEADERS}/Location.hpp
-${INC_HEADERS}/Macros.hpp
 ${INC_HEADERS}/Network.hpp
 ${INC_HEADERS}/Parse.hpp
 ${INC_HEADERS}/Server.hpp
@@ -33,6 +32,7 @@ src/Utilities/defaultStatusPage.cpp
 src/Utilities/deleteFile.cpp
 src/Utilities/findCharLocation.cpp
 src/Utilities/readFile.cpp
+src/Utilities/TOSTRING.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

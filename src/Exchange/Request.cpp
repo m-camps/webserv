@@ -22,7 +22,6 @@ Request::Request(const std::string Request, Exchange NewExchanger)
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        throw (std::out_of_range(e.what()));
     }
 }
 
