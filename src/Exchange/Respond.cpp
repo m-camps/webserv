@@ -3,7 +3,7 @@
 //
 
 #include "Respond.hpp"
-
+#include "../../inc/Cgi.hpp"
 #define ERROR 1
 
 #pragma region "ctor & dtor"
@@ -276,10 +276,14 @@ void Respond::RespondToClient(void)
     std::string Body;
 
     // if (!CGI)
-        ResponseBuilder();
+       // ResponseBuilder();
     // else
-    //     class CGI
+    //     Cgi cgi;
+    //      cgi.executeScript()
+    //
+    Cgi test;
 
+    test.executeScript();
     Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
 

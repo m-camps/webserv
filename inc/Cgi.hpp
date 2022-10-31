@@ -10,7 +10,7 @@ class Cgi
 		std::string*	getEnvTable(void);
 		void			printEnv(void);
 		void			createCgiResponse(void);
-
+		void			executeScript(void);
 		//i need to construct a header separate from the script
 			// VERSION & STATUSCODE FIRST
 			// ContentLength, if there is a body
