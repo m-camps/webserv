@@ -16,6 +16,7 @@ ${INC_HEADERS}/Network.hpp
 ${INC_HEADERS}/Parse.hpp
 ${INC_HEADERS}/Server.hpp
 ${INC_HEADERS}/Utilities.hpp
+${INC_HEADERS}/Generator.hpp
 ${EXCHANGE_HEADERS}/Exchange.hpp
 ${EXCHANGE_HEADERS}/Respond.hpp
 ${EXCHANGE_HEADERS}/Request.hpp
@@ -32,7 +33,7 @@ src/Utilities/defaultStatusPage.cpp
 src/Utilities/deleteFile.cpp
 src/Utilities/findCharLocation.cpp
 src/Utilities/readFile.cpp
-src/Utilities/TOSTRING.cpp
+src/Generator.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

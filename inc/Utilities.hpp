@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 
 std::vector<int> findCharLocation(std::string& line, int32_t c);
 
@@ -28,4 +29,9 @@ std::string readFile(const std::istringstream& Body);
 void deleteFile(std::string& filePath);
 
 template <typename T>
-std::string TOSTRING(T Number);
+std::string ToString(T Number)
+{
+    std::ostringstream ss;
+    ss << Number;
+    return (ss.str());
+}

@@ -48,10 +48,10 @@ void Respond::BuildGet_Redir(void)
 {
     const std::string NewLocation = _Exchanger.getServer().getIndex();
 
-    generateStatus();
-    generateLocation(NewLocation);
+    _Generator.generateStatus(_Exchanger);
+    _Generator.generateLocation(_Exchanger, NewLocation);
     _Exchanger.setBody("");
-    generateContentLength(0);
+    _Generator.generateContentLength(_Exchanger, 0);
 }
 
 void Respond::BuildGet(void)
@@ -75,9 +75,9 @@ void Respond::BuildGet(void)
             return ;
         }
 
-        generateStatus();
+        _Generator.generateStatus(_Exchanger);
 		_Exchanger.setBody(FileContent);
-        generateContentLength(_Exchanger.getBody().length());
+        _Generator.generateContentLength(_Exchanger, _Exchanger.getBody().length());
 	}
 	catch (const std::exception& e)
 	{
@@ -101,9 +101,9 @@ void Respond::BuildDelete()
         uint32_t StatusCode = modifyStatusCode(Path, relativePath);
         _Exchanger.setStatusCode(StatusCode);
 
-        generateStatus();
+        _Generator.generateStatus(_Exchanger);
         _Exchanger.setBody("");
-        generateContentLength(0);
+        _Generator.generateContentLength(_Exchanger, 0);
         deleteFile(relativePath);
     }
     catch (const std::exception& e)
@@ -115,18 +115,12 @@ void Respond::BuildDelete()
 
 /* //////////////////////////// */
 
-/*
- * Gonna make this a bit more elegant.
- */
 std::string getFilename(std::string& MetaData)
 {
     std::string line;
     std::size_t found = MetaData.find("filename=");
     if (found == std::string::npos)
-    {
-        std::cerr << "File has no name" << std::endl;
-        return ("UserUpload.txt");
-    }
+        throw (std::invalid_argument("File has no name"));
 
     std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
     std::getline(issFile, line);
@@ -137,11 +131,17 @@ std::string getFilename(std::string& MetaData)
 
 void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
-    std::string ContentType;
-    std::string Root = _Exchanger.getServer().getRoot();
-    std::ofstream File(Root + "/" + getFilename(MetaData));
+    try
+    {
+        std::string Root = _Exchanger.getServer().getRoot();
+        std::ofstream File(Root + "/" + getFilename(MetaData));
 
-    File << Body;
+        File << Body;
+    }
+    catch (const std::exception& e)
+    {
+        throw (e);
+    }
 }
 
 /* //////////////////////////// */
@@ -154,7 +154,7 @@ std::string Respond::getDataOfBody(void)
 
     try
     {
-        std::string Boundry = generateBoundry();
+        std::string Boundry = _Generator.generateBoundry(_Exchanger);
         RequestBody = RequestBody.substr(Boundry.length() + 5,
                                          RequestBody.length() - (Boundry.length() * 2) - 11);
 
@@ -184,12 +184,12 @@ void Respond::BuildPost()
     std::cout << "POST" << std::endl;
     try
     {
-        generateStatus();
+        _Generator.generateStatus(_Exchanger);
         Body = getDataOfBody();
 
         putBodyInFile(_MetaData, Body);
-        _Exchanger.setBody(Body);
-        generateContentLength(_Exchanger.getBody().length());
+        _Exchanger.setBody("");
+        _Generator.generateContentLength(_Exchanger, 0);
     }
     catch (const std::exception& e)
     {
@@ -222,7 +222,7 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& Allowe
 
 void Respond::ResponseBuilder(void)
 {
-    void (Respond::*FuncPointer)(void) = nullptr;
+    void (Respond::*FuncPointer)(void) = NULL;
 	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
     std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
 
@@ -235,10 +235,10 @@ void Respond::ResponseBuilder(void)
     if (!MethodIsAllowed(Method, AllowedMethods))
     {
         _Exchanger.setStatusCode(e_MethodNotFound);
-        generateStatus();
+        _Generator.generateStatus(_Exchanger);
         std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
         _Exchanger.setBody(FileContent);
-        generateContentLength(_Exchanger.getBody().length());
+        _Generator.generateContentLength(_Exchanger, _Exchanger.getBody().length());
         return ;
     }
 
@@ -258,7 +258,7 @@ void Respond::ResponseBuilder(void)
 void Respond::sendAsChunked(void)
 {
     ssize_t ret;
-    std::string Body = generateChunk();
+    std::string Body = _Generator.generateChunk(_Exchanger);
 
     while (Body.length() > 7)
     {
@@ -266,17 +266,10 @@ void Respond::sendAsChunked(void)
         ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
         if (ret < 0)
         {
-            Body = "0\r\n\r\n";
-            ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
-            if (ret < 0)
-            {
-                std::string StrError = std::strerror(errno);
-                throw (std::runtime_error(StrError));
-            }
             std::string StrError = std::strerror(errno);
             throw (std::runtime_error(StrError));
         }
-        Body = generateChunk();
+        Body = _Generator.generateChunk(_Exchanger);
     }
     Body = "0\r\n\r\n";
     ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
@@ -300,7 +293,7 @@ void Respond::RespondToClient(void)
 
     if (Body.length() > MAXBYTES)
     {
-        generateTransferEncoding();
+        _Generator.generateTransferEncoding(_Exchanger);
         IsChunked = true;
         Header = _Exchanger.getHeader();
         response = Header + "\r\n";
@@ -322,14 +315,21 @@ void Respond::RespondToClient(void)
         throw (std::runtime_error(StrError));
     }
     if (IsChunked == true)
-        sendAsChunked();
+        try
+        {
+            sendAsChunked();
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
 }
 
 #pragma region "NonClass functions"
 
 /* ///////// External Functions ////////// */
 
-bool isForbidden(const std::string& Path)
+bool isForbiddenPath(const std::string& Path)
 {
     std::size_t found = Path.find("../");
     if (found == std::string::npos)
@@ -341,7 +341,7 @@ bool isForbidden(const std::string& Path)
 
 uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 {
-    if (isForbidden(Path))
+    if (isForbiddenPath(Path))
         return (e_Forbidden);
 	if ("/" == Path)
 		return (e_Redir);
@@ -381,111 +381,3 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 }
 
 #pragma endregion "NonClass functions"
-
-#pragma region generators
-
-////////////// Generators //////////////
-
-/*
- * The status of the site should ALWAYS be the first line of the header.
- * The rest can be any line.
- */
-void Respond::generateStatus(void)
-{
-    HashMap tempHash = _Exchanger.getHashMap();
-    uint32_t StatusCode = _Exchanger.getStatusCode();
-    std::string StatusLine = tempHash.find("HTTPVersion")->second;
-
-    StatusLine += " " + TOSTRING( StatusCode ) + " \r\n";
-	_Exchanger.setHeader(StatusLine);
-}
-
-/* //////////////////////////// */
-
-void Respond::generateTransferEncoding(void)
-{
-    std::string TransferEncoding = "Transfer-Encoding: chunked\r\n";
-    _Exchanger.addLineToHeader(TransferEncoding);
-}
-
-/* //////////////////////////// */
-
-void Respond::generateContentLength(std::size_t BodyLength)
-{
-    std::string ContentLength = "Content-Length: " + TOSTRING(BodyLength) + "\r\n";
-	_Exchanger.addLineToHeader(ContentLength);
-}
-
-/* //////////////////////////// */
-
-std::string ConvertDecimalToHex(size_t decimal)
-{
-    std::stringstream ss;
-
-    ss << std::hex << decimal;
-    return (ss.str());
-}
-
-std::string Respond::generateChunk(void)
-{
-    std::string Chunk;
-    std::string Body = _Exchanger.getBody();
-
-    if (Body.length() > MAXBYTES)
-    {
-        Chunk = ConvertDecimalToHex(MAXBYTES) + "\r\n";
-        Chunk += Body.substr(0, MAXBYTES) + "\r\n\r\n";
-        Body = Body.substr(MAXBYTES, Body.length() - MAXBYTES);
-        _Exchanger.setBody(Body);
-    }
-    else
-    {
-        Chunk = ConvertDecimalToHex(Body.length()) + "\r\n";
-        Chunk += Body.substr(0, Body.length()) + "\r\n\r\n";
-        _Exchanger.setBody("");
-    }
-
-//    std::cout << "-------------CHUNK: ------------\n" << Chunk << std::endl;
-    return (Chunk);
-}
-
-/* //////////////////////////// */
-
-void Respond::generateLocation(const std::string NewLocation)
-{
-	std::string Location = "Location: " + NewLocation + "\r\n";
-	_Exchanger.addLineToHeader(Location);
-}
-
-/* //////////////////////////// */
-
-void Respond::generateContentType(void)
-{
-    std::string line;
-    std::string RequestBody = _Exchanger.getHashMapString("Body");
-    std::istringstream issBody(RequestBody);
-
-    while (std::getline(issBody, line))
-    {
-        if (line.compare(0, 13, "Content-Type:") == 0)
-        {
-            _Exchanger.addLineToHeader(line);
-            return ;
-        }
-    }
-}
-
-/* //////////////////////////// */
-
-std::string Respond::generateBoundry(void)
-{
-    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
-
-    std::size_t found = ContentType.find('=');
-    if (found == std::string::npos)
-        throw (std::logic_error("No boundry found"));
-
-    return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
-}
-
-#pragma endregion generators

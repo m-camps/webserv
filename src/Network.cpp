@@ -17,7 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 
-#define BUFF 10000
+#define BUFF 50000
 /* Default constructor */
 Network::Network() : _max_fd(5) {}
 

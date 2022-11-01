@@ -14,7 +14,7 @@ Exchange::Exchange(void)
 /* //////////////////////////// */
 
 Exchange::Exchange(Server NewSever, int32_t NewSocketFD)
-    : _body(""), _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
+    : _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
 {
 }
 

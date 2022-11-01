@@ -15,9 +15,9 @@
 
 #include "Server.hpp"
 #include "Network.hpp"
-#include "Exchange/Exchange.hpp"
-#include "Exchange/Respond.hpp"
-#include "Exchange/Request.hpp"
+#include "Exchange.hpp"
+#include "Respond.hpp"
+#include "Request.hpp"
 
 TEST_CASE("Using a string that does not exist in getHashMapstring")
 {

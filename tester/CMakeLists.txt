@@ -13,7 +13,6 @@ add_subdirectory(lib/Catch2-3.1.1)
 set(SOURCES
 ${INC_HEADERS}/Constants.hpp
 ${INC_HEADERS}/Location.hpp
-${INC_HEADERS}/Macros.hpp
 ${INC_HEADERS}/Network.hpp
 ${INC_HEADERS}/Parse.hpp
 ${INC_HEADERS}/Server.hpp
