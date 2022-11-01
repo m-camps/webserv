@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 12:19:46 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 12:38:50 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "../inc/Server.hpp"
 #include "../inc/Location.hpp"
 #include "../inc/Constants.hpp"
+#include "../inc/Utilities.hpp"
 #include "../inc/Macros.hpp"
 #include <fstream>
 #include <sstream>
@@ -28,45 +29,26 @@ int		g_line_count = 1;
 Parse::Parse() { return ; }
 Parse::~Parse() { return ; }
 
-void Parse::openFile(std::ifstream& configStream, std::string configName)
-{
-	configStream.open(configName);
-	if (configStream.is_open())
-	{
-		std::cout << "Config file opened." << std::endl;
-	}
-	else
-	{
-		std::cout << "Failed to open config file." << std::endl;
-		std::exit(EXIT_FAILURE);
-	}
-}
-
 File		Parse::extractFile(std::string& file)
 {
-	File				ret;
-	std::string			line;
-	std::ifstream		stream;
+	File						ret;
+	std::string					full_file = readFile(file);
+	std::vector<std::string>	splitFile = splitLineWithStrtok(full_file, "\n"); 
 
-	openFile(stream, file);
-	while(!stream.eof())
+	for (std::vector<std::string>::iterator it = splitFile.begin(); it != splitFile.end(); it++)
 	{
-		getline(stream, line);
-		if (stream.good())
+		Line tokLine = splitLineWithStrtok(*it, std::string(" \t\r\n\v\f"));
+		if (tokLine.empty())
 		{
-			Line	tokLine = splitLineWithStrtok(line);
-			if (tokLine.empty())
-			{
-				throw(ExceptionBuilder("Newlines not accepted"));
-			}
-			else
-			{
-				ret.push_back(tokLine);
-			}
-			g_line_count++;
+			throw(ExceptionBuilder("Newlines not accepted"));
 		}
+		else
+		{
+			ret.push_back(tokLine);
+		}
+		g_line_count++;
 	}
-	g_line_count = 1;
+	g_line_count = 1;	
 	return (ret);
 }
 
@@ -113,7 +95,9 @@ Server&		Parse::parseServer(ServerBlock& server_block, Server& server)
 		}
 		g_line_count++;
 		if (it != server_block.end())
+		{
 			it++;
+		}
 	}
 	g_line_count++;
 	return server;
@@ -218,6 +202,7 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 		{
 			ServerDirectiveFunction = dTable[i].ServerDirectiveFunction;
 			(this->*ServerDirectiveFunction)(server, line);
+			break ;
 		}
 	}
 }
@@ -242,6 +227,7 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 		{
 			LocationDirectiveFunction = dTable[i].LocationDirectiveFunction;
 			(this->*LocationDirectiveFunction)(location, line);
+			break ;
 		}
 	}
 }
@@ -412,23 +398,25 @@ std::invalid_argument Parse::ExceptionBuilder(std::string error)
 	return std::invalid_argument(str);
 }
 
-Line 	Parse::splitLineWithStrtok(std::string& line)
+Line 	Parse::splitLineWithStrtok(std::string& line, const std::string& delimit)
 {
 	char	*c_line = strdup(const_cast<char *>(line.c_str()));
 	char	*word;
 	Line 	ret;
-	char 	delimit[]= " \t\r\n\v\f";
+	
 
-	word = strtok(c_line, delimit);
+	word = strtok(c_line, delimit.c_str());
 	while (word != NULL)
 	{
 		ret.push_back(word);
-		word = strtok(NULL, delimit);
+		word = strtok(NULL, delimit.c_str());
 	}
 	if (DEBUG)
 	{
 		for (size_t i = 0; i < ret.size(); i++)
+		{
 			std::cout  << "[word " << i << "]: " << ret[i] << std::endl;
+		}
 	}
 	free(c_line);
 	return ret;

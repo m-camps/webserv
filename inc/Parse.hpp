@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 12:19:55 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 12:27:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,12 @@ class Parse
 
 		/* File I/O */
 		void 					openFile(std::ifstream& configStream, std::string configName);
-		File					extractFile(std::string& file);	
+		File					extractFile(std::string& file);
+		File					newExtractFileWithRead(std::string& file);
 
 		/* Helper Functions */
 		std::invalid_argument 	ExceptionBuilder(std::string error);
-		Line 					splitLineWithStrtok(std::string& line);
+		Line 					splitLineWithStrtok(std::string& line, const std::string& delimit);
 		bool 					isNumber(const std::string& s);
 		bool					isServerDirective(std::string& currentWord);
 		bool					isLocationDirective(std::string& currentWord);
