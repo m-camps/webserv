@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 18:02:21 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 12:19:46 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,13 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file_name, std::vector<Ser
 		Line line = *it;
 		if (line[0] == "server")
 		{
-			ServerBlock  	server_block = extractServerBlock(it, file);
+			ServerBlock  	server_block = extractBlock(it, file, "server");
 			Server			server;
 			servers.push_back(parseServer(server_block, server));
+		}
+		else
+		{
+			throw(ExceptionBuilder("No server block found"));
 		}
 	}
 	return servers;
@@ -101,7 +105,7 @@ Server&		Parse::parseServer(ServerBlock& server_block, Server& server)
 		}
 		else if (line[0] == "location")
 		{
-			parseLocationBlock(server, it, server_block);
+			parseLocationName(server, it, server_block);
 		}
 		else
 		{
@@ -115,27 +119,29 @@ Server&		Parse::parseServer(ServerBlock& server_block, Server& server)
 	return server;
 }
 
-ServerBlock		Parse::extractServerBlock(File::iterator& it, File& file)
+Block		Parse::extractBlock(Block::iterator& it, Block& block, std::string type)
 {
-	ServerBlock			ret;
-	std::stack<char>	stack;
-	bool				bracket_check = false;
+	Block					ret;
+	std::stack<std::string>	stack;
+	bool					bracket_check = false;
+	std::string				o_brack = (type == "server")? "{" : "[";
+	std::string				c_brack = (type == "server") ? "}" : "]";
 
 	it++;
-	while(it != file.end())
+	while(it != block.end())
 	{
 		Line line = *it;
-		if (line[0] == "{" && line.size() == 1)
+		if (line[0] == o_brack && line.size() == 1)
 		{
 			bracket_check = true;
-			stack.push('{');
+			stack.push(o_brack);
 		}
-		else if (line[0] == "}" && line.size() == 1)
+		else if (line[0] == c_brack && line.size() == 1)
 		{
 			bracket_check = true;
 			if (stack.empty())
 			{
-				throw (ExceptionBuilder("Incorrect brackets in server"));
+				throw (ExceptionBuilder("Incorrect brackets in " + type));
 			}
 			stack.pop();
 			break ;
@@ -148,57 +154,19 @@ ServerBlock		Parse::extractServerBlock(File::iterator& it, File& file)
 	}
 	if (stack.empty() == false || bracket_check == false)
 	{
-		throw (ExceptionBuilder("Incorrect brackets in server"));
+		throw (ExceptionBuilder("Incorrect brackets in " + type));
 	}
 	return ret;
 }
 
-LocationBlock	Parse::extractLocationBlock(ServerBlock::iterator&	it, ServerBlock& server_block)
-{
-	LocationBlock 				ret;
-	std::stack<char> 			stack;
-	bool						bracket_check = false;
-
-	it++;
-	while (it != server_block.end())
-	{
-		Line line = *it;
-		if (line[0] == "[" && line.size() == 1)
-		{
-			bracket_check = true;
-			stack.push('[');
-		}
-		else if (line[0] == "]" && line.size() == 1)
-		{
-			bracket_check = true;
-			if (stack.empty())
-			{
-				throw (ExceptionBuilder("Incorrect brackets in location"));
-			}
-			stack.pop();
-			break ;
-		}
-		else
-		{
-			ret.push_back(line);
-		}
-		it++;
-	}
-	if (stack.empty() == false || bracket_check == false)
-	{
-		throw (ExceptionBuilder("Incorrect brackets in location"));
-	}
-	return ret;
-}
-
-void		Parse::parseLocationBlock(Server& server, ServerBlock::iterator& it, ServerBlock& server_block)
+void		Parse::parseLocationName(Server& server, ServerBlock::iterator& it, ServerBlock& server_block)
 {
 	Line line = *it;
 	if (line.size() != 2)
 	{
 		throw (ExceptionBuilder("Incorrect location name")); 
 	}
-	LocationBlock 	location_block = extractLocationBlock(it, server_block);
+	LocationBlock 	location_block = extractBlock(it, server_block, "location");
 	Location		location;
 	std::string name = line[1];
 	
@@ -346,12 +314,11 @@ void	Parse::parseAllowedMethods(Server& server, Line& line)
 	std::string method = line[1];
 	std::vector<std::string> methods = server.getMethods();
 	
-	if (method == "GET" || method == "POST" || method == "DELETE")
-	{
-		if (std::find(methods.begin(), methods.end(), method) != methods.end())
-			throw (ExceptionBuilder("Duplicate port"));
-		server.addToMethods(method);
-	}
+	if (method != "GET" && method != "POST" && method != "DELETE")
+		throw (ExceptionBuilder("allow_methods value invalid"));
+	else if (std::find(methods.begin(), methods.end(), method) != methods.end())
+		throw (ExceptionBuilder("Duplicate port"));
+	server.addToMethods(method);
 }
 
 void	Parse::parseErrorPage(Server& server, Line& line)
@@ -393,12 +360,11 @@ void	Parse::parseLocationAllowMethod(Location& location, Line& line)
 	std::string method = line[1];
 	std::vector<std::string> methods = location.getAllowMethods();
 	
-	if (method == "GET" || method == "POST" || method == "DELETE")
-	{
-		if (std::find(methods.begin(), methods.end(), method) != methods.end())
-			throw (ExceptionBuilder("Duplicate port"));
-		location.addToAllowMethod(method);
-	}
+	if (method != "GET" && method != "POST" && method != "DELETE")
+		throw (ExceptionBuilder("allow_methods value invalid"));
+	else if (std::find(methods.begin(), methods.end(), method) != methods.end())
+		throw (ExceptionBuilder("Duplicate port"));
+	location.addToAllowMethod(method);
 }
 
 void	Parse::parseLocationAutoIndex(Location& location, Line& line)

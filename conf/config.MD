@@ -26,41 +26,43 @@ Context Location:
 
 Server
 ```
-server {
-	servername			fred.com;
-	listen				80;
-
-	error_page			500 502 503 504 /404.html;
-	client_body_size	100;
-	root				/www/data;
-	allow_methods		GET POST;
-	index				index.html;
-
-	location /php {
-		root				/fpm;
-		autoindex			off;
-		index				index.php;
-		allow_methods		GET;
-		cgi_file_extension	php;
-		cgi_name			php-fpm;
-	}
-
-	location /python {
-		root				/;
-		autoindex			on;
-		index				python.html;
-		allow_methods		GET DELETE;
-		cgi_file_extension	py;
-		cgi_name			python3;
-	}
+server 
+{
+	servername				fred.com
+	listen					80
+	error_page				500 /404.html
+	client_body_size		100
+	root					/www/data
+	allow_methods			GET 
+	allow_methods			POST
+	index					index.html
+	location /php 
+	[
+		root				/fpm
+		autoindex			off
+		index				index.php
+		allow_methods		GET
+		cgi_file_extension	php
+		cgi_name			php-fpm
+	]
+	location /python 
+	[
+		root				/
+		autoindex			on
+		index				python.html
+		allow_methods		GET 
+		allow_methods		DELETE
+		cgi_file_extension	py
+		cgi_name			python3
+	]
 }
 ```
 Redirect server
 
 ```
 server {
-	listen 				443;
-	server_name			;
-	return				301	http//localhost:80;
+	listen 				443
+	server_name			
+	return				301	http//localhost:80
 }
 ```

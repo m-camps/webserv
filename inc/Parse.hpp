@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 18:02:37 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 12:19:55 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ typedef std::vector<std::string>::iterator 	vecIt;
 typedef std::vector<std::string>			Line;
 typedef std::vector<Line>					LocationBlock;
 typedef std::vector<Line>					ServerBlock;
+typedef std::vector<Line>					Block;
 typedef std::vector<Line>					File;
 
 #define NR_OF_SERVER_DIRECTIVES 7 //will be more later
@@ -37,9 +38,8 @@ class Parse
 		Server&					parseServer(ServerBlock& server_block, Server& server);
 		Location&				parseLocation(LocationBlock& location_block, Location& location);
 
-		void					parseLocationBlock(Server& server, ServerBlock::iterator& it, ServerBlock& server_block);
-		LocationBlock			extractLocationBlock(ServerBlock::iterator&	it, ServerBlock& server_block);
-		ServerBlock				extractServerBlock(File::iterator& it, File& file);
+		void					parseLocationName(Server& server, ServerBlock::iterator& it, ServerBlock& server_block);
+		Block					extractBlock(Block::iterator& it, Block& block, std::string type);
 		
 	private:
 		/* Dispatch Table Server Functions */
