@@ -55,15 +55,6 @@ void			Cgi::executeScript(Exchange& ExchangeRef)
 	int	stat;
 	pipe(fds); //3,4 
 
-	Server current = ExchangeRef.getServer();
-	std::string executablePath; //../data/www/cgi-bin/filename+extension
-	executablePath += "../";
-	executablePath += current.getRoot();
-	executablePath += "/cgi-bin"; //for now
-	executablePath += "/hello"; //for now
-
-	const char* execvePath = executablePath.c_str();
-
 	pid_t	pid = fork();
 	if (pid == -1)
 	{
