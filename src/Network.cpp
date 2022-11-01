@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 15:00:38 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 18:12:05 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,22 +79,22 @@ void Network::run()
 			{
 				if (isSocketFd(cur.fd))
 				{
-					std::cout << "New connection" << "\n";
 					Server *server = getServerBySocketFd(cur.fd);
 					int newFd = server->acceptConnection(cur.fd);
 					addToPollFds(newFd);
+					std::cout << "New connection" << "\n";
 					std::cout << "On FD " << newFd << std::endl;
 				}
 				else
 				{
 					bzero(buff, BUFF);
 					int ret = recv(cur.fd, buff, sizeof(buff), 0);
-					std::cout << "\nret = " << ret;
+					// std::cout << "\nret = " << ret;
 					if (ret <= 0)
 					{
 						RequestStr.clear();
 						if (ret == 0)
-							;
+							std::cout << "Client closed connection" << "\n";
 						else
 							perror("In recv: ");
 						close(cur.fd);
@@ -124,7 +124,7 @@ void	Network::createFds(void)
 	}
 	
 	int j = 0;
-	for (int i = 0; i < _servers.size(); i++)
+	for (size_t i = 0; i < _servers.size(); i++)
 	{
 		std::vector<int> fds = _servers.at(i).getSocketFds();
 		for (std::vector<int>::iterator it = fds.begin(); it != fds.end(); it++)
