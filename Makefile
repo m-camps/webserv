@@ -88,7 +88,9 @@ test: all
 	@./$(NAME) conf/basic.conf
 
 unit_tester:
-	cmake -S tester/ -B tester/build
+	cmake -S . -B cBuild/
+	make -C cBuild/
+	./cBuild/tester/catch2Tester 2> /dev/null
 
 # Colors
 RED=\x1b[1;31m

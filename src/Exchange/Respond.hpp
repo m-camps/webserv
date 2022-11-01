@@ -36,7 +36,6 @@ private:
 	Respond& operator=(const Respond&);
 
     Exchange& _Exchanger;
-    Generator _Generator;
 
     // Tijdelijk
     std::string _MetaData;

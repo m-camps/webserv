@@ -48,10 +48,10 @@ void Respond::BuildGet_Redir(void)
 {
     const std::string NewLocation = _Exchanger.getServer().getIndex();
 
-    _Generator.generateStatus(_Exchanger);
-    _Generator.generateLocation(_Exchanger, NewLocation);
+    Generator::generateStatus(_Exchanger);
+    Generator::generateLocation(_Exchanger, NewLocation);
     _Exchanger.setBody("");
-    _Generator.generateContentLength(_Exchanger, 0);
+    Generator::generateContentLength(_Exchanger, 0);
 }
 
 void Respond::BuildGet(void)
@@ -75,9 +75,9 @@ void Respond::BuildGet(void)
             return ;
         }
 
-        _Generator.generateStatus(_Exchanger);
+        Generator::generateStatus(_Exchanger);
 		_Exchanger.setBody(FileContent);
-        _Generator.generateContentLength(_Exchanger, _Exchanger.getBody().length());
+        Generator::generateContentLength(_Exchanger, _Exchanger.getBody().length());
 	}
 	catch (const std::exception& e)
 	{
@@ -101,9 +101,9 @@ void Respond::BuildDelete()
         uint32_t StatusCode = modifyStatusCode(Path, relativePath);
         _Exchanger.setStatusCode(StatusCode);
 
-        _Generator.generateStatus(_Exchanger);
+        Generator::generateStatus(_Exchanger);
         _Exchanger.setBody("");
-        _Generator.generateContentLength(_Exchanger, 0);
+        Generator::generateContentLength(_Exchanger, 0);
         deleteFile(relativePath);
     }
     catch (const std::exception& e)
@@ -154,7 +154,7 @@ std::string Respond::getDataOfBody(void)
 
     try
     {
-        std::string Boundry = _Generator.generateBoundry(_Exchanger);
+        std::string Boundry = Generator::generateBoundry(_Exchanger);
         RequestBody = RequestBody.substr(Boundry.length() + 5,
                                          RequestBody.length() - (Boundry.length() * 2) - 11);
 
@@ -184,12 +184,12 @@ void Respond::BuildPost()
     std::cout << "POST" << std::endl;
     try
     {
-        _Generator.generateStatus(_Exchanger);
+        Generator::generateStatus(_Exchanger);
         Body = getDataOfBody();
 
         putBodyInFile(_MetaData, Body);
         _Exchanger.setBody("");
-        _Generator.generateContentLength(_Exchanger, 0);
+        Generator::generateContentLength(_Exchanger, 0);
     }
     catch (const std::exception& e)
     {
@@ -235,10 +235,10 @@ void Respond::ResponseBuilder(void)
     if (!MethodIsAllowed(Method, AllowedMethods))
     {
         _Exchanger.setStatusCode(e_MethodNotFound);
-        _Generator.generateStatus(_Exchanger);
+        Generator::generateStatus(_Exchanger);
         std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
         _Exchanger.setBody(FileContent);
-        _Generator.generateContentLength(_Exchanger, _Exchanger.getBody().length());
+        Generator::generateContentLength(_Exchanger, _Exchanger.getBody().length());
         return ;
     }
 
@@ -258,7 +258,7 @@ void Respond::ResponseBuilder(void)
 void Respond::sendAsChunked(void)
 {
     ssize_t ret;
-    std::string Body = _Generator.generateChunk(_Exchanger);
+    std::string Body = Generator::generateChunk(_Exchanger);
 
     while (Body.length() > 7)
     {
@@ -269,7 +269,7 @@ void Respond::sendAsChunked(void)
             std::string StrError = std::strerror(errno);
             throw (std::runtime_error(StrError));
         }
-        Body = _Generator.generateChunk(_Exchanger);
+        Body = Generator::generateChunk(_Exchanger);
     }
     Body = "0\r\n\r\n";
     ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
@@ -293,7 +293,7 @@ void Respond::RespondToClient(void)
 
     if (Body.length() > MAXBYTES)
     {
-        _Generator.generateTransferEncoding(_Exchanger);
+        Generator::generateTransferEncoding(_Exchanger);
         IsChunked = true;
         Header = _Exchanger.getHeader();
         response = Header + "\r\n";

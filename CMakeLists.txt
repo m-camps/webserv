@@ -9,6 +9,8 @@ set(EXCHANGE_HEADERS ./src/Exchange)
 include_directories(${INC_HEADERS})
 include_directories(${EXCHANGE_HEADERS})
 
+add_subdirectory(tester)
+
 set(SOURCES
 ${INC_HEADERS}/Constants.hpp
 ${INC_HEADERS}/Location.hpp

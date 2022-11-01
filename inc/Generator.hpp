@@ -5,12 +5,12 @@
 #ifndef GENERATE_HPP
 #define GENERATE_HPP
 
-#include "Exchange/Exchange.hpp"
+#include "Exchange.hpp"
 #include "Utilities.hpp"
 
 #include <iostream>
 
-#define MAXBYTES 30000
+#define MAXBYTES 100000
 
 class Generator
 {
@@ -18,13 +18,13 @@ public:
     Generator(void);
     ~Generator(void);
 
-    void generateStatus(Exchange&);
-    void generateContentLength(Exchange&, std::size_t);
-    void generateLocation(Exchange&, const std::string);
-    void generateContentType(Exchange&);
-    void generateTransferEncoding(Exchange&);
-    std::string generateChunk(Exchange&);
-    std::string generateBoundry(Exchange&);
+    static void generateStatus(Exchange&);
+    static void generateContentLength(Exchange&, std::size_t);
+    static void generateLocation(Exchange&, const std::string);
+    static void generateContentType(Exchange&);
+    static void generateTransferEncoding(Exchange&);
+    static std::string generateChunk(Exchange&);
+    static std::string generateBoundry(Exchange&);
 };
 
 
