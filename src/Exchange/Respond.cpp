@@ -270,8 +270,6 @@ void Respond::ResponseBuilder(void)
 	}
 }
 
-
-
 /* for now just a checker function, probably should belong to respond */
 bool	isCgiRequest(Exchange& ExchangeRef) //check if 
 {
