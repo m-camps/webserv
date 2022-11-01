@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 13:22:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 14:37:25 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@
 
 Server::Server()
 {
-	this->_root = "";
-	this->_index = "";
+	_client_body_size = -1;
 }
 
 Server::~Server() { return; }

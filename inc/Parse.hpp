@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 12:27:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 14:31:28 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,13 @@ class Parse
 		/* File I/O */
 		void 					openFile(std::ifstream& configStream, std::string configName);
 		File					extractFile(std::string& file);
-		File					newExtractFileWithRead(std::string& file);
 
+		/* Validator */
+		std::invalid_argument 	ValidateException(std::string error, int block);
+		void					validate(std::vector<Server>& servers);
+		void					validateServer(Server& server, int block);
+		void					validateLocation(Location& location, int block);
+		
 		/* Helper Functions */
 		std::invalid_argument 	ExceptionBuilder(std::string error);
 		Line 					splitLineWithStrtok(std::string& line, const std::string& delimit);

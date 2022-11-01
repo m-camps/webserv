@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 14:03:55 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 14:05:42 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void Network::run()
 		}
 		for (int i = 0; i < _total_fd; i++)
 		{
-			std::cout << "total_fd " << _total_fd << "fd " <<_fds[i].fd << '\n';
  			struct pollfd cur = _fds[i];
 			if ((cur.revents & POLLIN))
 			{

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 12:38:50 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 14:42:47 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ std::vector<Server>&	Parse::parseNetwork(std::string& file_name, std::vector<Ser
 			throw(ExceptionBuilder("No server block found"));
 		}
 	}
+	validate(servers);
 	return servers;
 }
 
@@ -286,6 +287,8 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 		throw (ExceptionBuilder("client_body_size directive incorrect"));
 	else if (!isNumber(line[1]))
 		throw (ExceptionBuilder("client_body_size directive not a number"));
+	else if(server.getClientBodySize() != -1)
+		throw (ExceptionBuilder("Duplicate client_body_size"));
 
 	int clientBodySize = std::stoi(line[1], nullptr, 10);
 	server.setClientBody(clientBodySize);
@@ -445,4 +448,69 @@ bool    Parse::isLocationDirective(std::string& directive)
 	return (directive == "root" || directive == "index" ||
 			directive == "allow_methods" || directive == "autoindex" ||
 			directive == "cgi_name" || directive == "cgi_ext");
+}
+
+std::invalid_argument Parse::ValidateException(std::string error, int block)
+{
+	std::string str;
+	
+	str.append("Incomplete Error | ServerBlock " + TOSTRING(block) + " | ");
+	str.append(error);
+	return std::invalid_argument(str);
+}
+
+void	Parse::validate(std::vector<Server>& servers)
+{
+	std::vector<Server>::iterator 	it = servers.begin();
+	int								i = 1;
+	
+	if (servers.size() == 0)
+		throw(ExceptionBuilder("No servers found"));
+	for ( ;it != servers.end(); it++)
+	{
+		validateServer(*it, i);
+		i++;
+	}
+}
+
+void	Parse::validateServer(Server& server, int block)
+{
+	if (server.getPorts().empty())
+		throw(ValidateException("Ports not set", block));
+	else if (server.getNames().empty())
+		throw(ValidateException("Server name not set", block));
+	else if (server.getRoot() == "")
+		throw(ValidateException("Root not set", block));
+	else if (server.getIndex() == "")
+		throw(ValidateException("Index not set", block));
+	else if (server.getClientBodySize() == -1)
+		throw(ValidateException("ClientBodySize not set", block));
+	else if (server.getMethods().empty())
+		throw(ValidateException("Allow_methods not set", block));
+
+	std::map<std::string, Location>	locations = server.getLocations();
+	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)
+	{
+		if (it->first == "")
+			throw(ValidateException("Location name not set", block));
+		validateLocation(it->second, block);
+	}
+}
+
+void	Parse::validateLocation(Location& location, int block)
+{
+	if (location.getName() == "")
+		throw(ValidateException("Location name not set in", block));
+	else if (location.getRoot() == "")
+		throw(ValidateException("Location root not set in location: " + location.getName(), block));
+	else if (location.getIndex() == "")
+		throw(ValidateException("Location index not set in location: " + location.getName(), block));
+	else if (location.getAutoIndex() == -1)
+		throw(ValidateException("Location autoindex not set in location: " + location.getName(), block));
+	else if (location.getAllowMethods().empty())
+		throw(ValidateException("Location allow_methods not set in location: " + location.getName(), block));
+	else if (location.getCgiFileExtension() == "")
+		throw(ValidateException("Location cgi_ext not set in location: " + location.getName(), block));
+	else if (location.getCgiName() == "")
+		throw(ValidateException("Location cgi_name not set in location: " + location.getName(), block));
 }
