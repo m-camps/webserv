@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 16:07:15 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 13:22:03 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,6 @@ Server::Server()
 {
 	this->_root = "";
 	this->_index = "";
-	this->_socket_fd = 0;
-    this->_listen_set = false;
-    this->_servername_set = false;
 }
 
 Server::~Server() { return; }
@@ -34,8 +31,7 @@ std::string  									Server::getIndex(void) const { return _index; }
 int												Server::getClientBodySize(void) const { return _client_body_size; }
 std::vector<std::string>						Server::getMethods(void) const { return _methods; }
 std::map<std::string, Location> 				Server::getLocations(void) const { return _locations; }
-int												Server::getSocketFd(void) const { return _socket_fd; }
-struct sockaddr_in*       						Server::getSockAddr(void) const { return _address_in; }
+std::vector<int>								Server::getSocketFds(void) const { return _socket_fds; }
 std::vector<int>								Server::getClientFds(void) const { return _client_fds; }
 std::map<int, std::string> 						Server::getErrorPage(void) const { return _error_pages; }
 
@@ -72,21 +68,32 @@ void	Server::removeFromClientFds(int fd)
 }
 
 /* Public Functions */ 
-void	Server::setup()
+int		Server::setup()
 {
-	makeSocketAddr();
-	createSocket();
-	setupSocket();
-	fcntl(_socket_fd, F_SETFL, O_NONBLOCK);
+	int	totalFdSetup = 0;
+	for (std::vector<int>::iterator it = _ports.begin(); it != _ports.end(); it++)
+	{
+		int 				port;
+		int 				socket_fd;
+		struct sockaddr_in* address_in;
+		port = *it;
+		socket_fd = createSocket();
+		address_in = makeSocketAddr(port);
+		setupSocket(socket_fd, address_in);
+		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
+		_socket_fds.push_back(socket_fd);
+		totalFdSetup++;
+	}
+	return (totalFdSetup);
 }
 
-int		Server::acceptConnection()
+int		Server::acceptConnection(int& socket_fd)
 {
 	struct  sockaddr_in			client_addr;
 	socklen_t					client_addrlen = sizeof(client_addr);
 	
 
-	int	clientFd = accept(_socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
+	int	clientFd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
 	if (clientFd != -1 && DEBUG)
 	{
 		std::cout << "["<<_names.back() << ":" << _ports.front() <<   "] "; //previously used with _port instead of +.back()
@@ -104,33 +111,42 @@ bool	Server::isClientFdInServer(int fd)
 		return false;
 }
 
+bool	Server::isSocketFdInServer(int fd)
+{
+	if (std::find(_socket_fds.begin(), _socket_fds.end(), fd) != _socket_fds.end())
+		return true;
+	else
+		return false;
+}
+
 /* Helper Functions */
 
-void	Server::setupSocket()
+void	Server::setupSocket(int& socket_fd, struct sockaddr_in* address_in)
 {
-	if (bind(_socket_fd, (const struct sockaddr *)_address_in, sizeof(*_address_in)) < 0)
+	if (bind(socket_fd, (const struct sockaddr *)address_in, sizeof(*address_in)) < 0)
 	{
 		std::perror("In Bind: ");
 		std::exit(ERROR);
 	}
 
-	if (listen(_socket_fd, 5) < 0)
+	if (listen(socket_fd, 5) < 0)
 	{
 		std::perror("In listen: ");
 		std::exit(ERROR);
 	}
 }
 
-void	Server::createSocket(void)
+int		Server::createSocket(void)
 {
-	int32_t socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
+	
 	if (socket_fd < 0) {
 		std::exit(EXIT_FAILURE);
 	}
 	int reuse = 1;
 	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
    		std::perror("setsockopt(SO_REUSEADDR) failed");
-	_socket_fd = socket_fd;
+	return socket_fd;
 }
 
 /*
@@ -138,15 +154,15 @@ void	Server::createSocket(void)
 *** For now I use _port.back() instead of previously used _port,
 *** but we might have to use a loop outside to make sockets for all ports attached.
 */
-void	Server::makeSocketAddr() 
+struct sockaddr_in *	Server::makeSocketAddr(int& port) 
 {
 	struct sockaddr_in *address = new sockaddr_in();
 
 	address->sin_family = AF_INET;
-	address->sin_port = htons(_ports.front()); // <- Converts from host byte order to network byte order.
+	address->sin_port = htons(port);
 	address->sin_addr.s_addr = INADDR_ANY;
 	memset(address->sin_zero, 0, sizeof(address->sin_zero));
-	_address_in = address;
+	return address;
 }
 
 /* Stream overload */
@@ -168,7 +184,10 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
 	for(size_t i = 0; i < server.getMethods().size(); i++) 
         stream << server.getMethods().at(i) << " ";
 	stream << "]\n";
-	stream << "SocketFD: [" << server.getSocketFd() << "]\n";
+	stream << "SocketFD(s) [";
+	for(size_t i = 0; i < server.getSocketFds().size(); i++) 
+        stream << server.getSocketFds().at(i) << " ";
+	stream << "]\n";
 	stream << "ClientFD(s) [";
 	for(size_t i = 0; i < server.getClientFds().size(); i++) 
         stream << server.getClientFds().at(i) << " ";

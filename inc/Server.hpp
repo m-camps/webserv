@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 16:05:54 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 13:10:25 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ class Server
 		int									getClientBodySize(void) const;
 		std::vector<std::string>			getMethods(void) const;
 		std::map<std::string, Location>		getLocations(void) const;
-		int									getSocketFd(void) const;
-		struct sockaddr_in*					getSockAddr(void) const;
-		std::vector<int>					getClientFds(void) const;
 		std::map<int, std::string>          getErrorPage(void) const;
+
+		std::vector<int>					getSocketFds(void) const;
+		std::vector<int>					getClientFds(void) const;
 
 		/* Setters */
 		void	setRoot(std::string& root);
@@ -63,10 +63,10 @@ class Server
 
 		/* Public Functions */
 		void	changePort(std::string newPort);
-		void	setup();
-		int		acceptConnection();
+		int		setup();
+		int		acceptConnection(int& socket_fd);
 		bool	isClientFdInServer(int fd);
-
+		bool	isSocketFdInServer(int fd);
 
 	private:
 		std::vector<int>							_ports;
@@ -75,18 +75,16 @@ class Server
 		std::string									_index; 					// default = "index.html"
 		int											_client_body_size;			// default = 10;
 		std::vector<std::string>					_methods;					// default = ["GET", "POST", "DELETE"]
-		struct sockaddr_in*							_address_in; 				// Optional can be deleted
-		int											_socket_fd; 				// Socket FD the server is running on
-		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
 		std::map<std::string, Location>				_locations;					// All locations of the Server
-		std::map<int, std::string>					_error_pages;				//should be vector of ints as the first part of the map?
-		bool										_listen_set; 				//setters for these?
-		bool										_servername_set;  			//setters for these?
+		std::map<int, std::string>					_error_pages;				// Map of error pages
+		
+		std::vector<int>							_socket_fds; 				// Socket FD the server is running on
+		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
 
 		/* Helper Functions */
-		void	makeSocketAddr();
-		void	createSocket();
-		void	setupSocket();
+		struct sockaddr_in*	makeSocketAddr(int& port);
+		int					createSocket(void);
+		void				setupSocket(int& socket_fd, struct sockaddr_in* address_in);
 };
 
 /* Stream overload */

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 14:28:48 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 14:03:55 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #define BUFF 10000
 
 /* Default constructor */
-Network::Network() : _max_fd(5) {}
+Network::Network() {}
 
 /* Default deconstructor */
 Network::~Network() {}
@@ -36,6 +36,7 @@ void Network::setup(std::string file)
 	Parse				parser;
 	std::vector<Server> tmp;
 	
+	_total_fd = 0;
 	try
 	{
 		_servers = parser.parseNetwork(file, tmp);
@@ -49,12 +50,11 @@ void Network::setup(std::string file)
 
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
+		_total_fd += _servers.at(i).setup();
 		std::cout << _servers.at(i) << "\n";
-		_servers.at(i).setup();
 	}
-
-	_total_fd = _servers.size();
 	createFds();
+	_max_fd = _total_fd;
 }
 
 /* Poll() loop of the network */
@@ -74,7 +74,7 @@ void Network::run()
 		}
 		for (int i = 0; i < _total_fd; i++)
 		{
-			std::cout << _total_fd << _fds[i].fd << '\n';
+			std::cout << "total_fd " << _total_fd << "fd " <<_fds[i].fd << '\n';
  			struct pollfd cur = _fds[i];
 			if ((cur.revents & POLLIN))
 			{
@@ -82,7 +82,7 @@ void Network::run()
 				{
 					std::cout << "New connection" << "\n";
 					Server *server = getServerBySocketFd(cur.fd);
-					int newFd = server->acceptConnection();
+					int newFd = server->acceptConnection(cur.fd);
 					addToPollFds(newFd);
 					std::cout << "On FD " << newFd << std::endl;
 				}
@@ -117,22 +117,27 @@ void Network::run()
 
 void	Network::createFds(void)
 {
-	_fds = (pollfd*)malloc(_max_fd * sizeof(pollfd));
+	_fds = (pollfd*)malloc((_total_fd) * sizeof(pollfd));
 	if (!_fds)
 	{
 		perror("Malloc: ");
 		exit(EXIT_FAILURE);
 	}
 	
-	for (int i = 0; i < (int)_servers.size(); i++)
+	int j = 0;
+	for (int i = 0; i < _servers.size(); i++)
 	{
-		_fds[i].fd = _servers.at(i).getSocketFd();
-		_fds[i].events = POLLIN;
+		std::vector<int> fds = _servers.at(i).getSocketFds();
+		for (std::vector<int>::iterator it = fds.begin(); it != fds.end(); it++)
+		{
+			_fds[j] = createNewPollfd(*it);
+			j++;
+		}
 	}
 	if (DEBUG)
 	{
 		std::cout << "File descriptors in use: [";
-		for (int i = 0; i < (int)_servers.size(); i++)
+		for (int i = 0; i < _total_fd; i++)
 			std::cout << ((i != 0) ? "," : "") << _fds[i].fd;
 		std::cout << "]\n";
 	}
@@ -140,8 +145,6 @@ void	Network::createFds(void)
 
 void	Network::addToPollFds(int fd)
 {
-	if (DEBUG)
-		std::cout << "total_fd " << _total_fd << " _max_fd " << _max_fd << "\n";
 	if (_total_fd >= _max_fd)
 	{
 		_max_fd *= 2;
@@ -172,12 +175,11 @@ struct pollfd Network::createNewPollfd(int fd)
 }
 
 /* Helper functions */ 
-
 bool	Network::isSocketFd(int fd)
 {
 	for (int i = 0; i < (int)_servers.size(); i++)
 	{
-		if (_servers.at(i).getSocketFd() == fd)
+		if (_servers.at(i).isSocketFdInServer(fd))
 			return true;
 	}
 	return false;
@@ -187,7 +189,7 @@ Server*	Network::getServerBySocketFd(int fd)
 {
 	for (int i = 0; i < (int)_servers.size(); i++)
 	{
-		if (_servers.at(i).getSocketFd() == fd)
+		if (_servers.at(i).isSocketFdInServer(fd))
 			return &_servers.at(i);
 	}
 	return NULL;
