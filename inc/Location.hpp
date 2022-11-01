@@ -26,7 +26,7 @@ class Location {
 		bool						_autoindex; //GET
 		std::string					_cgi_name; //GET
 		std::string					_cgi_ext; //GET
-
+		//if there is a cginame and cgi extension then its a cgi request
 	public:
 		Location();
 		~Location();

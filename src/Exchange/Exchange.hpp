@@ -28,7 +28,8 @@ public:
     uint32_t getStatusCode(void) const;
     Server getServer(void) const;
     int32_t getSocketFD(void) const;
-
+    
+    std::string getPath(void) const;
     // Setters
     void setHashMap(const HashMap);
     void setHeader(const std::string);

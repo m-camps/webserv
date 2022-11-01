@@ -18,6 +18,10 @@ Location::Location()
 	this->_root = "/";
 	this->_index = "index.html";
 	this->_autoindex = false;
+	this->_cgi_ext = "";
+	this->_cgi_name = "";
+	this->_name = "";
+	//this->_methods should be just an empty vector
 }
 
 Location::~Location(){}

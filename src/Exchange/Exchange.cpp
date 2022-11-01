@@ -128,6 +128,7 @@ void Exchange::setStatusCode(const uint32_t NewStatus)
 
 void Exchange::setHeader(const std::string NewHeader)
 {
+    std::cout << NewHeader << " will be the header" << std::endl;
     _header = NewHeader;
 }
 

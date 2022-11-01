@@ -4,6 +4,8 @@
 
 #include "Respond.hpp"
 #include "../../inc/Cgi.hpp"
+#include "../../inc/Server.hpp"
+
 #define ERROR 1
 
 #pragma region "ctor & dtor"
@@ -13,7 +15,7 @@
 Respond::Respond(Exchange& ExchangeRef)
 	: _Exchanger(ExchangeRef)
 {
-	RespondToClient();
+	RespondToClient(ExchangeRef);
 }
 
 /* //////////////////////////// */
@@ -21,7 +23,7 @@ Respond::Respond(Exchange& ExchangeRef)
 Respond::Respond(const Respond& ref)
 		: _Exchanger(ref._Exchanger)
 {
-	RespondToClient();
+	RespondToClient(_Exchanger);
 }
 
 /* //////////////////////////// */
@@ -268,22 +270,67 @@ void Respond::ResponseBuilder(void)
 	}
 }
 
+
+
+/* for now just a checker function, probably should belong to respond */
+bool	isCgiRequest(Exchange& ExchangeRef) //check if 
+{
+	Server current = ExchangeRef.getServer();
+	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
+	std::map<std::string, Location>::iterator	it = locationBlocksToCheck.begin();
+
+	for (int i = 0; i < locationBlocksToCheck.size(); i++)
+	{
+		if (it->second.getLocationCgiName() != "" && it->second.getLocationCgiFileExtension() != "") //check extension format
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+/* for now just a checker function, probably should belong to respond */
+bool	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look until the last executable part /folder/inside/(executable.py), for now checks for exact match eg: ROOT /py == LOCATION /py
+{
+	Server current = ExchangeRef.getServer();
+	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
+	std::map<std::string, Location>::iterator	it = locationBlocksToCheck.begin();
+	std::map<std::string, std::string> 			map = ExchangeRef.getHashMap();
+	std::string 								s1 = "Path";
+
+	for (int i = 0; i < locationBlocksToCheck.size(); i++)
+	{
+		if (map.find(s1) != map.end())
+		{
+			if (map[s1] == it->first)
+			{
+				std::cout << it->first << " is a match to the requested path of: " << map[s1] << std::endl;
+				//maybe we could even return the locationblock which matches, now its double work
+				return true;
+			}
+		}
+		it++;
+	}
+	return false;
+}
+
 /* //////////////////////////// */
 
-void Respond::RespondToClient(void)
+void Respond::RespondToClient(Exchange& ExchangeRef) //maybe here would be ideal to the Exchange& ExchangeRef so we can check in the serverblock if there is a URI matching
 {
 	std::string Header;
     std::string Body;
 
-    // if (!CGI)
-       // ResponseBuilder();
-    // else
-    //     Cgi cgi;
-    //      cgi.executeScript()
-    //
-    Cgi test;
+	if (isUriMatchingALocationBlock(ExchangeRef) == true && isCgiRequest(ExchangeRef) == true)
+	{
+		Cgi cgi;
+		cgi.executeScript(ExchangeRef);
+	}
+    else
+	{
+    	ResponseBuilder();
+	}
 
-    test.executeScript();
     Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();
 

@@ -49,7 +49,8 @@ private:
 	void BuildPost(void);
 	void BuildDelete(void);
 
-	void RespondToClient(void);
+	//void RespondToClient(void);
+    void RespondToClient(Exchange& ExchangeRef);
     void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
     std::string getBodyDataCurl(void);

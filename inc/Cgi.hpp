@@ -2,6 +2,7 @@
 #define CGI_HPP
 #include <string>
 #define NR_OF_CGI_ENV_VARS 24
+#include "../src/Exchange/Exchange.hpp"
 
 class Cgi
 {
@@ -10,7 +11,10 @@ class Cgi
 		std::string*	getEnvTable(void);
 		void			printEnv(void);
 		void			createCgiResponse(void);
-		void			executeScript(void);
+		void			executeScript(Exchange& ExchangeRef);
+		void			parentProcess(int* fds, int& stat);
+		void			childProcess(int* fds);
+
 		//i need to construct a header separate from the script
 			// VERSION & STATUSCODE FIRST
 			// ContentLength, if there is a body
