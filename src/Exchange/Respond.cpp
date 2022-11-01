@@ -155,12 +155,12 @@ std::string Respond::getDataOfBody(void)
     try
     {
         std::string Boundry = generateBoundry();
-        RequestBody = RequestBody.substr(Boundry.length(),
-                                         RequestBody.length() - (Boundry.length() * 2) - 13);
+        RequestBody = RequestBody.substr(Boundry.length() + 5,
+                                         RequestBody.length() - (Boundry.length() * 2) - 11);
 
-        std::cout << RequestBody << std::endl;
-        while ((found = RequestBody.find(CRLF)) != std::string::npos)
+        for (int32_t i = 0; i < 3; i++)
         {
+            found = RequestBody.find(CRLF);
             _MetaData += RequestBody.substr(0, found) + "\n";
             RequestBody = RequestBody.substr(found + 2, RequestBody.length());
         }
@@ -275,7 +275,10 @@ void Respond::RespondToClient(void)
 	std::string Header;
     std::string Body;
 
-    ResponseBuilder();
+    // if (!CGI)
+        ResponseBuilder();
+    // else
+    //     class CGI
 
     Header = _Exchanger.getHeader();
     Body = _Exchanger.getBody();

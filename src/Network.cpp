@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 14:05:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 15:00:38 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void	Network::addToPollFds(int fd)
 	{
 		_max_fd *= 2;
 		struct pollfd *tmp = (pollfd*)realloc(_fds, _max_fd * sizeof(pollfd));
-		if (tmp == NULL)
+		if (!tmp)
 			exit(ERROR);
 		_fds = tmp;
 	}

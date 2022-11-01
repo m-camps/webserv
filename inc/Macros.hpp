@@ -5,9 +5,9 @@
 #ifndef WEBSERV_MACROS_HPP
 #define WEBSERV_MACROS_HPP
 
-#include <iostream>
-#include <string>
 #include <sstream>
+
+// #define TOSTRING( x ) static_cast< std::ostringstream & >( ( std::ostringstream() << std::dec << x ) ).str()
 
 template <typename T>
   std::string TOSTRING ( T Number )
@@ -16,5 +16,4 @@ template <typename T>
      ss << Number;
      return ss.str();
   }
-  
 #endif //WEBSERV_MACROS_HPP

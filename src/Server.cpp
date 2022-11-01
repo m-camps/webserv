@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 14:37:25 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/01 15:03:42 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,8 +91,12 @@ int		Server::acceptConnection(int& socket_fd)
 	struct  sockaddr_in			client_addr;
 	socklen_t					client_addrlen = sizeof(client_addr);
 	
-
 	int	clientFd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
+	if (clientFd == -1)
+	{
+		std::perror("In accept: ");
+		std::exit(EXIT_FAILURE);
+	}
 	if (clientFd != -1 && DEBUG)
 	{
 		std::cout << "["<<_names.back() << ":" << _ports.front() <<   "] "; //previously used with _port instead of +.back()

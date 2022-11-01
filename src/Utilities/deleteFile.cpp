@@ -10,6 +10,6 @@ void deleteFile(std::string& filePath)
     if (result != 0)
     {
         std::perror("In remove: ");
-        return ; // Throw?
+        throw (std::out_of_range("filePath cannot be removed"));
     }
 }

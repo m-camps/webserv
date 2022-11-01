@@ -64,7 +64,11 @@ HashMap Exchange::getHashMap(void) const
 
 std::string Exchange::getHashMapString(const std::string& RequestedMap) const
 {
-    return (_dictHeader.find(RequestedMap)->second);
+        std::string second = _dictHeader.find(RequestedMap)->second;
+
+        if (second == "")
+            throw (std::invalid_argument("Invalid string"));
+        return (second);
 }
 
 /* //////////////////////////// */
@@ -135,14 +139,7 @@ void Exchange::setHeader(const std::string NewHeader)
 
 void Exchange::addHashMapNode(const std::string NameNode, const std::string ContentNode)
 {
-    try
-    {
-        _dictHeader[NameNode] = ContentNode;
-    }
-    catch (const std::exception& e)
-    {
-        throw (e.what());
-    }
+    _dictHeader[NameNode] = ContentNode;
 }
 
 /* //////////////////////////// */
