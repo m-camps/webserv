@@ -232,11 +232,12 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
+    // Hoeft niet?
     if (!MethodIsAllowed(Method, AllowedMethods))
     {
         _Exchanger.setStatusCode(e_MethodNotFound);
         Generator::generateStatus(_Exchanger);
-        std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
+        std::string FileContent = Generator::generateDefaulPage(_Exchanger.getStatusCode());
         _Exchanger.setBody(FileContent);
         Generator::generateContentLength(_Exchanger, _Exchanger.getBody().length());
         return ;
@@ -369,13 +370,13 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 				FileContent = readFile(Root + "/Error404.html");
 				break ;
             default:
-                FileContent = defaultStatusPage(StatusCode);
+                FileContent = Generator::generateDefaulPage(StatusCode);
                 break ;
 		}
 	}
 	catch (const std::exception& e)
 	{
-		FileContent = defaultStatusPage(StatusCode);
+		FileContent = Generator::generateDefaulPage(StatusCode);
 	}
 	return (FileContent);
 }

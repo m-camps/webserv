@@ -20,7 +20,7 @@ OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
 CONFIG := data/conf/basic.conf
 
-INC := -Iinc -Isrc
+INC := -Iinc -Isrc/Exchange
 CFLAGS :=  -pedantic -Wall -Werror -Wextra $(INC)
 CC	:= c++
 EXTRA := -std=c++98

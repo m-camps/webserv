@@ -114,3 +114,68 @@ std::string Generator::generateBoundry(Exchange& Exchanger)
 
     return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
 }
+
+/* //////////////////////////// */
+
+std::string Generator::generateDefaulPage(uint32_t StatusCode)
+{
+     return (
+            "<!DOCTYPE html>\n"
+            "<body>\n"
+            "<h1>ERROR " + ToString(StatusCode) +
+            "</h1>\n"
+            "</body>\n"
+            "</html>"
+    );
+}
+
+/* //////////////////////////// */
+
+std::vector<std::string> ListDir(DIR **dir, std::string Root)
+{
+    dirent *t_dirlist;
+    std::vector<std::string> DirectoryList;
+
+    *dir = opendir(Root.c_str());
+    if (!*dir)
+    {
+        perror("In opendir: ");
+        throw ("idk");
+    }
+
+    while ((t_dirlist = readdir(*dir)) != NULL)
+    {
+        DirectoryList.push_back(t_dirlist->d_name);
+    }
+    return (DirectoryList);
+}
+
+std::string Generator::generateAutoIndex(Exchange& Exchanger)
+{
+    DIR *dir;
+    std::string AutoIndex;
+    std::string Root = Exchanger.getServer().getRoot();
+    std::vector<std::string> DirectoryList = ListDir(&dir, Root);
+    std::vector<std::string>::iterator it = DirectoryList.begin();
+
+    AutoIndex =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"en\">\n"
+        "<head>\n"
+        "<meta charset=\"UTF-8\">\n"
+        "<title>Auto Index of " + Root + "</title>\n"
+        "</head>\n"
+        "<body>\n";
+        for (; it != DirectoryList.end(); it++)
+             AutoIndex += "<a href=\"" + *it + "\">" + *it + "</a><br>\n";
+        AutoIndex += "</pre><hr></body>\n"
+        "</html>";
+
+    if (closedir(dir) < 0)
+    {
+        perror("In closedir: ");
+        throw ("idk");
+    }
+    std::cout << AutoIndex << std::endl;
+    return (AutoIndex);
+}

@@ -28,14 +28,13 @@ src/main.cpp
 src/Network.cpp
 src/Parse.cpp
 src/Server.cpp
+src/Generator.cpp
 src/Exchange/Exchange.cpp
 src/Exchange/Request.cpp
 src/Exchange/Respond.cpp
-src/Utilities/defaultStatusPage.cpp
-src/Utilities/deleteFile.cpp
+        src/Utilities/deleteFile.cpp
 src/Utilities/findCharLocation.cpp
 src/Utilities/readFile.cpp
-src/Generator.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

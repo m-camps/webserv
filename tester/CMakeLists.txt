@@ -10,6 +10,7 @@ include_directories(${INC_HEADERS})
 include_directories(${EXCHANGE_HEADERS})
 
 add_subdirectory(lib/Catch2-3.1.1)
+
 set(SOURCES
 ${INC_HEADERS}/Constants.hpp
 ${INC_HEADERS}/Location.hpp
@@ -32,8 +33,7 @@ src/ConfTest.cpp
 ../src/Exchange/Exchange.cpp
 ../src/Exchange/Request.cpp
 ../src/Exchange/Respond.cpp
-../src/Utilities/defaultStatusPage.cpp
-../src/Utilities/deleteFile.cpp
+        ../src/Utilities/deleteFile.cpp
 ../src/Utilities/findCharLocation.cpp
 ../src/Utilities/readFile.cpp
 )

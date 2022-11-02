@@ -9,6 +9,7 @@
 #include "Utilities.hpp"
 
 #include <iostream>
+#include <dirent.h> // DIR
 
 #define MAXBYTES 100000
 
@@ -25,6 +26,8 @@ public:
     static void generateTransferEncoding(Exchange&);
     static std::string generateChunk(Exchange&);
     static std::string generateBoundry(Exchange&);
+    static std::string generateDefaulPage(uint32_t);
+    static std::string generateAutoIndex(Exchange&);
 };
 
 
