@@ -10,8 +10,9 @@
 
 #include <iostream>
 #include <dirent.h> // DIR
+#include <sys/stat.h>
 
-#define MAXBYTES 100000
+#define MAXBYTES 150000
 
 class Generator
 {
@@ -28,6 +29,7 @@ public:
     static std::string generateBoundry(Exchange&);
     static std::string generateDefaulPage(uint32_t);
     static std::string generateAutoIndex(Exchange&);
+    static std::string generateUploadSucces(void);
 };
 
 

@@ -150,6 +150,15 @@ std::vector<std::string> ListDir(DIR **dir, std::string Root)
     return (DirectoryList);
 }
 
+bool isDirectory(std::string FileName)
+{
+    struct stat t_status;
+
+    if (stat(FileName.c_str(), &t_status) == 0)
+        return (true);
+    return (false);
+}
+
 std::string Generator::generateAutoIndex(Exchange& Exchanger)
 {
     DIR *dir;
@@ -167,7 +176,11 @@ std::string Generator::generateAutoIndex(Exchange& Exchanger)
         "</head>\n"
         "<body>\n";
         for (; it != DirectoryList.end(); it++)
+        {
+            if (isDirectory(*it) == true)
+                *it += "/";
              AutoIndex += "<a href=\"" + *it + "\">" + *it + "</a><br>\n";
+        }
         AutoIndex += "</pre><hr></body>\n"
         "</html>";
 

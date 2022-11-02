@@ -76,7 +76,7 @@ void Network::run()
 				}
 				else
 				{
-					ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
+					ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0); // MSG_NOSIGNAL
 					if (ret <= 0)
 					{
 						RequestStr.clear();
