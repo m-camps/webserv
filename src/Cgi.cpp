@@ -2,26 +2,39 @@
 #include <iostream>
 #include <unistd.h>
 
-
-void			Cgi::childProcess(int *fds)
+const char*		buildCgiExecPath(Exchange& ExchangeRef, locIt& location)
 {
-	/* will have to build a proper path and call it as executable for now you can replace the path in faccessat and execve with your absolute path
 	Server current = ExchangeRef.getServer();
-	std::string executablePath; //../data/www/cgi-bin/filename+extension
-	executablePath += "../";
-	executablePath += current.getRoot();
-	executablePath += "/cgi-bin"; //for now
-	executablePath += "/hello"; //for now
 
+	char absolutePath[300];
+	getcwd(absolutePath, sizeof(absolutePath));
+	
+	std::string executablePath(absolutePath); //../data/www/cgi-bin/filename+extension
+	executablePath += "/";
+	executablePath += current.getRoot(); //for now, will depend on the root of the location/server block
+	executablePath += "/cgi-bin";
+	executablePath += location->second.getLocationName();
+	executablePath += "/";
+	executablePath += location->second.getLocationCgiName();
+
+	//only if there is an fileextension format
+	//executablePath += ".";
+	//executablePath += location->second.getLocationCgiFileExtension();
 	const char* execvePath = executablePath.c_str();
-	*/
+
+	return execvePath;
+}
+
+void			Cgi::childProcess(int *fds, Exchange& ExchangeRef, locIt& location)
+{
+	const char *path = buildCgiExecPath(ExchangeRef, location);
+		
 	close(fds[0]);
 	close(STDIN_FILENO);
-	dup2(fds[1], STDOUT_FILENO); //closes stdout, now fds1 is stdout
-	if (access("/Users/bence/Desktop/tmpwebserv/webserv_current_oct30/webserv/data/www/cgi-bin/hello", (X_OK | F_OK)) == 0)   //faccessat(AT_FDCWD, "/Users/bence/Desktop/tmpwebserv/webserv_current_oct30/webserv/data/www/cgi-bin/hello", (X_OK | F_OK), 0) == 0) //f_ok is existence, x_ok is execute permission
+	dup2(fds[1], STDOUT_FILENO);
+	if (access(path, (X_OK | F_OK)) == 0) //access("/Users/bence/Desktop/tmpwebserv/webserv_current_oct30/webserv/data/www/cgi-bin/hello", (X_OK | F_OK)) == 0)   ////f_ok is existence, x_ok is execute permission
 	{
-		std::cout << "RIGHT PLACE HERE" << std::endl;
-		execve("/Users/bence/Desktop/tmpwebserv/webserv_current_oct30/webserv/data/www/cgi-bin/hello", NULL, NULL); //first will be the path as built from location, second the arguments after, third is envp variables
+		execve(path, NULL, NULL); //first will be the path as built from location, second the arguments after, third is envp variables
 	}
 	else
 	{
@@ -32,50 +45,45 @@ void			Cgi::childProcess(int *fds)
 	return ;
 }
 
-/*
+
 void			Cgi::parentProcess(int* fds, int& stat)
 {
-	close(fds[1]); //no use for write end of the pipe
-	dup2(fds[0], STDIN_FILENO); //closes STDIN, points at the read end of the pipe
-	waitpid(-1, &stat, 0); //wait for any child
-	if (WIFEXITED(stat) == true) //did it exit without problem?
+	close(fds[1]);
+	dup2(fds[0], STDIN_FILENO);
+	waitpid(-1, &stat, 0);
+	if (WIFEXITED(stat) == true)
 	{
 		static char buff[1024];
-		int ret = read(fds[0], buff, sizeof(buff)); //reads from the read end
-		//std::cout << buff << " is whats inside the buffer, " << ret << " is ret." << std::endl;
+		int ret = read(fds[0], buff, sizeof(buff));
+		std::cout << buff << " " << ret << std::endl;
 	}
-	close(fds[0]); //closes last unused fd
+	else
+	{
+		//maybe signaled quit? interruption ? 
+	}
+	close(fds[0]);
 	return ;
 }
-*/
 
-void			Cgi::executeScript(Exchange& ExchangeRef)
+
+void			Cgi::executeScript(Exchange& ExchangeRef, locIt& location)
 {
 	int	fds[2];
 	int	stat;
-	pipe(fds); //3,4 
+	pipe(fds); //3,4
 
 	pid_t	pid = fork();
 	if (pid == -1)
 	{
-		std::cout << "FORK FAILED" << std::endl;
+		std::cout << "Forking process for CGI failed." << std::endl;
 	}
 	else if (pid == 0)
 	{	
-		childProcess(fds);
+		childProcess(fds, ExchangeRef, location);
 	}
 	else if (pid > 0)
 	{
-		close(fds[1]); //no use for write end of the pipe
-		dup2(fds[0], STDIN_FILENO); //closes STDIN, points at the read end of the pipe
-		waitpid(-1, &stat, 0); //wait for any child
-		if (WIFEXITED(stat) == true) //did it exit without problem?
-		{
-			static char buff[1024];
-			int ret = read(fds[0], buff, sizeof(buff)); //reads from the read end
-			//std::cout << buff << " is whats inside the buffer, " << ret << " is ret." << std::endl;
-		}
-		close(fds[0]); //closes last unused fd
+		parentProcess(fds, stat);
 	}
 	return ;
 }

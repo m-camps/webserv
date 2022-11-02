@@ -38,22 +38,22 @@ Respond::~Respond(void)
 
 Respond& Respond::operator=(const Respond& ref)
 {
-    if (this != &ref)
-    {
-    }
-    return (*this);
+	if (this != &ref)
+	{
+	}
+	return (*this);
 }
 
 //////////// Responder ////////////
 
 void Respond::BuildGet_Redir(void)
 {
-    const std::string NewLocation = _Exchanger.getServer().getIndex();
+	const std::string NewLocation = _Exchanger.getServer().getIndex();
 
-    generateStatus();
-    generateLocation(NewLocation);
-    _Exchanger.setBody("");
-    generateContentLength(0);
+	generateStatus();
+	generateLocation(NewLocation);
+	_Exchanger.setBody("");
+	generateContentLength(0);
 }
 
 void Respond::BuildGet(void)
@@ -63,7 +63,7 @@ void Respond::BuildGet(void)
 	std::string Root = _Exchanger.getServer().getRoot();
 	std::string Path = _Exchanger.getHashMapString("Path");
 
-    std::cout << "GET" << std::endl;
+	std::cout << "GET" << std::endl;
 	try
 	{
 		relativePath = Root + Path;
@@ -71,20 +71,20 @@ void Respond::BuildGet(void)
 		_Exchanger.setStatusCode(StatusCode);
 
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
-        if (StatusCode == e_Redir)
-        {
-            BuildGet_Redir();
-            return ;
-        }
+		if (StatusCode == e_Redir)
+		{
+			BuildGet_Redir();
+			return ;
+		}
 
-        generateStatus();
+		generateStatus();
 		_Exchanger.setBody(FileContent);
-        generateContentLength(_Exchanger.getBody().length());
+		generateContentLength(_Exchanger.getBody().length());
 	}
 	catch (const std::exception& e)
 	{
-        std::cerr << "Fatal Error: " << e.what() << std::endl;
-        std::exit(ERROR);
+		std::cerr << "Fatal Error: " << e.what() << std::endl;
+		std::exit(ERROR);
 	}
 }
 
@@ -92,27 +92,27 @@ void Respond::BuildGet(void)
 
 void Respond::BuildDelete()
 {
-    std::string relativePath;
-    std::string Root = _Exchanger.getServer().getRoot();
-    std::string Path = _Exchanger.getHashMapString("Path");
+	std::string relativePath;
+	std::string Root = _Exchanger.getServer().getRoot();
+	std::string Path = _Exchanger.getHashMapString("Path");
 
-    std::cout << "DELETE" << std::endl;
-    try
-    {
-        relativePath = Root + Path;
-        uint32_t StatusCode = modifyStatusCode(Path, relativePath);
-        _Exchanger.setStatusCode(StatusCode);
+	std::cout << "DELETE" << std::endl;
+	try
+	{
+		relativePath = Root + Path;
+		uint32_t StatusCode = modifyStatusCode(Path, relativePath);
+		_Exchanger.setStatusCode(StatusCode);
 
-        generateStatus();
-        _Exchanger.setBody("");
-        generateContentLength(0);
-        deleteFile(relativePath);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Fatal Error: " << e.what() << '\n';
-        std::exit(EXIT_FAILURE);
-    }
+		generateStatus();
+		_Exchanger.setBody("");
+		generateContentLength(0);
+		deleteFile(relativePath);
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Fatal Error: " << e.what() << '\n';
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 /* //////////////////////////// */
@@ -122,126 +122,126 @@ void Respond::BuildDelete()
  */
 std::string getFilename(std::string& MetaData)
 {
-    std::string line;
-    std::size_t found = MetaData.find("filename=");
-    if (found == std::string::npos)
-    {
-        std::cerr << "File has no name" << std::endl;
-        return ("UserUpload.txt");
-    }
+	std::string line;
+	std::size_t found = MetaData.find("filename=");
+	if (found == std::string::npos)
+	{
+		std::cerr << "File has no name" << std::endl;
+		return ("UserUpload.txt");
+	}
 
-    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
-    std::getline(issFile, line);
+	std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
+	std::getline(issFile, line);
 
-    line = line.substr(0, line.length() - 1);
-    return (line);
+	line = line.substr(0, line.length() - 1);
+	return (line);
 }
 
 void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
-    std::string ContentType;
-    std::string Root = _Exchanger.getServer().getRoot();
-    std::ofstream File(Root + "/" + getFilename(MetaData));
+	std::string ContentType;
+	std::string Root = _Exchanger.getServer().getRoot();
+	std::ofstream File(Root + "/" + getFilename(MetaData));
 
-    File << Body;
+	File << Body;
 }
 
 /* //////////////////////////// */
 
 std::string Respond::getDataOfBody(void)
 {
-    std::size_t found;
-    std::string ContentFile;
-    std::string RequestBody = _Exchanger.getHashMapString("Body");
+	std::size_t found;
+	std::string ContentFile;
+	std::string RequestBody = _Exchanger.getHashMapString("Body");
 
-    try
-    {
-        std::string Boundry = generateBoundry();
-        RequestBody = RequestBody.substr(Boundry.length() + 5,
-                                         RequestBody.length() - (Boundry.length() * 2) - 11);
+	try
+	{
+		std::string Boundry = generateBoundry();
+		RequestBody = RequestBody.substr(Boundry.length() + 5,
+										 RequestBody.length() - (Boundry.length() * 2) - 11);
 
-        for (int32_t i = 0; i < 3; i++)
-        {
-            found = RequestBody.find(CRLF);
-            _MetaData += RequestBody.substr(0, found) + "\n";
-            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
-        }
-        ContentFile = RequestBody.substr(0, RequestBody.length());
-    }
-    catch (const std::exception& e)
-    {
-        while ((found = RequestBody.find(CRLF)) != std::string::npos)
-        {
-            _MetaData += RequestBody.substr(0, found) + "\n";
-            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
-        }
-        ContentFile = RequestBody.substr(0, RequestBody.length());
-    }
+		for (int32_t i = 0; i < 3; i++)
+		{
+			found = RequestBody.find(CRLF);
+			_MetaData += RequestBody.substr(0, found) + "\n";
+			RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+		}
+		ContentFile = RequestBody.substr(0, RequestBody.length());
+	}
+	catch (const std::exception& e)
+	{
+		while ((found = RequestBody.find(CRLF)) != std::string::npos)
+		{
+			_MetaData += RequestBody.substr(0, found) + "\n";
+			RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+		}
+		ContentFile = RequestBody.substr(0, RequestBody.length());
+	}
 
-    return (ContentFile);
+	return (ContentFile);
 }
 
 /* //////////////////////////// */
 
 std::string Respond::getBodyDataCurl(void)
 {
-    std::string RequestBody = _Exchanger.getHashMapString("Body");
+	std::string RequestBody = _Exchanger.getHashMapString("Body");
 
-    std::cout << "BODY: \n" << RequestBody << std::endl;
-    return (RequestBody);
+	std::cout << "BODY: \n" << RequestBody << std::endl;
+	return (RequestBody);
 }
 
 /* //////////////////////////// */
 
 void Respond::BuildPost()
 {
-    std::string MetaData;
-    std::string Body = _Exchanger.getHashMapString("Body");
+	std::string MetaData;
+	std::string Body = _Exchanger.getHashMapString("Body");
 
-    std::cout << "POST" << std::endl;
-    try
-    {
-        generateStatus();
-        Body = getDataOfBody();
+	std::cout << "POST" << std::endl;
+	try
+	{
+		generateStatus();
+		Body = getDataOfBody();
 
-        putBodyInFile(_MetaData, Body);
-        _Exchanger.setBody(Body);
-        generateContentLength(_Exchanger.getBody().length());
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+		putBodyInFile(_MetaData, Body);
+		_Exchanger.setBody(Body);
+		generateContentLength(_Exchanger.getBody().length());
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
 }
 
 /* //////////////////////////// */
 
 struct s_Methods
 {
-    std::string Method;
-    void (Respond::*FuncPointer)(void);
+	std::string Method;
+	void (Respond::*FuncPointer)(void);
 };
 
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods)
 {
-    std::vector<std::string>::iterator it = AllowedMethods.begin();
+	std::vector<std::string>::iterator it = AllowedMethods.begin();
 
-    for (; it != AllowedMethods.end(); it++)
-    {
-        if (Method == *it)
-            return (true);
-    }
-    return (false);
+	for (; it != AllowedMethods.end(); it++)
+	{
+		if (Method == *it)
+			return (true);
+	}
+	return (false);
 }
 
 /* //////////////////////////// */
 
 void Respond::ResponseBuilder(void)
 {
-    void (Respond::*FuncPointer)(void) = nullptr;
+	void (Respond::*FuncPointer)(void) = nullptr;
 	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
-    std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
+	std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
 
 	const s_Methods CompareMethods [3] = {
 			{ "GET", &Respond::BuildGet },
@@ -249,23 +249,23 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
-    if (!MethodIsAllowed(Method, AllowedMethods))
-    {
-        _Exchanger.setStatusCode(e_MethodNotFound);
-        generateStatus();
-        std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
-        _Exchanger.setBody(FileContent);
-        generateContentLength(_Exchanger.getBody().length());
-        return ;
-    }
+	if (!MethodIsAllowed(Method, AllowedMethods))
+	{
+		_Exchanger.setStatusCode(e_MethodNotFound);
+		generateStatus();
+		std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
+		_Exchanger.setBody(FileContent);
+		generateContentLength(_Exchanger.getBody().length());
+		return ;
+	}
 
 	for (int32_t i = 0; i < 3; i++)
 	{
 		if (Method == CompareMethods[i].Method)
 		{
 			FuncPointer = CompareMethods[i].FuncPointer;
-            (this->*FuncPointer)();
-            return ;
+			(this->*FuncPointer)();
+			return ;
 		}
 	}
 }
@@ -273,9 +273,9 @@ void Respond::ResponseBuilder(void)
 /* for now just a checker function, probably should belong to respond */
 bool	isCgiRequest(Exchange& ExchangeRef) //check if 
 {
-	Server current = ExchangeRef.getServer();
+	Server 										current = ExchangeRef.getServer();
 	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
-	std::map<std::string, Location>::iterator	it = locationBlocksToCheck.begin();
+	locIt										it = locationBlocksToCheck.begin();
 
 	for (int i = 0; i < locationBlocksToCheck.size(); i++)
 	{
@@ -288,9 +288,9 @@ bool	isCgiRequest(Exchange& ExchangeRef) //check if
 }
 
 /* for now just a checker function, probably should belong to respond */
-bool	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look until the last executable part /folder/inside/(executable.py), for now checks for exact match eg: ROOT /py == LOCATION /py
+locIt&	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look until the last executable part /folder/inside/(executable.py), for now checks for exact match eg: ROOT /py == LOCATION /py
 {
-	Server current = ExchangeRef.getServer();
+	Server 										current = ExchangeRef.getServer();
 	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
 	std::map<std::string, Location>::iterator	it = locationBlocksToCheck.begin();
 	std::map<std::string, std::string> 			map = ExchangeRef.getHashMap();
@@ -302,14 +302,14 @@ bool	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look 
 		{
 			if (map[s1] == it->first)
 			{
-				std::cout << it->first << " is a match to the requested path of: " << map[s1] << std::endl;
-				//maybe we could even return the locationblock which matches, now its double work
-				return true;
+				//std::cout << it->first << " is a match to the requested path of: " << map[s1] << std::endl;
+				//return it;
+				break ;
 			}
 		}
 		it++;
 	}
-	return false;
+	return it;
 }
 
 /* //////////////////////////// */
@@ -317,28 +317,29 @@ bool	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look 
 void Respond::RespondToClient(Exchange& ExchangeRef) //maybe here would be ideal to the Exchange& ExchangeRef so we can check in the serverblock if there is a URI matching
 {
 	std::string Header;
-    std::string Body;
+	std::string Body;
 
-	if (isUriMatchingALocationBlock(ExchangeRef) == true && isCgiRequest(ExchangeRef) == true)
+	if (isCgiRequest(ExchangeRef) == true) //prob have to check
 	{
-		Cgi cgi;
-		cgi.executeScript(ExchangeRef);
+		locIt	location =  isUriMatchingALocationBlock(ExchangeRef);
+		Cgi		cgi;
+		cgi.executeScript(ExchangeRef, location);
 	}
-    else
+	else
 	{
-    	ResponseBuilder();
+		ResponseBuilder();
 	}
 
-    Header = _Exchanger.getHeader();
-    Body = _Exchanger.getBody();
+	Header = _Exchanger.getHeader();
+	Body = _Exchanger.getBody();
 
-    std::string response =
-            Header +
-            "\r\n" +
-            Body;
+	std::string response =
+			Header +
+			"\r\n" +
+			Body;
 
 //    std::cout << "Response: \n" << response << std::endl;
-    send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
+	send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
 #pragma region "NonClass functions"
@@ -347,21 +348,21 @@ void Respond::RespondToClient(Exchange& ExchangeRef) //maybe here would be ideal
 
 bool isForbidden(const std::string& Path)
 {
-    std::size_t found = Path.find("../");
-    if (found == std::string::npos)
-        return (false);
-    return (true);
+	std::size_t found = Path.find("../");
+	if (found == std::string::npos)
+		return (false);
+	return (true);
 }
 
 /* //////////////////////////// */
 
 uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 {
-    if (isForbidden(Path))
-        return (e_Forbidden);
+	if (isForbidden(Path))
+		return (e_Forbidden);
 	if ("/" == Path)
 		return (e_Redir);
-    if (access(relativePath.c_str(), R_OK) != 0)
+	if (access(relativePath.c_str(), R_OK) != 0)
 		return (e_NotFound);
 	return (e_OK);
 }
@@ -380,13 +381,13 @@ std::string getValidFile(std::string Root, std::string relativePath, uint32_t St
 				FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
-                break ;
+				break ;
 			case e_NotFound:
 				FileContent = readFile(Root + "/Error404.html");
 				break ;
-            default:
-                FileContent = defaultStatusPage(StatusCode);
-                break ;
+			default:
+				FileContent = defaultStatusPage(StatusCode);
+				break ;
 		}
 	}
 	catch (const std::exception& e)
@@ -419,11 +420,11 @@ std::size_t Respond::getBodySize(std::string& Body) const
  */
 void Respond::generateStatus(void)
 {
-    HashMap tempHash = _Exchanger.getHashMap();
-    uint32_t StatusCode = _Exchanger.getStatusCode();
-    std::string StatusLine = tempHash.find("HTTPVersion")->second;
+	HashMap tempHash = _Exchanger.getHashMap();
+	uint32_t StatusCode = _Exchanger.getStatusCode();
+	std::string StatusLine = tempHash.find("HTTPVersion")->second;
 
-    StatusLine += " " + TOSTRING( StatusCode ) + " \r\n";
+	StatusLine += " " + TOSTRING( StatusCode ) + " \r\n";
 	_Exchanger.setHeader(StatusLine);
 }
 
@@ -431,7 +432,7 @@ void Respond::generateStatus(void)
 
 void Respond::generateContentLength(std::size_t BodyLength)
 {
-    std::string ContentLength = "Content-Length: " + TOSTRING(BodyLength) + "\r\n";
+	std::string ContentLength = "Content-Length: " + TOSTRING(BodyLength) + "\r\n";
 	_Exchanger.addLineToHeader(ContentLength);
 }
 
@@ -447,31 +448,31 @@ void Respond::generateLocation(const std::string NewLocation)
 
 void Respond::generateContentType(void)
 {
-    std::string line;
-    std::string RequestBody = _Exchanger.getHashMapString("Body");
-    std::istringstream issBody(RequestBody);
+	std::string line;
+	std::string RequestBody = _Exchanger.getHashMapString("Body");
+	std::istringstream issBody(RequestBody);
 
-    while (std::getline(issBody, line))
-    {
-        if (line.compare(0, 13, "Content-Type:") == 0)
-        {
-            _Exchanger.addLineToHeader(line);
-            return ;
-        }
-    }
+	while (std::getline(issBody, line))
+	{
+		if (line.compare(0, 13, "Content-Type:") == 0)
+		{
+			_Exchanger.addLineToHeader(line);
+			return ;
+		}
+	}
 }
 
 /* //////////////////////////// */
 
 std::string Respond::generateBoundry(void)
 {
-    std::string ContentType = _Exchanger.getHashMapString("Content-Type");
+	std::string ContentType = _Exchanger.getHashMapString("Content-Type");
 
-    std::size_t found = ContentType.find('=');
-    if (found == std::string::npos)
-        throw (std::logic_error("No boundry found"));
+	std::size_t found = ContentType.find('=');
+	if (found == std::string::npos)
+		throw (std::logic_error("No boundry found"));
 
-    return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
+	return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
 }
 
 #pragma endregion generators
