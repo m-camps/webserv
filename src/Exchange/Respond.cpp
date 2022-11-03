@@ -90,7 +90,7 @@ void Respond::BuildGet(void)
 		generateStatus();
 		if (_Exchanger.getIsCgi() == false)
 		{
-			_Exchanger.setBody(FileContent); //if its a cgi, then we have to apply the cgi one here
+			_Exchanger.setBody(FileContent);
 		}
 		generateContentLength(FileContent.length());
 	}
