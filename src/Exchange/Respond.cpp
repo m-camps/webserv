@@ -338,7 +338,7 @@ void Respond::RespondToClient(Exchange& ExchangeRef)
 	std::string Body;
 	std::string	cgiBody;
 
-	if (isCgiRequest(ExchangeRef) == true) //prob have to check, this always calls now this
+	if (isCgiRequest(ExchangeRef) == true) //prob have to check, always enters
 	{
 		locIt	location =  isUriMatchingALocationBlock(ExchangeRef);
 		Cgi		cgi;
