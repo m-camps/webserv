@@ -63,6 +63,7 @@ void Respond::BuildGet(void)
 	std::string Root = _Exchanger.getServer().getRoot();
 	std::string Path = _Exchanger.getHashMapString("Path");
 
+
 	std::cout << "GET" << std::endl;
 	try
 	{
@@ -70,7 +71,16 @@ void Respond::BuildGet(void)
 		uint32_t StatusCode = modifyStatusCode(Path, relativePath);
 		_Exchanger.setStatusCode(StatusCode);
 
-		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+		if (_Exchanger.getIsCgi() == false)
+		{
+			FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+		}
+		else
+		{	//for now set statuscode manually, I have a bug somewhere, always gives 404 statuscode
+			FileContent = getCgiFileContent();
+			FileContent = defaultStatusPage(200);
+			_Exchanger.setStatusCode(200);
+		}
 		if (StatusCode == e_Redir)
 		{
 			BuildGet_Redir();
@@ -78,8 +88,11 @@ void Respond::BuildGet(void)
 		}
 
 		generateStatus();
-		_Exchanger.setBody(FileContent);
-		generateContentLength(_Exchanger.getBody().length());
+		if (_Exchanger.getIsCgi() == false)
+		{
+			_Exchanger.setBody(FileContent); //if its a cgi, then we have to apply the cgi one here
+		}
+		generateContentLength(FileContent.length());
 	}
 	catch (const std::exception& e)
 	{
@@ -302,8 +315,6 @@ locIt&	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only loo
 		{
 			if (map[s1] == it->first)
 			{
-				//std::cout << it->first << " is a match to the requested path of: " << map[s1] << std::endl;
-				//return it;
 				break ;
 			}
 		}
@@ -312,33 +323,47 @@ locIt&	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only loo
 	return it;
 }
 
+void    Respond::setCgiFileContent(std::string fileContent)
+{
+	_fileContent = fileContent;
+	return ;
+}
+
+
 /* //////////////////////////// */
 
-void Respond::RespondToClient(Exchange& ExchangeRef) //maybe here would be ideal to the Exchange& ExchangeRef so we can check in the serverblock if there is a URI matching
+void Respond::RespondToClient(Exchange& ExchangeRef)
 {
 	std::string Header;
 	std::string Body;
+	std::string	cgiBody;
 
-	if (isCgiRequest(ExchangeRef) == true) //prob have to check
+	if (isCgiRequest(ExchangeRef) == true) //prob have to check, this always calls now this
 	{
 		locIt	location =  isUriMatchingALocationBlock(ExchangeRef);
 		Cgi		cgi;
-		cgi.executeScript(ExchangeRef, location);
+		cgiBody = cgi.executeScript(ExchangeRef, location);
+		setCgiFileContent(cgiBody);
+		_Exchanger.setIsCgi(true);
+	}
+	ResponseBuilder();
+	Header = _Exchanger.getHeader();
+	if (_Exchanger.getIsCgi() == false)
+	{
+		Body =  _Exchanger.getBody();
 	}
 	else
 	{
-		ResponseBuilder();
+		Body = getCgiFileContent();
 	}
-
-	Header = _Exchanger.getHeader();
-	Body = _Exchanger.getBody();
-
+	generateContentLength(_Exchanger.getBody().length());
 	std::string response =
 			Header +
 			"\r\n" +
 			Body;
 
-//    std::cout << "Response: \n" << response << std::endl;
+	_Exchanger.setIsCgi(false); //in any case, reset it
+	//std::cout << "Response: \n" << response << std::endl;
 	send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }
 
@@ -407,6 +432,12 @@ std::size_t Respond::getBodySize(std::string& Body) const
 {
 	return (Body.length());
 }
+
+std::string&	Respond::getCgiFileContent(void)
+{
+	return _fileContent;
+}
+
 
 #pragma endregion Getter
 

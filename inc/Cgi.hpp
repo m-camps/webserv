@@ -11,8 +11,8 @@ class Cgi
 		std::string*	getEnvTable(void);
 		void			printEnv(void);
 		void			createCgiResponse(void);
-		void			executeScript(Exchange& ExchangeRef, locIt& location);
-		void			parentProcess(int* fds, int& stat);
+		std::string		executeScript(Exchange& ExchangeRef, locIt& location);
+		void			parentProcess(Exchange& ExchangeRef, int* fds, int& stat);
 		void			childProcess(int* fds, Exchange& ExchangeRef, std::map<std::string, Location>::iterator& location);
 
 		//i need to construct a header separate from the script

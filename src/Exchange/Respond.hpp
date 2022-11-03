@@ -36,31 +36,36 @@ public:
 private:
 	Respond(void);
 
-    Exchange _Exchanger;
+	Exchange _Exchanger;
 
-    // Tijdelijk
-    std::string _MetaData;
+	// Tijdelijk
+	std::string _MetaData;
+	std::string _fileContent;
 
 	std::size_t getBodySize(std::string&) const;
 
-    void ResponseBuilder(void);
-    void BuildGet_Redir(void);
+	void ResponseBuilder(void);
+	void BuildGet_Redir(void);
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);
 
-	//void RespondToClient(void);
-    void RespondToClient(Exchange& ExchangeRef);
-    void putBodyInFile(std::string&, std::string&);
-    std::string getDataOfBody(void);
-    std::string getBodyDataCurl(void);
+	// Tijdelijk
+	void			setCgiFileContent(std::string fileContent);
+	std::string&	getCgiFileContent(void);
 
-    // Generate
-    void generateStatus(void);
-    void generateContentLength(std::size_t);
+	//void RespondToClient(void);
+	void RespondToClient(Exchange& ExchangeRef);
+	void putBodyInFile(std::string&, std::string&);
+	std::string getDataOfBody(void);
+	std::string getBodyDataCurl(void);
+
+	// Generate
+	void generateStatus(void);
+	void generateContentLength(std::size_t);
 	void generateLocation(const std::string);
 	void generateContentType(void);
-    std::string generateBoundry(void);
+	std::string generateBoundry(void);
 };
 
 #endif //WEBSERV_RESPOND_HPP

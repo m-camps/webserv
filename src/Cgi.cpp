@@ -17,11 +17,17 @@ const char*		buildCgiExecPath(Exchange& ExchangeRef, locIt& location)
 	executablePath += "/";
 	executablePath += location->second.getLocationCgiName();
 
-	//only if there is an fileextension format
-	//executablePath += ".";
-	//executablePath += location->second.getLocationCgiFileExtension();
+	// bool locationcgiextension = location->second.getLocationCgiFileExtension() != "";
+	// bool locationcginame = location->second.getLocationCgiName() != "";
+	// std::cout << location->second.getLocationCgiFileExtension() << " is file extension " << std::endl;
+	// std::cout << locationcgiextension << " is extension bool, " << locationcginame << " is cginame bool" << std::endl;
+	//this evaluates as true which isnt the case with /cpp, tofix
+	if (location->second.getLocationCgiFileExtension() != "" && location->second.getLocationCgiName() != "")
+	{
+		executablePath += ".";
+		executablePath += location->second.getLocationCgiFileExtension();
+	}
 	const char* execvePath = executablePath.c_str();
-
 	return execvePath;
 }
 
@@ -32,21 +38,19 @@ void			Cgi::childProcess(int *fds, Exchange& ExchangeRef, locIt& location)
 	close(fds[0]);
 	close(STDIN_FILENO);
 	dup2(fds[1], STDOUT_FILENO);
-	if (access(path, (X_OK | F_OK)) == 0) //access("/Users/bence/Desktop/tmpwebserv/webserv_current_oct30/webserv/data/www/cgi-bin/hello", (X_OK | F_OK)) == 0)   ////f_ok is existence, x_ok is execute permission
+	if (access(path, (X_OK | F_OK)) == 0)
 	{
-		execve(path, NULL, NULL); //first will be the path as built from location, second the arguments after, third is envp variables
+		execve(path, NULL, NULL);
 	}
 	else
 	{
 		std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
 		exit(1);
 	}
-	close(fds[1]); //prob dont need this one
-	return ;
 }
 
 
-void			Cgi::parentProcess(int* fds, int& stat)
+void			Cgi::parentProcess(Exchange& ExchangeRef, int* fds, int& stat)
 {
 	close(fds[1]);
 	dup2(fds[0], STDIN_FILENO);
@@ -55,7 +59,8 @@ void			Cgi::parentProcess(int* fds, int& stat)
 	{
 		static char buff[1024];
 		int ret = read(fds[0], buff, sizeof(buff));
-		std::cout << buff << " " << ret << std::endl;
+		std::string cgiBody(buff);
+		ExchangeRef.setBody(cgiBody);
 	}
 	else
 	{
@@ -66,12 +71,12 @@ void			Cgi::parentProcess(int* fds, int& stat)
 }
 
 
-void			Cgi::executeScript(Exchange& ExchangeRef, locIt& location)
+std::string			Cgi::executeScript(Exchange& ExchangeRef, locIt& location)
 {
 	int	fds[2];
 	int	stat;
-	pipe(fds); //3,4
 
+	pipe(fds);
 	pid_t	pid = fork();
 	if (pid == -1)
 	{
@@ -83,15 +88,14 @@ void			Cgi::executeScript(Exchange& ExchangeRef, locIt& location)
 	}
 	else if (pid > 0)
 	{
-		parentProcess(fds, stat);
+		parentProcess(ExchangeRef, fds, stat);
 	}
-	return ;
+	return (ExchangeRef.getBody());
 }
 
 Cgi::Cgi() 
 {
-	std::cout << "inside constructor for cgi" << std::endl;
-	return ;
+	;
 }
 
 
