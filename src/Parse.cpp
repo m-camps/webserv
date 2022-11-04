@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/04 13:28:01 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:38:24 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,10 +151,14 @@ void		Parse::parseLocationName(Server& server, ServerBlock::iterator& it, Server
 	{
 		throw (ExceptionBuilder("Incorrect location name")); 
 	}
+	
 	LocationBlock 	location_block = extractBlock(it, server_block, "location");
 	Location		location;
 	std::string name = line[1];
+	std::map<std::string, Location> locations = server.getLocations();
 	
+	if (locations.count(name) > 0)
+		throw (ExceptionBuilder("duplicate location name in server"));
 	location = parseLocation(location_block, location);
 	location.setName(name);
 	server.addToLocations(name, location);
@@ -304,6 +308,10 @@ void	Parse::parseErrorPage(Server& server, Line& line)
 
 	int status_code = std::stoi(line[1], nullptr, 10);
 	std::string page = line[2];
+
+	std::map<int, std::string> errorPages = server.getErrorPage();
+	if (errorPages.count(status_code) > 0)
+		throw (ExceptionBuilder("duplicate error_page in server"));
 	server.addToErrorPages(status_code, page);
 }
 
