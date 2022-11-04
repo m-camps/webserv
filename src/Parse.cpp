@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/04 13:21:35 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:28:01 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,8 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 		throw (ExceptionBuilder("Duplicate client_body_size"));
 
 	int clientBodySize = std::stoi(line[1], nullptr, 10);
+	if (clientBodySize == 0)
+		throw (ExceptionBuilder("client_body_size can't be 0"));
 	server.setClientBody(clientBodySize);
 }
 
