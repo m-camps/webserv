@@ -11,50 +11,37 @@
 #define VALID_PATH "tester/confs/Valid/"
 #define INVALID_PATH "tester/confs/Invalid/"
 
+void	ASSERT_VALID_CONFIG(std::string file)
+{
+	std::string configFile = VALID_PATH + file;
+	SECTION("--- " + file + " ---")
+	{
+		Parse parser;
+		std::vector<Server> tmp;
+		REQUIRE_NOTHROW(parser.parseNetwork(configFile, tmp));
+	}
+}
+
+void	ASSERT_INVALID_CONFIG(std::string file)
+{
+	std::string configFile = VALID_PATH + file;
+	SECTION("--- " + file + " ---")
+	{
+		Parse parser;
+		std::vector<Server> tmp;
+		REQUIRE_THROWS(parser.parseNetwork(configFile, tmp));
+	}
+}
+
 TEST_CASE("Valid Configs")
 {
-    SECTION("--- Basic.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"basic.conf"));
-    }
-    SECTION("--- MoreListen.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"MoreListen.conf"));
-    }
-    SECTION("--- MoreListenDup.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"MoreListenDup.conf"));
-    }
-    SECTION("--- NoLocation.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"NoLocation.conf"));
-    }
-    SECTION("--- NoLocation.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"NoLocation.conf"));
-    }
-    SECTION("--- NoLocation.conf ---")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(VALID_PATH"NoLocation.conf"));
-    }
+	ASSERT_VALID_CONFIG("Basic.conf");
+	ASSERT_VALID_CONFIG("MultipleListen.conf");
+	ASSERT_VALID_CONFIG("MultipleServers.conf");
+	ASSERT_VALID_CONFIG("NoLocation.conf");
 }
 
 TEST_CASE("Invalid Configs")
 {
-    SECTION("--- NoStartParentheses.conf -- ")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(INVALID_PATH"NoStartParentheses.conf"));
-    }
-    SECTION("--- NoServerName.conf -- ")
-    {
-        Network network;
-        REQUIRE_NOTHROW(network.setup(INVALID_PATH"NoServerName.conf"));
-    }
+	ASSERT_INVALID_CONFIG("DuplicateListen.conf");
 }
