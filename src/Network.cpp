@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 18:12:05 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:45:41 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 
-#define BUFF 10000
-
+#define BUFF 5000
 /* Default constructor */
 Network::Network() {}
 
@@ -87,9 +86,7 @@ void Network::run()
 				}
 				else
 				{
-					bzero(buff, BUFF);
-					int ret = recv(cur.fd, buff, sizeof(buff), 0);
-					// std::cout << "\nret = " << ret;
+					ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0); // MSG_NOSIGNAL
 					if (ret <= 0)
 					{
 						RequestStr.clear();
@@ -103,15 +100,14 @@ void Network::run()
 					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-						Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-						Request request(RequestStr, exchange);
+                        Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
+                        Request request(RequestStr, exchange);
                         RequestStr.erase();
-					}
-				}
-				cur.revents = 0;
-			}
-		}
-	}
+                    }
+                }
+            }
+        }
+    }
 }
 
 void	Network::createFds(void)

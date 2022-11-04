@@ -38,17 +38,6 @@ Request::~Request(void)
 {
 }
 
-////////////// Operators //////////////
-
-Request &Request::operator=(const Request& ref)
-{
-	if (this != &ref)
-	{
-		_Exchanger = ref._Exchanger;
-	}
-	return (*this);
-}
-
 ////////////// Functions //////////////
 
 /**
@@ -62,7 +51,7 @@ std::string Request::AppendRequest(const std::string& Request)
 
 	std::size_t found = Request.find("\r\n\r\n");
 	if (found == std::string::npos)
-		throw (std::invalid_argument("No seperator found"));
+		throw (std::out_of_range("No seperator found"));
 
 	Header.append(Request, 0, found);
 

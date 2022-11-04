@@ -14,7 +14,7 @@ Exchange::Exchange(void)
 /* //////////////////////////// */
 
 Exchange::Exchange(Server NewSever, int32_t NewSocketFD)
-    : _body(""), _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
+    : _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
 {
 }
 
@@ -33,16 +33,6 @@ Exchange::~Exchange(void)
 }
 
 #pragma endregion ctoranddtor
-
-/* //////////////////////////// */
-
-Exchange& Exchange::operator=(const Exchange& ref)
-{
-    if (this != &ref)
-    {
-    }
-    return (*this);
-}
 
 #pragma region getter
 

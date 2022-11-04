@@ -12,9 +12,9 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
-#include "../../inc/Macros.hpp" // Macros
-#include "../../inc/Server.hpp" // Server class
-#include "../../inc/Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+#include "Server.hpp" // Server class
+#include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+#include "Generator.hpp"
 
 #define CRLF "\r\n"
 
@@ -31,17 +31,14 @@ public:
 	Respond(const Respond&);
 	~Respond(void);
 
-	Respond& operator=(const Respond&);
-
 private:
 	Respond(void);
+	Respond& operator=(const Respond&);
 
-    Exchange _Exchanger;
+    Exchange& _Exchanger;
 
     // Tijdelijk
     std::string _MetaData;
-
-	std::size_t getBodySize(std::string&) const;
 
     void ResponseBuilder(void);
     void BuildGet_Redir(void);
@@ -52,14 +49,8 @@ private:
 	void RespondToClient(void);
     void putBodyInFile(std::string&, std::string&);
     std::string getDataOfBody(void);
-    std::string getBodyDataCurl(void);
 
-    // Generate
-    void generateStatus(void);
-    void generateContentLength(std::size_t);
-	void generateLocation(const std::string);
-	void generateContentType(void);
-    std::string generateBoundry(void);
+    void sendAsChunked(void);
 };
 
 #endif //WEBSERV_RESPOND_HPP

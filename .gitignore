@@ -3,6 +3,7 @@ webserv
 build/
 tester/build/
 .idea
+.vscode
 
 # Prerequisites
 *.d

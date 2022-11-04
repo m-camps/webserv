@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/11/01 18:06:19 by mcamps        ########   odam.nl          #
+#    Updated: 2022/11/04 13:44:36 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,8 @@ OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
 CONFIG := data/conf/basic.conf
 
-INC := -Iinc -Isrc
-CFLAGS :=  -Wall -Werror -Wextra -pedantic $(INC)
+INC := -Iinc -Isrc/Exchange
+CFLAGS :=  -pedantic -Wall -Werror -Wextra $(INC)
 CC	:= c++
 EXTRA := -std=c++98
 SHELL := /bin/bash
@@ -88,7 +88,9 @@ test: all
 	@./$(NAME) conf/basic.conf
 
 unit_tester:
-	cmake -S tester/ -B tester/build
+	cmake -S . -B cBuild/
+	make -C cBuild/
+	./cBuild/tester/catch2Tester 2> /dev/null
 
 # Colors
 RED=\x1b[1;31m

@@ -6,19 +6,19 @@
 /*   By: xvoorvaa <xvoorvaa@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 13:40:28 by xvoorvaa      #+#    #+#                 */
-/*   Updated: 2022/10/30 14:06:00 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/10/30 16:22:39 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <catch2/catch_test_macros.hpp>
-
-#include "../../inc/Server.hpp"
-#include "../../inc/Network.hpp"
-#include "../../src/Exchange/Exchange.hpp"
-#include "../../src/Exchange/Respond.hpp"
-#include "../../src/Exchange/Request.hpp"
-
 #include <string>
+
+#include "Server.hpp"
+#include "Network.hpp"
+#include "Exchange.hpp"
+#include "Respond.hpp"
+#include "Request.hpp"
+#include "Generator.hpp"
 
 TEST_CASE("Using a string that does not exist in getHashMapstring")
 {
@@ -63,31 +63,19 @@ TEST_CASE("deleteFile should Throw, if file does not exists")
 	REQUIRE_THROWS(deleteFile(path));
 }
 
-TEST_CASE("Check if function exits out of program")
+TEST_CASE("Generator Test")
 {
-	SECTION("acceptConnection() exits")
-	{
-		Server tmpServer;
-		pid_t ChildPid = fork();
+    Server server;
+    Exchange exchanger(server, 0);
 
-		if (ChildPid < 0)
-			return ;
-		if (ChildPid == 0)
-		{
-			REQUIRE_FALSE(tmpServer.acceptConnection());
-		}
-	}
-
-	SECTION("run() exits")
-	{
-		Network tmpNetwork;
-		pid_t ChildPid = fork();
-
-		if (ChildPid < 0)
-			return ;
-		if (ChildPid == 0)
-		{
-			// CHECK(tmpNetwork.run());
-		}
-	}
+    SECTION("Exchange has a Body")
+    {
+        exchanger.setBody("Hallo");
+        REQUIRE(Generator::generateChunk(exchanger) == "5\r\nHallo\r\n\r\n");
+    }
+    SECTION("Exchange has a no Body")
+    {
+        exchanger.setBody("");
+        REQUIRE(Generator::generateChunk(exchanger) == "0\r\n\r\n\r\n");
+    }
 }
