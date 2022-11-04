@@ -405,6 +405,10 @@ void    Parse::parseLocationDirective(std::vector<std::string>::iterator& it, st
 	{
 		(&locationInstance->*pointerToLocation)(restOfLine);
 	}
+	if (locationInstance.getLocationCgiName() != "" && locationInstance.getLocationCgiFileExtension() != "")
+	{
+		locationInstance.setCgiCompleteBool(true);
+	}
 }
 
 /*** 

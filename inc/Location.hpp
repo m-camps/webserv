@@ -26,6 +26,8 @@ class Location {
 		bool						_autoindex; //GET
 		std::string					_cgi_name; //GET
 		std::string					_cgi_ext; //GET
+		bool						_is_cgi_complete;
+
 		//if there is a cginame and cgi extension then its a cgi request
 	public:
 		Location();
@@ -38,14 +40,17 @@ class Location {
 		std::vector<std::string>&	getLocationAllowMethods(void);
 		std::string&				getLocationCgiFileExtension(void);
 		std::string&				getLocationCgiName(void);
-
+		bool						getCgiCompleteBool(void) const;
+		
 		void						setLocationName(std::string& locationNameToAdd);
-		 void						setLocationRoot(std::string& locationRootToAdd);
-		 void						setLocationIndex(std::string& LocationIndexToAdd);
-		 void						setLocationAllowMethod(std::string& locationAllowedMethods);
-		 void						setLocationAutoindex(std::string& AutiondexToSet);
-		 void						setCgiName(std::string& cgiName);
-		 void						setCgiFileExtension(std::string& cgiFileExtension);
+		void						setLocationRoot(std::string& locationRootToAdd);
+		void						setLocationIndex(std::string& LocationIndexToAdd);
+		void						setLocationAllowMethod(std::string& locationAllowedMethods);
+		void						setLocationAutoindex(std::string& AutiondexToSet);
+		void						setCgiName(std::string& cgiName);
+		void						setCgiFileExtension(std::string& cgiFileExtension);
+		void						setCgiCompleteBool(bool value);
+
 };
 
 std::ostream& operator<<(std::ostream& stream, Location& location);

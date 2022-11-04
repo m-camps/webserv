@@ -284,51 +284,34 @@ void Respond::ResponseBuilder(void)
 }
 
 /* for now just a checker function, probably should belong to respond */
-bool	isCgiRequest(Exchange& ExchangeRef) //check if 
+bool	correctCgiRequestLocationFound(Exchange& ExchangeRef, locIt& location) //check if 
 {
 	Server 										current = ExchangeRef.getServer();
-	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
+	locationsOfServer 							locationBlocksToCheck = current.getLocations();
 	locIt										it = locationBlocksToCheck.begin();
-
-	for (int i = 0; i < locationBlocksToCheck.size(); i++)
-	{
-		if (it->second.getLocationCgiName() != "" && it->second.getLocationCgiFileExtension() != "") //check extension format
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-/* for now just a checker function, probably should belong to respond */
-locIt&	isUriMatchingALocationBlock(Exchange& ExchangeRef) //this should only look until the last executable part /folder/inside/(executable.py), for now checks for exact match eg: ROOT /py == LOCATION /py
-{
-	Server 										current = ExchangeRef.getServer();
-	std::map<std::string, Location> 			locationBlocksToCheck = current.getLocations();
-	std::map<std::string, Location>::iterator	it = locationBlocksToCheck.begin();
 	std::map<std::string, std::string> 			map = ExchangeRef.getHashMap();
 	std::string 								s1 = "Path";
 
 	for (int i = 0; i < locationBlocksToCheck.size(); i++)
 	{
-		if (map.find(s1) != map.end())
+		if (it->second.getCgiCompleteBool() == true) //check extension format
 		{
-			if (map[s1] == it->first)
+			if (map.find(s1) != map.end() && map[s1] == it->first)
 			{
-				break ;
+				location = it;
+				return true ;
 			}
 		}
 		it++;
 	}
-	return it;
+	return false;
 }
 
-void    Respond::setCgiFileContent(std::string fileContent)
+void	Respond::setCgiFileContent(std::string fileContent)
 {
 	_fileContent = fileContent;
 	return ;
 }
-
 
 /* //////////////////////////// */
 
@@ -337,15 +320,16 @@ void Respond::RespondToClient(Exchange& ExchangeRef)
 	std::string Header;
 	std::string Body;
 	std::string	cgiBody;
+	locIt		location;
 
-	if (isCgiRequest(ExchangeRef) == true) //prob have to check, always enters
+	if (correctCgiRequestLocationFound(ExchangeRef, location) == true)
 	{
-		locIt	location =  isUriMatchingALocationBlock(ExchangeRef);
 		Cgi		cgi;
 		cgiBody = cgi.executeScript(ExchangeRef, location);
 		setCgiFileContent(cgiBody);
 		_Exchanger.setIsCgi(true);
 	}
+		
 	ResponseBuilder();
 	Header = _Exchanger.getHeader();
 	if (_Exchanger.getIsCgi() == false)

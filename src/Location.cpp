@@ -21,6 +21,7 @@ Location::Location()
 	this->_cgi_ext = "";
 	this->_cgi_name = "";
 	this->_name = "";
+	this->_is_cgi_complete = false;
 	//this->_methods should be just an empty vector
 }
 
@@ -62,6 +63,10 @@ std::string&	Location::getLocationCgiName(void)
 	return _cgi_name;
 }
 
+bool			Location::getCgiCompleteBool(void) const
+{
+	return _is_cgi_complete;
+}
 
 /* MUTATORS */
 void	Location::setLocationName(std::string& locationNameToAdd)
@@ -130,6 +135,12 @@ void	Location::setLocationAutoindex(std::string& AutiondexToSet)
 	{
 		_autoindex = true;
 	}
+	return ;
+}
+
+void	Location::setCgiCompleteBool(bool value)
+{
+	_is_cgi_complete = value;
 	return ;
 }
 

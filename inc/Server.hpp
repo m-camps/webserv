@@ -29,6 +29,7 @@
 typedef std::map<std::string, Location>::iterator locIt;
 typedef std::map<std::vector<int>, std::string>::iterator errorIt;
 typedef std::map<std::vector<int>, std::string> ErrorMap;
+typedef std::map<std::string, Location> locationsOfServer;
 
 class Server
 {
