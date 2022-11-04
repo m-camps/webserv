@@ -239,7 +239,7 @@ void Respond::ResponseBuilder(void)
 {
     void (Respond::*FuncPointer)(void) = nullptr;
 	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
-    std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
+    // std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
 
 	const s_Methods CompareMethods [3] = {
 			{ "GET", &Respond::BuildGet },
@@ -247,15 +247,16 @@ void Respond::ResponseBuilder(void)
 			{ "DELETE", &Respond::BuildDelete }
 	};
 
-    if (!MethodIsAllowed(Method, AllowedMethods))
-    {
-        _Exchanger.setStatusCode(e_MethodNotFound);
-        generateStatus();
-        std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
-        _Exchanger.setBody(FileContent);
-        generateContentLength(_Exchanger.getBody().length());
-        return ;
-    }
+	/* Has to be rewritten since methods are always allowed on the server, locations can be restricted */
+    // if (!MethodIsAllowed(Method, AllowedMethods))
+    // {
+    //     _Exchanger.setStatusCode(e_MethodNotFound);
+    //     generateStatus();
+    //     std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
+    //     _Exchanger.setBody(FileContent);
+    //     generateContentLength(_Exchanger.getBody().length());
+    //     return ;
+    // }
 
 	for (int32_t i = 0; i < 3; i++)
 	{

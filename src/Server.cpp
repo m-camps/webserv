@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 15:03:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:26:51 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ std::vector<std::string>						Server::getNames(void) const { return _names; }
 std::string										Server::getRoot(void) const { return _root; }
 std::string  									Server::getIndex(void) const { return _index; }
 int												Server::getClientBodySize(void) const { return _client_body_size; }
-std::vector<std::string>						Server::getMethods(void) const { return _methods; }
 std::map<std::string, Location> 				Server::getLocations(void) const { return _locations; }
 std::vector<int>								Server::getSocketFds(void) const { return _socket_fds; }
 std::vector<int>								Server::getClientFds(void) const { return _client_fds; }
@@ -42,7 +41,6 @@ void	Server::setClientBody(int& client_body_size) { _client_body_size = client_b
 
 /* Adders */
 void	Server::addToNames(std::string& name) { _names.push_back(name); }
-void	Server::addToMethods(std::string& method) {_methods.push_back(method); }
 void	Server::addToPorts(int &port) { _ports.push_back(port); }
 
 void	Server::addToLocations(std::string& name, Location& location)
@@ -183,10 +181,6 @@ std::ostream& operator<<(std::ostream& stream, const Server& server)
 	stream << "Root: [" << server.getRoot() << "]\n";
 	stream << "Index: ["  << server.getIndex() << "]\n";
 	stream << "ClientBodySize: [" << server.getClientBodySize() << "]\n";
-	stream << "Methods [";
-	for(size_t i = 0; i < server.getMethods().size(); i++) 
-        stream << server.getMethods().at(i) << " ";
-	stream << "]\n";
 	stream << "SocketFD(s) [";
 	for(size_t i = 0; i < server.getSocketFds().size(); i++) 
         stream << server.getSocketFds().at(i) << " ";

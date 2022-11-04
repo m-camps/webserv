@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 14:31:28 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:19:41 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ class Parse
 		void    				parseRoot(Server& server, Line& line);
 		void    				parseIndex(Server& server, Line& line);
 		void    				parseClientBodySize(Server& server, Line& line);
-		void					parseAllowedMethods(Server& server, Line& line);
 		void					parseErrorPage(Server& server, Line& line);
 
 		/* Dispatch Table Location Functions */

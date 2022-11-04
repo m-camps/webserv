@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 15:01:36 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/04 13:21:35 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,6 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 			{"root", &Parse::parseRoot},
 			{"index", &Parse::parseIndex},
 			{"client_body_size", &Parse::parseClientBodySize},
-			{"allow_methods", &Parse::parseAllowedMethods},
 			{"error_page", &Parse::parseErrorPage},
 	};
 	
@@ -292,22 +291,6 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 
 	int clientBodySize = std::stoi(line[1], nullptr, 10);
 	server.setClientBody(clientBodySize);
-}
-
-
-void	Parse::parseAllowedMethods(Server& server, Line& line)
-{
-	if (line.size() != 2)
-		throw (ExceptionBuilder("allow_methods directive incorrect"));
-
-	std::string method = line[1];
-	std::vector<std::string> methods = server.getMethods();
-	
-	if (method != "GET" && method != "POST" && method != "DELETE")
-		throw (ExceptionBuilder("allow_methods value invalid"));
-	else if (std::find(methods.begin(), methods.end(), method) != methods.end())
-		throw (ExceptionBuilder("Duplicate port"));
-	server.addToMethods(method);
 }
 
 void	Parse::parseErrorPage(Server& server, Line& line)
@@ -485,8 +468,6 @@ void	Parse::validateServer(Server& server, int block)
 		throw(ValidateException("Index not set", block));
 	else if (server.getClientBodySize() == -1)
 		throw(ValidateException("ClientBodySize not set", block));
-	else if (server.getMethods().empty())
-		throw(ValidateException("Allow_methods not set", block));
 
 	std::map<std::string, Location>	locations = server.getLocations();
 	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)
