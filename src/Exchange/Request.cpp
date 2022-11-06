@@ -103,7 +103,7 @@ void Request::HeaderToMap(const std::string& Header)
 		std::size_t found = line.find(':');
 		if (found == std::string::npos)
 		{
-			splitMethod(line.substr(0, line.size() - 1));
+			splitMethod(line.erase(line.length()));
 			continue ;
 		}
 		_Exchanger.addHashMapNode(line.substr(0, found),

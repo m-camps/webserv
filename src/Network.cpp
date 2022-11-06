@@ -17,7 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 
-#define BUFF 5000
+#define BUFF 200000
 /* Default constructor */
 Network::Network() {}
 

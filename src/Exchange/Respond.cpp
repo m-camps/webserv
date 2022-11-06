@@ -69,11 +69,6 @@ void Respond::BuildGet(void)
 		_Exchanger.setStatusCode(StatusCode);
 
 		FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
-        if (StatusCode == e_Redir)
-        {
-            BuildGet_Redir();
-            return ;
-        }
 
         Generator::generateStatus(_Exchanger);
 		_Exchanger.setBody(FileContent);
@@ -125,7 +120,7 @@ std::string getFilename(std::string& MetaData)
     std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
     std::getline(issFile, line);
 
-    line = line.substr(0, line.length() - 1);
+    line.erase(line.length() - 1, 1);
     return (line);
 }
 
@@ -155,20 +150,20 @@ std::string Respond::getDataOfBody(void)
     try
     {
         std::string Boundry = Generator::generateBoundry(_Exchanger);
-        RequestBody = RequestBody.substr(Boundry.length() + 5,
-                                         RequestBody.length() - (Boundry.length() * 2) - 11);
+        RequestBody.erase(0, Boundry.length() + 5);
+        RequestBody.erase(RequestBody.length() - Boundry.length() - 6, Boundry.length() + 6);
 
         for (int32_t i = 0; i < 3; i++)
         {
             found = RequestBody.find(CRLF);
             _MetaData += RequestBody.substr(0, found) + "\n";
-            RequestBody = RequestBody.substr(found + 2, RequestBody.length());
+            RequestBody.erase(0, found + 2);
         }
         ContentFile = RequestBody.substr(0, RequestBody.length());
     }
     catch (const std::exception& e)
     {
-        throw(std::logic_error("POST could not be handled"));
+        throw (std::logic_error("POST could not be handled"));
     }
 
     return (ContentFile);
@@ -224,34 +219,12 @@ void Respond::ResponseBuilder(void)
 {
     void (Respond::*FuncPointer)(void) = NULL;
 	std::string Method = _Exchanger.getHashMapString("HTTPMethod");
-    // std::vector<std::string> AllowedMethods = _Exchanger.getServer().getMethods();
 
 	const s_Methods CompareMethods [3] = {
 			{ "GET", &Respond::BuildGet },
 			{ "POST", &Respond::BuildPost },
 			{ "DELETE", &Respond::BuildDelete }
 	};
-
-	/* Has to be rewritten since methods are always allowed on the server, locations can be restricted */
-    // if (!MethodIsAllowed(Method, AllowedMethods))
-    // {
-    //     _Exchanger.setStatusCode(e_MethodNotFound);
-    //     generateStatus();
-    //     std::string FileContent = defaultStatusPage(_Exchanger.getStatusCode());
-    //     _Exchanger.setBody(FileContent);
-    //     generateContentLength(_Exchanger.getBody().length());
-    //     return ;
-    // }
-    // Hoeft niet?
-    // if (!MethodIsAllowed(Method, AllowedMethods))
-    // {
-    //     _Exchanger.setStatusCode(e_MethodNotFound);
-    //     Generator::generateStatus(_Exchanger);
-    //     std::string FileContent = Generator::generateDefaulPage(_Exchanger.getStatusCode());
-    //     _Exchanger.setBody(FileContent);
-    //     Generator::generateContentLength(_Exchanger, _Exchanger.getBody().length());
-    //     return ;
-    // }
 
 	for (int32_t i = 0; i < 3; i++)
 	{
@@ -274,7 +247,7 @@ void Respond::sendAsChunked(void)
     while (Body.length() > 7)
     {
 
-        ret = send(_Exchanger.getSocketFD(), Body.c_str(), Body.length(), 0);
+        ret = send(_Exchanger.getSocketFD(), Body.data(), Body.length(), 0);
         if (ret < 0)
         {
             std::string StrError = std::strerror(errno);
@@ -319,7 +292,7 @@ void Respond::RespondToClient(void)
             Body;
     }
 
-    ssize_t ret = send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
+    ssize_t ret = write(_Exchanger.getSocketFD(), response.c_str(), response.length());
     if (ret < 0)
     {
         std::string StrError = std::strerror(errno);
@@ -363,22 +336,27 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 
 /* //////////////////////////// */
 
-std::string getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
+std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
 {
 	std::string FileContent;
+    ErrorPageMap ErrorPages = _Exchanger.getServer().getErrorPage();
+    ErrorPageMap::iterator it = ErrorPages.find(StatusCode);
 
 	try
 	{
-		switch (StatusCode)
+        if (it != ErrorPages.end())
+        {
+            FileContent = readFile(Root + it->second);
+            return (FileContent);
+        }
+        switch (StatusCode)
 		{
 			case e_OK:
 				FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
+                BuildGet_Redir();
                 break ;
-			case e_NotFound:
-				FileContent = readFile(Root + "/Error404.html");
-				break ;
             default:
                 FileContent = Generator::generateDefaulPage(StatusCode);
                 break ;
