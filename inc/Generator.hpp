@@ -2,12 +2,11 @@
 // Created by Xander Voorvaart on 11/1/22.
 //
 
-#ifndef GENERATE_HPP
-#define GENERATE_HPP
+#pragma once
 
-#include "Exchange.hpp"
+
 #include "Utilities.hpp"
-
+#include "../src/Exchange/Respond.hpp"
 #include <iostream>
 #include <dirent.h> // DIR
 #include <sys/stat.h>
@@ -15,22 +14,23 @@
 #define MAXBYTES 200000
 #define CRLF "\r\n"
 
+class Respond; // Need to include this otherwise compile error
+
 class Generator
 {
 public:
     Generator(void);
     ~Generator(void);
 
-    static void generateStatus(Exchange&);
-    static void generateContentLength(Exchange&, std::size_t);
-    static void generateLocation(Exchange&, const std::string);
-    static void generateContentType(Exchange&);
-    static void generateTransferEncoding(Exchange&);
-    static std::string generateChunk(Exchange&);
-    static std::string generateBoundry(Exchange&);
+    static void generateStatus(Respond&);
+    static void generateContentLength(Respond&, std::size_t);
+    static void generateLocation(Respond&, const std::string);
+    static void generateContentType(Respond&);
+    static void generateTransferEncoding(Respond&);
+    static std::string generateChunk(Respond&);
+    static std::string generateBoundry(Respond&);
     static std::string generateDefaulPage(uint32_t);
-    static std::string generateAutoIndex(Exchange&);
+    static std::string generateAutoIndex(Respond&);
     static std::string generateUploadSucces(void);
 };
 
-#endif //GENERATE_HPP

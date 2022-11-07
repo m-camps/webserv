@@ -4,25 +4,25 @@
 
 #include "Respond.hpp"
 
-void Respond::BuildGet(void)
+void Respond::buildGet(void)
 {
     std::cout << "GET" << std::endl;
     try
     {
         std::string FileContent;
         std::string relativePath;
-        std::string Root = _Exchanger.getServer().getRoot();
-        std::string Path = _Exchanger.getHashMapString("Path");
+        std::string Root = _server.getRoot();
+        std::string Path = getEntryFromMap("Path");
 
         relativePath = Root + Path;
         uint32_t StatusCode = modifyStatusCode(Path, relativePath);
-        _Exchanger.setStatusCode(StatusCode);
+		_status_code = StatusCode;
 
-        FileContent = getValidFile(Root, relativePath, _Exchanger.getStatusCode());
+        FileContent = getValidFile(Root, relativePath, _status_code);
 
-        Generator::generateStatus(_Exchanger);
-        _Exchanger.setBody(FileContent);
-        Generator::generateContentLength(_Exchanger, _Exchanger.getBody().length());
+        Generator::generateStatus(*this);
+        setBody(FileContent);
+        Generator::generateContentLength(*this, getBody().length());
     }
     catch (const std::exception& e)
     {

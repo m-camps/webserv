@@ -3,33 +3,28 @@
 //
 
 #include "Exchange.hpp"
+#include "Request.hpp"
+#include "Respond.hpp"
 
 #pragma region "ctor & dtor"
 
-Exchange::Exchange(void)
-    : _statusCode(200), _SocketFD(0)
+Exchange::Exchange(void) : _socketFD(0) {}
+Exchange::~Exchange(void) {}
+
+Exchange::Exchange(Server& server, int32_t& socketFd, std::string& requestStr)
+    : _server(server), _socketFD(socketFd)
 {
-}
+	Request request;
+	Respond	response(server);
+	HashMap	requestData;
 
-/* //////////////////////////// */
-
-Exchange::Exchange(Server NewSever, int32_t NewSocketFD)
-    : _statusCode(200), _server(NewSever), _SocketFD(NewSocketFD)
-{
-}
-
-/* //////////////////////////// */
-
-Exchange::Exchange(const Exchange &ref)
-    : _dictHeader(ref._dictHeader), _body(ref._body),
-        _statusCode(ref._statusCode), _server(ref._server), _SocketFD(ref._SocketFD)
-{
-}
-
-/* //////////////////////////// */
-
-Exchange::~Exchange(void)
-{
+	requestData = request.parseRequest(requestStr);
+	std::cout << requestStr << std::endl;
+	response.buildResponse(requestData);
+	std::cout << response.getResponse() << std::endl;
+	if (response.isChunked)
+		sendToClientChunked(response.getResponse());
+	sendToClient(response.getResponse());
 }
 
 #pragma endregion ctoranddtor
@@ -38,107 +33,31 @@ Exchange::~Exchange(void)
 
 /* ////////// Getter //////////// */
 
-Server Exchange::getServer(void) const
-{
-    return (_server);
-}
-
-/* //////////////////////////// */
-
-HashMap Exchange::getHashMap(void) const
-{
-    return (_dictHeader);
-}
-
-/* //////////////////////////// */
-
-std::string Exchange::getHashMapString(const std::string& RequestedMap)
-{
-        HashMap::iterator it = _dictHeader.find(RequestedMap);
-
-        if (it == _dictHeader.end())
-            throw (std::invalid_argument("Invalid string"));
-        return (it->second);
-}
-
-/* //////////////////////////// */
-
-std::string Exchange::getHeader(void) const
-{
-	return (_header);
-}
-
-/* //////////////////////////// */
-
-std::string Exchange::getBody(void) const
-{
-    return (_body);
-}
-
-/* //////////////////////////// */
-
-uint32_t Exchange::getStatusCode(void) const
-{
-    return (_statusCode);
-}
-
-/* //////////////////////////// */
-
-int32_t Exchange::getSocketFD(void) const
-{
-    return (_SocketFD);
-}
-
-/* //////////////////////////// */
-
-void Exchange::setHashMap(const HashMap NewHashMap)
-{
-    _dictHeader = NewHashMap;
-}
+Server 		Exchange::getServer(void) const { return (_server); }
+HashMap		Exchange::getRequestData(void) const { return (_requestData); }
+int32_t 	Exchange::getSocketFD(void) const { return (_socketFD); }
 
 #pragma endregion getter
 
-#pragma region setter
+#pragma region functions
 
-/* ////////// Setter //////////// */
+/* ////////// Functions //////////// */
 
-void Exchange::setBody(const std::string NewBody)
+void		Exchange::sendToClient(std::string response)
 {
-    _body = NewBody;
+	 ssize_t ret;
+
+    ret = write(getSocketFD(), response.data(), response.length());
+    if (ret < 0 || ret != (ssize_t)response.length())
+    {
+        std::string ErrorMsg = std::strerror(errno);
+        throw (std::runtime_error(ErrorMsg));
+    }
 }
 
-/* //////////////////////////// */
-
-void Exchange::setStatusCode(const uint32_t NewStatus)
+void		Exchange::sendToClientChunked(std::string response)
 {
-    _statusCode = NewStatus;
+	(void)response;
+	return ;
 }
-
-/* //////////////////////////// */
-
-void Exchange::setHeader(const std::string NewHeader)
-{
-    _header = NewHeader;
-}
-
-#pragma endregion setter
-
-#pragma region adders
-
-/* ////////// Adders //////////// */
-
-void Exchange::addHashMapNode(const std::string NameNode, const std::string ContentNode)
-{
-    _dictHeader[NameNode] = ContentNode;
-}
-
-/* //////////////////////////// */
-
-void Exchange::addLineToHeader(const std::string NewLine)
-{
-	std::string NewHeader = getHeader() + NewLine;
-
-	setHeader(NewHeader);
-}
-
-#pragma endregion adders
+#pragma endregion functions

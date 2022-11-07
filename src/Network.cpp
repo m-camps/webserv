@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/04 13:45:41 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/07 15:18:16 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,7 @@ void Network::run()
 					RequestStr.append(buff, ret);
 					if (ret != BUFF && ret > 0)
 					{
-                        Exchange exchange(*getServerByClientFd(cur.fd),cur.fd);
-                        Request request(RequestStr, exchange);
+                        Exchange exchange(*getServerByClientFd(cur.fd),cur.fd, RequestStr);
                         RequestStr.erase();
                     }
                 }

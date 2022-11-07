@@ -6,25 +6,40 @@
 
 ////////////// Ctor & Dtor //////////////
 
+/**
+ * @param Request will be the header & the body in one string
+ */
+Request::Request(const std::string Request, Exchange NewExchanger)
+		: _Exchanger(NewExchanger)
+{
+    try
+    {
+	    const std::string Header = AppendRequest(Request);
 
-Request::Request(void) {}
-Request::~Request(void) {}
+        HeaderToMap(Header);
+	    Respond Responder(_Exchanger);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+}
+
+/* //////////////////////////// */
+
+Request::Request(const Request& ref)
+		: _Exchanger(ref._Exchanger)
+{
+}
+
+/* //////////////////////////// */
+
+Request::~Request(void)
+{
+}
 
 ////////////// Functions //////////////
 
-HashMap		Request::parseRequest(std::string requestStr)
-{
-	try
-	{
-		const std::string Header = AppendRequest(requestStr);
-		stringToMap(Header);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-	return (_requestData);
-}
 /**
  * I look for the "\\r\\n\\r\\n" seperator by using std::find.
  * Which I will then append to the Header string & the Body string.
@@ -41,7 +56,8 @@ std::string Request::AppendRequest(const std::string& Request)
 	Header.append(Request, 0, found);
 
     Body.append(Request, found, Request.length() - found);
-    addHashMapNode("Body", Body);
+    _Exchanger.addHashMapNode("Body", Body);
+
 	return (Header);
 }
 
@@ -60,11 +76,11 @@ void Request::splitMethod(std::string line)
 
 	try
 	{
-        addHashMapNode("HTTPMethod", line.substr(0, *it));
+        _Exchanger.addHashMapNode("HTTPMethod", line.substr(0, *it));
         last_it = *it + 1;
-        addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
+        _Exchanger.addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
         last_it = *it;
-        addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it));
+        _Exchanger.addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it));
 	}
 	catch(const std::exception& e)
 	{
@@ -77,7 +93,7 @@ void Request::splitMethod(std::string line)
  * I created a HashMap by using std::map.
  * You can use std::map::find() to find the data you are looking for. \n
  */
-void Request::stringToMap(const std::string& Header)
+void Request::HeaderToMap(const std::string& Header)
 {
 	std::string line;
 	std::istringstream issHeader(Header);
@@ -90,12 +106,7 @@ void Request::stringToMap(const std::string& Header)
 			splitMethod(line.erase(line.length()));
 			continue ;
 		}
-		addHashMapNode(line.substr(0, found),
+		_Exchanger.addHashMapNode(line.substr(0, found),
                                   line.substr(found + 2, (line.size() - found - 3)));
 	}
-}
-
-void Request::addHashMapNode(const std::string NameNode, const std::string ContentNode)
-{
-    _requestData[NameNode] = ContentNode;
 }

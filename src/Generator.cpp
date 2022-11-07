@@ -18,30 +18,33 @@ Generator::~Generator(void)
  * The status of the site should ALWAYS be the first line of the header.
  * The rest can be any line.
  */
-void Generator::generateStatus(Exchange& Exchanger)
+void Generator::generateStatus(Respond& Responder)
 {
-    HashMap tempHash = Exchanger.getHashMap();
-    uint32_t StatusCode = Exchanger.getStatusCode();
+    HashMap tempHash = Responder.getRequestData();
+    uint32_t StatusCode = Responder.getStatusCode();
     std::string StatusLine = tempHash.find("HTTPVersion")->second;
 
-    StatusLine += " " + ToString(StatusCode) + " \r\n";
-    Exchanger.setHeader(StatusLine);
+	std::cout << StatusLine << "StatusLine: " << StatusCode <<std::endl;
+	StatusLine.append(" " + ToString(StatusCode) + " \r\n");
+    // StatusLine +=  " " + ToString(StatusCode) + " \r\n";
+    Responder.addLineToResponse(StatusLine);
+	std::cout << StatusLine <<  "StatusLine: "<< std::endl;
 }
 
 /* //////////////////////////// */
 
-void Generator::generateTransferEncoding(Exchange& Exchanger)
+void Generator::generateTransferEncoding(Respond& Responder)
 {
     std::string TransferEncoding = "Transfer-Encoding: chunked\r\n";
-    Exchanger.addLineToHeader(TransferEncoding);
+    Responder.addLineToResponse(TransferEncoding);
 }
 
 /* //////////////////////////// */
 
-void Generator::generateContentLength(Exchange& Exchanger, std::size_t BodyLength)
+void Generator::generateContentLength(Respond& Responder, std::size_t BodyLength)
 {
     std::string ContentLength = "Content-Length: " + ToString(BodyLength) + "\r\n";
-    Exchanger.addLineToHeader(ContentLength);
+    Responder.addLineToResponse(ContentLength);
 }
 
 /* //////////////////////////// */
@@ -54,10 +57,10 @@ std::string ConvertDecimalToHex(size_t decimal)
     return (ss.str());
 }
 
-std::string Generator::generateChunk(Exchange& Exchanger)
+std::string Generator::generateChunk(Respond& Responder)
 {
     std::string Chunk;
-    std::string Body = Exchanger.getBody();
+    std::string Body = Responder.getBody();
 
     if (Body.length() > MAXBYTES)
     {
@@ -65,13 +68,13 @@ std::string Generator::generateChunk(Exchange& Exchanger)
         Chunk.append(Body, 0, MAXBYTES);
         Chunk.append("\r\n\r\n");
         Body.erase(0, MAXBYTES);
-        Exchanger.setBody(Body);
+        Responder.setBody(Body);
     }
     else
     {
         Chunk = ConvertDecimalToHex(Body.length()) + CRLF;
         Chunk += Body.substr(0, Body.length()) + "\r\n\r\n";
-        Exchanger.setBody("");
+        Responder.setBody("");
     }
 
     return (Chunk);
@@ -79,25 +82,25 @@ std::string Generator::generateChunk(Exchange& Exchanger)
 
 /* //////////////////////////// */
 
-void Generator::generateLocation(Exchange& Exchanger, const std::string NewLocation)
+void Generator::generateLocation(Respond& Responder, const std::string NewLocation)
 {
     std::string Location = "Location: " + NewLocation + "\r\n";
-    Exchanger.addLineToHeader(Location);
+    Responder.addLineToResponse(Location);
 }
 
 /* //////////////////////////// */
 
-void Generator::generateContentType(Exchange& Exchanger)
+void Generator::generateContentType(Respond& Responder)
 {
     std::string line;
-    std::string RequestBody = Exchanger.getHashMapString("Body");
+    std::string RequestBody = Responder.getEntryFromMap("Body");
     std::istringstream issBody(RequestBody);
 
     while (std::getline(issBody, line))
     {
         if (line.compare(0, 13, "Content-Type:") == 0)
         {
-            Exchanger.addLineToHeader(line);
+            Responder.addLineToResponse(line);
             return ;
         }
     }
@@ -105,9 +108,9 @@ void Generator::generateContentType(Exchange& Exchanger)
 
 /* //////////////////////////// */
 
-std::string Generator::generateBoundry(Exchange& Exchanger)
+std::string Generator::generateBoundry(Respond& Responder)
 {
-    std::string ContentType = Exchanger.getHashMapString("Content-Type");
+    std::string ContentType = Responder.getEntryFromMap("Content-Type");
 
     std::size_t found = ContentType.find('=');
     if (found == std::string::npos)
@@ -160,11 +163,11 @@ bool isDirectory(std::string FileName)
     return (false);
 }
 
-std::string Generator::generateAutoIndex(Exchange& Exchanger)
+std::string Generator::generateAutoIndex(Respond& Responder)
 {
     DIR *dir;
     std::string AutoIndex;
-    std::string Root = Exchanger.getServer().getRoot();
+    std::string Root = Responder.getServer().getRoot();
     std::vector<std::string> DirectoryList = ListDir(&dir, Root);
     std::vector<std::string>::iterator it = DirectoryList.begin();
 

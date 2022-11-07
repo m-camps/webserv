@@ -10,37 +10,20 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Exchange& ExchangeRef)
-	: _Exchanger(ExchangeRef)
-{
-	RespondToClient();
-}
-
-/* //////////////////////////// */
-
-Respond::Respond(const Respond& ref)
-		: _Exchanger(ref._Exchanger)
-{
-	RespondToClient();
-}
-
-/* //////////////////////////// */
-
-Respond::~Respond(void)
-{
-}
+Respond::Respond(Server& server) : isChunked(false), _server(server){}
+Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
 
-//////////// Operator ////////////
+std::string		Respond::getHeader(void) const { return _header; }
+std::string		Respond::getBody(void) const { return _body; }
+HashMap			Respond::getRequestData(void) const { return _requestData; }
+int				Respond::getStatusCode(void) const { return _status_code; }
+Server			Respond::getServer(void) const { return _server; }
+std::string		Respond::getResponse(void) const {return _response; }
 
-Respond& Respond::operator=(const Respond& ref)
-{
-    if (this != &ref)
-    {
-    }
-    return (*this);
-}
+void			Respond::setHeader(std::string& header) { _header = header; }
+void			Respond::setBody(std::string body) { _body = body; }
 
 //////////// Responder ////////////
 
@@ -67,17 +50,18 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
     return (e_OK);
 }
 
-void Respond::ResponseBuilder(void)
+void 	Respond::buildResponse(HashMap requestData)
 {
+	_requestData = requestData;
     try
     {
         void (Respond::*FuncPointer)(void) = NULL;
-        std::string Method = _Exchanger.getHashMapString("HTTPMethod");
+        std::string Method = getEntryFromMap("HTTPMethod");
 
         const s_Methods CompareMethods[3] = {
-                {"GET",    &Respond::BuildGet},
-                {"POST",   &Respond::BuildPost},
-                {"DELETE", &Respond::BuildDelete}
+                {"GET",    &Respond::buildGet},
+                {"POST",   &Respond::buildPost},
+                {"DELETE", &Respond::buildDelete}
         };
 
         for (int32_t i = 0; i < 3; i++) {
@@ -96,21 +80,90 @@ void Respond::ResponseBuilder(void)
     }
 }
 
-/* //////////////////////////// */
-
-void Respond::RespondToClient(void)
+std::string Respond::getEntryFromMap(std::string entry)
 {
-    std::string response;
-    std::string Header;
-    std::string body;
-    ssize_t ret;
+	HashMap::iterator it = _requestData.find(entry);
 
-    ResponseBuilder();
+        if (it == _requestData.end())
+            throw (std::invalid_argument("Invalid string"));
+        return (it->second);
+}
 
-    ret = write(_Exchanger.getSocketFD(), response.data(), response.length());
-    if (ret < 0 || ret != (ssize_t)response.length())
+void 		Respond::addLineToResponse(const std::string NewLine)
+{
+	std::string NewHeader = _response + NewLine;
+
+	_response = NewHeader;
+}
+
+std::string getFilename(std::string& MetaData)
+{
+    std::string line;
+    std::size_t found = MetaData.find("filename=");
+    if (found == std::string::npos)
+        throw (std::invalid_argument("File has no name"));
+
+    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
+    std::getline(issFile, line);
+
+    line.erase(line.length() - 1, 1);
+    return (line);
+}
+
+void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
+{
+    try
     {
-        std::string ErrorMsg = std::strerror(errno);
-        throw (std::runtime_error(ErrorMsg));
+        std::string Root = getServer().getRoot();
+        std::ofstream File(Root + "/" + getFilename(MetaData));
+
+        File << Body;
+    }
+    catch (const std::exception& e)
+    {
+        throw (e);
     }
 }
+
+void Respond::BuildGet_Redir(void)
+{
+    const std::string NewLocation = getServer().getIndex();
+
+    Generator::generateStatus(*this);
+    Generator::generateLocation(*this, NewLocation);
+	setBody("");
+}
+
+std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
+{
+	std::string FileContent;
+    ErrorPageMap ErrorPages = getServer().getErrorPage();
+    ErrorPageMap::iterator it = ErrorPages.find(StatusCode);
+
+	try
+	{
+        if (it != ErrorPages.end())
+        {
+            FileContent = readFile(Root + it->second);
+            return (FileContent);
+        }
+        switch (StatusCode)
+		{
+			case e_OK:
+				FileContent = readFile(relativePath);
+				break ;
+			case e_Redir:
+                BuildGet_Redir();
+                break ;
+            default:
+                FileContent = Generator::generateDefaulPage(StatusCode);
+                break ;
+		}
+	}
+	catch (const std::exception& e)
+	{
+		FileContent = Generator::generateDefaulPage(StatusCode);
+	}
+	return (FileContent);
+}
+

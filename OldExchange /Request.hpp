@@ -2,7 +2,8 @@
 // Created by Xander Voorvaart on 9/30/22.
 //
 
-#pragma once
+#ifndef WEBSERV_REQUEST_HPP
+#define WEBSERV_REQUEST_HPP
 
 #include <map>
 #include <iostream> // std::cout
@@ -12,25 +13,24 @@
 #include "Respond.hpp"
 #include "Server.hpp" // Server class
 
-typedef std::map<std::string, std::string> HashMap;
+typedef std::map<std::string, std::string> map;
 
 class Request
 {
 public:
- 	Request(void);
+    explicit Request(std::string, Exchange);
     Request(const Request&);
     ~Request(void);
 
-	HashMap		parseRequest(std::string requestStr);
-
 private:
-   
+    Request(void);
     Request& operator=(const Request& ref);
 
-	HashMap			_requestData;
+    Exchange _Exchanger;
 
-    void		stringToMap(const std::string&);
-    void 		splitMethod(std::string line);
+    void HeaderToMap(const std::string&);
+    void splitMethod(std::string line);
     std::string AppendRequest(const std::string& Request);
-	void 		addHashMapNode(const std::string, const std::string);
 };
+
+#endif //WEBSERV_REQUEST_HPP

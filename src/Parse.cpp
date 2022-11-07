@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/07 12:22:58 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/07 17:03:37 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,7 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 			{"autoindex", &Parse::parseLocationAutoIndex},
 			{"cgi_name", &Parse::parseLocationCgiName},
 			{"cgi_ext", &Parse::parseLocationCgiExt},
-			{"return", &Parse::parserLocationReturn}
+			{"return", &Parse::parseLocationReturn}
 	};
 
 	for (int i = 0; i < NR_OF_LOCATION_DIRECTIVES; i++)
