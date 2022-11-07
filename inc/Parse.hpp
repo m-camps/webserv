@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/04 13:19:41 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/07 12:17:58 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ class Parse
 		void					parseLocationAutoIndex(Location& location, Line& line);
 		void					parseLocationCgiName(Location& location, Line& line);
 		void					parseLocationCgiExt(Location& location, Line& line);
+		void					parseLocationReturn(Location& location, Line& line);
 
 		/* File I/O */
 		void 					openFile(std::ifstream& configStream, std::string configName);

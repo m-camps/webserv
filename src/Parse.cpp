@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/04 17:50:41 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/07 12:22:58 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,7 +222,8 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 			{"allow_methods", &Parse::parseLocationAllowMethod},
 			{"autoindex", &Parse::parseLocationAutoIndex},
 			{"cgi_name", &Parse::parseLocationCgiName},
-			{"cgi_ext", &Parse::parseLocationCgiExt}
+			{"cgi_ext", &Parse::parseLocationCgiExt},
+			{"return", &Parse::parserLocationReturn}
 	};
 
 	for (int i = 0; i < NR_OF_LOCATION_DIRECTIVES; i++)
@@ -384,6 +385,14 @@ void	Parse::parseLocationCgiExt(Location& location, Line& line)
 	else if(location.getCgiFileExtension() != "")
 		throw (ExceptionBuilder("duplicate cgi_ext in location"));
 	location.setCgiExt(line[1]);
+}
+
+void	Parse::parseLocationReturn(Location& location, Line& line)
+{
+	if (line.size() != 2 || line.size() != 3)
+		throw (ExceptionBuilder("return location directive incorrect"));
+	else if (location.getReturnPath() != "" || location.getReturnStatus() != -1)
+		throw (ExceptionBuilder("duplicate return in location"));
 }
 
 /* Helper Functions */

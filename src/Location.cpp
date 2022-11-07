@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/31 15:55:19 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/07 12:23:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 Location::Location()
 {
 	_autoindex = -1;
+	_return_status = -1;
 }
 
 Location::~Location(){} 
@@ -28,6 +29,8 @@ int							Location::getAutoIndex(void) const { return _autoindex; }
 std::vector<std::string>	Location::getAllowMethods(void) const { return _methods; }
 std::string					Location::getCgiFileExtension(void) const { return _cgi_ext; }
 std::string					Location::getCgiName(void) const { return _cgi_name; }
+int							Location::getReturnStatus(void) const { return _return_status; }
+std::string					Location::getReturnPath(void) const { return _return_path; }
 
 /* Setters */
 void						Location::setName(std::string& name) { _name = name; }
@@ -36,6 +39,8 @@ void						Location::setIndex(std::string& index) { _index = index; }
 void						Location::setAutoIndex(int& autoindex) { _autoindex = autoindex; }
 void						Location::setCgiName(std::string& cgiName) { _cgi_name = cgiName; }
 void						Location::setCgiExt(std::string& cgiExt) { _cgi_ext = cgiExt; }
+void						Location::setReturnStatus(int& status) { _return_status = status; }
+void						Location::setReturnPath(std::string& path) { _return_path = path; }
 
 /* Adders */
 void 						Location::addToAllowMethod(std::string& method) { _methods.push_back(method); }
