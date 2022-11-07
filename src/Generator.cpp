@@ -61,14 +61,15 @@ std::string Generator::generateChunk(Exchange& Exchanger)
 
     if (Body.length() > MAXBYTES)
     {
-        Chunk = ConvertDecimalToHex(MAXBYTES) + "\r\n";
-        Chunk += Body.substr(0, MAXBYTES) + "\r\n\r\n";
-        Body = Body.substr(MAXBYTES, Body.length() - MAXBYTES);
+        Chunk = ConvertDecimalToHex(MAXBYTES) + CRLF;
+        Chunk.append(Body, 0, MAXBYTES);
+        Chunk.append("\r\n\r\n");
+        Body.erase(0, MAXBYTES);
         Exchanger.setBody(Body);
     }
     else
     {
-        Chunk = ConvertDecimalToHex(Body.length()) + "\r\n";
+        Chunk = ConvertDecimalToHex(Body.length()) + CRLF;
         Chunk += Body.substr(0, Body.length()) + "\r\n\r\n";
         Exchanger.setBody("");
     }

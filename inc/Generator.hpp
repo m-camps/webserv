@@ -12,7 +12,8 @@
 #include <dirent.h> // DIR
 #include <sys/stat.h>
 
-#define MAXBYTES 150000
+#define MAXBYTES 200000
+#define CRLF "\r\n"
 
 class Generator
 {
@@ -31,6 +32,5 @@ public:
     static std::string generateAutoIndex(Exchange&);
     static std::string generateUploadSucces(void);
 };
-
 
 #endif //GENERATE_HPP

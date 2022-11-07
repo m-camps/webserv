@@ -19,9 +19,9 @@
 #define CRLF "\r\n"
 
 typedef std::map<std::string, std::string> HashMap;
+typedef std::map<int, std::string> ErrorPageMap;
 
 uint32_t modifyStatusCode(std::string, const std::string&);
-std::string getValidFile(std::string, std::string, uint32_t);
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
 
 class Respond
@@ -35,22 +35,35 @@ private:
 	Respond(void);
 	Respond& operator=(const Respond&);
 
+    std::string _header;
+    std::string _body;
     Exchange& _Exchanger;
 
-    // Tijdelijk
-    std::string _MetaData;
-
+	void RespondToClient(void);
     void ResponseBuilder(void);
-    void BuildGet_Redir(void);
+
 	void BuildGet(void);
 	void BuildPost(void);
 	void BuildDelete(void);
 
-	void RespondToClient(void);
+    std::string getValidFile(std::string, std::string, uint32_t);
     void putBodyInFile(std::string&, std::string&);
-    std::string getDataOfBody(void);
+    std::string ParseBody(void);
 
     void sendAsChunked(void);
+};
+
+/* -- Structs --- */
+
+struct s_Methods
+{
+    std::string Method;
+    void (Respond::*FuncPointer)(void);
+};
+
+struct s_Booleans
+{
+
 };
 
 #endif //WEBSERV_RESPOND_HPP
