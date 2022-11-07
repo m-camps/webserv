@@ -43,8 +43,6 @@ private:
     Exchange& operator=(const Exchange&);
 
     HashMap _dictHeader;
-    std::string _header;
-    std::string _body;
     uint32_t _statusCode;
     const Server _server;
     const int32_t _SocketFD;
