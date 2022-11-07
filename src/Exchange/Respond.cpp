@@ -51,7 +51,6 @@ void Respond::BuildGet_Redir(void)
     Generator::generateStatus(_Exchanger);
     Generator::generateLocation(_Exchanger, NewLocation);
     _Exchanger.setBody("");
-    Generator::generateContentLength(_Exchanger, 0);
 }
 
 void Respond::BuildGet(void)
@@ -290,9 +289,10 @@ void Respond::RespondToClient(void)
             Header +
             "\r\n" +
             Body;
+        std::cout << response << std::endl;
     }
 
-    ssize_t ret = write(_Exchanger.getSocketFD(), response.c_str(), response.length());
+    ssize_t ret = write(_Exchanger.getSocketFD(), response.data(), response.length());
     if (ret < 0)
     {
         std::string StrError = std::strerror(errno);

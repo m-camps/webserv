@@ -21,7 +21,7 @@ public:
 
     // Getters
     HashMap getHashMap(void) const;
-    std::string getHashMapString(const std::string&) const;
+    std::string getHashMapString(const std::string&);
 	std::string getHeader(void) const;
     std::string getBody(void) const;
     uint32_t getStatusCode(void) const;

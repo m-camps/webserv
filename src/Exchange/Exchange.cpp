@@ -52,11 +52,11 @@ HashMap Exchange::getHashMap(void) const
 
 /* //////////////////////////// */
 
-std::string Exchange::getHashMapString(const std::string& RequestedMap) const
+std::string Exchange::getHashMapString(const std::string& RequestedMap)
 {
         HashMap::iterator it = _dictHeader.find(RequestedMap);
 
-        if (it != _dictHeader.end())
+        if (it == _dictHeader.end())
             throw (std::invalid_argument("Invalid string"));
         return (it->second);
 }
