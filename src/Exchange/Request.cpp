@@ -64,7 +64,7 @@ void Request::splitMethod(std::string line)
         last_it = *it + 1;
         addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
         last_it = *it;
-        addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it));
+        addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it - 2));
 	}
 	catch(const std::exception& e)
 	{

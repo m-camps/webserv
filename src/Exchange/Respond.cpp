@@ -10,7 +10,7 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Server& server) : isChunked(false), _server(server){}
+Respond::Respond(Server& server) : isChunked(false), _server(server) {}
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -53,6 +53,7 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
+
     try
     {
         void (Respond::*FuncPointer)(void) = NULL;
@@ -68,6 +69,7 @@ void 	Respond::buildResponse(HashMap requestData)
             if (Method == CompareMethods[i].Method) {
                 FuncPointer = CompareMethods[i].FuncPointer;
                 (this->*FuncPointer)();
+                addLineToResponse(_body);
                 return;
             }
         }
@@ -125,15 +127,6 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
     }
 }
 
-void Respond::BuildGet_Redir(void)
-{
-    const std::string NewLocation = getServer().getIndex();
-
-    Generator::generateStatus(*this);
-    Generator::generateLocation(*this, NewLocation);
-	setBody("");
-}
-
 std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
 {
 	std::string FileContent;
@@ -153,7 +146,7 @@ std::string Respond::getValidFile(std::string Root, std::string relativePath, ui
 				FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
-                BuildGet_Redir();
+                BuildRedir();
                 break ;
             default:
                 FileContent = Generator::generateDefaulPage(StatusCode);

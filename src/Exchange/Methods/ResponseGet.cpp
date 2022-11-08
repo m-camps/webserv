@@ -4,6 +4,15 @@
 
 #include "Respond.hpp"
 
+void Respond::BuildRedir(void)
+{
+    const std::string NewLocation = getServer().getIndex();
+
+    Generator::generateStatus(*this);
+    Generator::generateLocation(*this, NewLocation);
+    setBody("");
+}
+
 void Respond::buildGet(void)
 {
     std::cout << "GET" << std::endl;
@@ -20,9 +29,9 @@ void Respond::buildGet(void)
 
         FileContent = getValidFile(Root, relativePath, _status_code);
 
-        Generator::generateStatus(*this);
-        setBody(FileContent);
-        Generator::generateContentLength(*this, getBody().length());
+        addToHeader(Generator::generateStatus(*this));
+        setBody(CRLF + FileContent);
+        Generator::generateContentLength(*this, getBody().length() - 2);
     }
     catch (const std::exception& e)
     {

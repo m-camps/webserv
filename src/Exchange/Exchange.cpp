@@ -11,7 +11,7 @@
 Exchange::Exchange(void) : _socketFD(0) {}
 Exchange::~Exchange(void) {}
 
-Exchange::Exchange(Server& server, int32_t& socketFd, std::string& requestStr)
+Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
     : _server(server), _socketFD(socketFd)
 {
 	Request request;
@@ -19,12 +19,11 @@ Exchange::Exchange(Server& server, int32_t& socketFd, std::string& requestStr)
 	HashMap	requestData;
 
 	requestData = request.parseRequest(requestStr);
-	std::cout << requestStr << std::endl;
 	response.buildResponse(requestData);
-	std::cout << response.getResponse() << std::endl;
 	if (response.isChunked)
 		sendToClientChunked(response.getResponse());
-	sendToClient(response.getResponse());
+    else
+	    sendToClient(response.getResponse());
 }
 
 #pragma endregion ctoranddtor
@@ -47,7 +46,8 @@ void		Exchange::sendToClient(std::string response)
 {
 	 ssize_t ret;
 
-    ret = write(getSocketFD(), response.data(), response.length());
+     std::cout << response << std::endl;
+     ret = write(getSocketFD(), response.data(), response.length());
     if (ret < 0 || ret != (ssize_t)response.length())
     {
         std::string ErrorMsg = std::strerror(errno);

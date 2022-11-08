@@ -4,7 +4,6 @@
 
 #pragma once
 
-
 #include <iostream>
 
 #include "Server.hpp" // Server class
@@ -14,7 +13,7 @@ typedef std::map<std::string, std::string> HashMap;
 class Exchange
 {
 public:
-    Exchange(Server&, int32_t&, std::string&);
+    Exchange(Server&, int32_t, std::string&);
     ~Exchange(void);
 
     /* Getters */

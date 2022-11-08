@@ -24,11 +24,8 @@ void Generator::generateStatus(Respond& Responder)
     uint32_t StatusCode = Responder.getStatusCode();
     std::string StatusLine = tempHash.find("HTTPVersion")->second;
 
-	std::cout << StatusLine << "StatusLine: " << StatusCode <<std::endl;
-	StatusLine.append(" " + ToString(StatusCode) + " \r\n");
-    // StatusLine +=  " " + ToString(StatusCode) + " \r\n";
+    StatusLine +=  " " + ToString(StatusCode) + " \r\n";
     Responder.addLineToResponse(StatusLine);
-	std::cout << StatusLine <<  "StatusLine: "<< std::endl;
 }
 
 /* //////////////////////////// */

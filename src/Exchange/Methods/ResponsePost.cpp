@@ -19,7 +19,7 @@ std::string Respond::ParseBody(void)
         for (int32_t i = 0; i < 3; i++)
         {
             found = RequestBody.find(CRLF);
-            // _MetaData += RequestBody.substr(0, found) + "\n"; _MetaData does not exist
+             _MetaData += RequestBody.substr(0, found) + "\n";
             RequestBody.erase(0, found + 2);
         }
         ContentFile = RequestBody.substr(0, RequestBody.length());
@@ -34,12 +34,12 @@ std::string Respond::ParseBody(void)
 
 void 		Respond::buildPost(void)
 {
+    std::cout << "POST" << std::endl;
     try
     {
         std::string MetaData;
         std::string Body = getEntryFromMap("Body");
 
-        std::cout << "POST" << std::endl;
         Generator::generateStatus(*this);
         Body = ParseBody();
 

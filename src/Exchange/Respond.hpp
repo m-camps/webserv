@@ -16,6 +16,7 @@
 #include "Generator.hpp"
 
 #define CRLF "\r\n"
+#define SEPERATOR "\r\n\r\n"
 
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
@@ -58,7 +59,10 @@ class Respond
 		std::string		_response;
 		int				_status_code;
 
-		void 			BuildGet_Redir(void);
+        // Tijdeijk
+        std::string _MetaData;
+
+		void 			BuildRedir(void);
 		void 			buildGet(void);
 		void 			buildPost(void);
 		void 			buildDelete(void);
@@ -66,7 +70,6 @@ class Respond
 		std::string 	getValidFile(std::string, std::string, uint32_t);
 		void 			putBodyInFile(std::string&, std::string&);
 		std::string 	ParseBody(void);
-
 
 		void 			sendAsChunked(void);
 };
