@@ -10,7 +10,7 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Server& server) : isChunked(false), _server(server) {}
+Respond::Respond(Server& server) : _server(server), _isChunked(false) {}
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -21,9 +21,17 @@ HashMap			Respond::getRequestData(void) const { return _requestData; }
 int				Respond::getStatusCode(void) const { return _status_code; }
 Server			Respond::getServer(void) const { return _server; }
 
-void			Respond::setHeader(std::string& header) { _header = header; }
+bool			Respond::IsChunked(void) const { return _isChunked; }
+
 void			Respond::setBody(std::string body) { _body = body; }
 
+
+void 		Respond::addToHeader(const std::string NewLine)
+{
+	std::string NewHeader = _header + NewLine;
+
+	_header = NewHeader;
+}
 //////////// Responder ////////////
 
 /* ///////// External Functions ////////// */
@@ -87,13 +95,6 @@ std::string Respond::getEntryFromMap(std::string entry)
         if (it == _requestData.end())
             throw (std::invalid_argument("Invalid string"));
         return (it->second);
-}
-
-void 		Respond::addToHeader(const std::string NewLine)
-{
-	std::string NewHeader = _header + NewLine;
-
-	_header = NewHeader;
 }
 
 std::string getFilename(std::string& MetaData)

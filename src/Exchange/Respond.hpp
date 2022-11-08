@@ -31,23 +31,27 @@ class Respond
 		Respond(const Respond&);
 		~Respond(void);
 
+		/* Getters */
 		std::string		getHeader(void) const;
 		std::string		getBody(void) const;
 		HashMap			getRequestData(void) const;
 		int				getStatusCode(void) const;
 		Server			getServer(void) const;
-		std::string		getResponse(void) const;
 
-		void			setHeader(std::string& header);
+		/* Flags */
+		bool			IsChunked(void) const;
+
+		/* Setters */
 		void			setBody(std::string body);
 
+		/* Adders */
 		void			addToHeader(const std::string NewLine);
 
+		/* Public build function*/
 		void 			buildResponse(HashMap	requestData);
 
+		/* Interface */
 		std::string 	getEntryFromMap(std::string	entry);
-
-		bool			isChunked;
 
 	private:
 		Respond(void);
@@ -58,20 +62,21 @@ class Respond
 		std::string 	_header;
 		std::string 	_body;
 		int				_status_code;
+		bool			_isChunked;
 
         // Tijdeijk
         std::string _MetaData;
 
+		/* Build functions */
 		void 			BuildRedir(void);
 		void 			buildGet(void);
 		void 			buildPost(void);
 		void 			buildDelete(void);
 
+		/* Helper functions */
 		std::string 	getValidFile(std::string, std::string, uint32_t);
 		void 			putBodyInFile(std::string&, std::string&);
 		std::string 	ParseBody(void);
-
-		void 			sendAsChunked(void);
 };
 
 /* --- Structs --- */
