@@ -26,8 +26,8 @@ public:
 
 	/* Send */
 	void			sendToClient(Respond& response);
-	void			sendChunked(std::string strToSend);
-	void			sendNormal(std::string strToSend);
+	void			sendChunked(std::string str);
+	void			sendNormal(std::string str);
 
 private:
     Exchange(void);

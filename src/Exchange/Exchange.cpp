@@ -42,22 +42,25 @@ int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 void		Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
-	sendNormal(response.getBody());
+	if (response.IsChunked())
+		sendNormal(response.getBody());
+	else
+		sendChunked(response.getBody());
 }
 
-void		Exchange::sendChunked(std::string strToSend)
+void		Exchange::sendChunked(std::string str)
 {
-	(void)strToSend;
+	(void)str;
 	return ;
 }
 
-void		Exchange::sendNormal(std::string strToSend)
+void		Exchange::sendNormal(std::string str)
 {
 	ssize_t ret;
 
-    std::cout << strToSend << std::endl;
-    ret = write(_socketFd, strToSend.data(), strToSend.length());
-    if (ret < 0 || ret != (ssize_t)strToSend.length())
+    std::cout << str << std::endl;
+    ret = write(_socketFd, str.data(), str.length());
+    if (ret < 0 || ret != (ssize_t)str.length())
     {
         std::string ErrorMsg = std::strerror(errno);
         throw (std::runtime_error(ErrorMsg));
