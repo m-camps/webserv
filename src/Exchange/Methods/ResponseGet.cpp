@@ -8,8 +8,8 @@ void Respond::BuildRedir(void)
 {
     const std::string NewLocation = getServer().getIndex();
 
-    Generator::generateStatus(*this);
-    Generator::generateLocation(*this, NewLocation);
+    addToHeader(Generator::generateStatus(*this));
+    addToHeader(Generator::generateLocation(NewLocation));
     setBody("");
 }
 
@@ -31,7 +31,7 @@ void Respond::buildGet(void)
 
         addToHeader(Generator::generateStatus(*this));
         setBody(CRLF + FileContent);
-        Generator::generateContentLength(*this, getBody().length() - 2);
+        addToHeader(Generator::generateContentLength(getBody().length() - 2));
     }
     catch (const std::exception& e)
     {

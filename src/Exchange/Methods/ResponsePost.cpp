@@ -40,12 +40,12 @@ void 		Respond::buildPost(void)
         std::string MetaData;
         std::string Body = getEntryFromMap("Body");
 
-        Generator::generateStatus(*this);
+        addToHeader(Generator::generateStatus(*this));
         Body = ParseBody();
 
         putBodyInFile(MetaData, Body);
         setBody("");
-        Generator::generateContentLength(*this, 0);
+        addToHeader(Generator::generateContentLength(0));
     }
     catch (const std::exception& e)
     {

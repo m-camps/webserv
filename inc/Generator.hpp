@@ -22,11 +22,11 @@ public:
     Generator(void);
     ~Generator(void);
 
-    static void generateStatus(Respond&);
-    static void generateContentLength(Respond&, std::size_t);
-    static void generateLocation(Respond&, const std::string);
-    static void generateContentType(Respond&);
-    static void generateTransferEncoding(Respond&);
+    static std::string generateStatus(Respond&);
+    static std::string generateContentLength(std::size_t);
+    static std::string generateLocation(const std::string);
+    static std::string generateContentType(Respond&);
+    static std::string generateTransferEncoding(void);
     static std::string generateChunk(Respond&);
     static std::string generateBoundry(Respond&);
     static std::string generateDefaulPage(uint32_t);

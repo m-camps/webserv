@@ -7,8 +7,11 @@
 #include <iostream>
 
 #include "Server.hpp" // Server class
+#include "Respond.hpp"
 
 typedef std::map<std::string, std::string> HashMap;
+
+class Respond ;
 
 class Exchange
 {
@@ -19,11 +22,12 @@ public:
     /* Getters */
 	Server 			getServer(void) const;
     HashMap 		getRequestData(void) const;
-    int32_t 		getSocketFD(void) const;
+    int32_t 		getSocketFd(void) const;
 
 	/* Send */
-	void			sendToClient(std::string response);
-	void			sendToClientChunked(std::string response);
+	void			sendToClient(Respond& response);
+	void			sendChunked(std::string strToSend);
+	void			sendNormal(std::string strToSend);
 
 private:
     Exchange(void);
@@ -32,6 +36,6 @@ private:
 	std::string		_requestStr;
     HashMap 		_requestData;
     const Server 	_server;
-    const int32_t 	_socketFD;
+    const int32_t 	_socketFd;
 };
 

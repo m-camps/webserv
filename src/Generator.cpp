@@ -18,30 +18,30 @@ Generator::~Generator(void)
  * The status of the site should ALWAYS be the first line of the header.
  * The rest can be any line.
  */
-void Generator::generateStatus(Respond& Responder)
+std::string Generator::generateStatus(Respond& Responder)
 {
     HashMap tempHash = Responder.getRequestData();
     uint32_t StatusCode = Responder.getStatusCode();
     std::string StatusLine = tempHash.find("HTTPVersion")->second;
 
     StatusLine +=  " " + ToString(StatusCode) + " \r\n";
-    Responder.addLineToResponse(StatusLine);
+	return (StatusLine);
 }
 
 /* //////////////////////////// */
 
-void Generator::generateTransferEncoding(Respond& Responder)
+std::string Generator::generateTransferEncoding(void)
 {
     std::string TransferEncoding = "Transfer-Encoding: chunked\r\n";
-    Responder.addLineToResponse(TransferEncoding);
+	return (TransferEncoding);
 }
 
 /* //////////////////////////// */
 
-void Generator::generateContentLength(Respond& Responder, std::size_t BodyLength)
+std::string Generator::generateContentLength(std::size_t BodyLength)
 {
     std::string ContentLength = "Content-Length: " + ToString(BodyLength) + "\r\n";
-    Responder.addLineToResponse(ContentLength);
+    return (ContentLength);
 }
 
 /* //////////////////////////// */
@@ -79,15 +79,15 @@ std::string Generator::generateChunk(Respond& Responder)
 
 /* //////////////////////////// */
 
-void Generator::generateLocation(Respond& Responder, const std::string NewLocation)
+std::string Generator::generateLocation(const std::string NewLocation)
 {
     std::string Location = "Location: " + NewLocation + "\r\n";
-    Responder.addLineToResponse(Location);
+	return (Location);
 }
 
 /* //////////////////////////// */
 
-void Generator::generateContentType(Respond& Responder)
+std::string Generator::generateContentType(Respond& Responder)
 {
     std::string line;
     std::string RequestBody = Responder.getEntryFromMap("Body");
@@ -97,10 +97,10 @@ void Generator::generateContentType(Respond& Responder)
     {
         if (line.compare(0, 13, "Content-Type:") == 0)
         {
-            Responder.addLineToResponse(line);
-            return ;
+            break ;
         }
     }
+	return (line);
 }
 
 /* //////////////////////////// */

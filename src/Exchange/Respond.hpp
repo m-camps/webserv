@@ -41,9 +41,10 @@ class Respond
 		void			setHeader(std::string& header);
 		void			setBody(std::string body);
 
+		void			addToHeader(const std::string NewLine);
+
 		void 			buildResponse(HashMap	requestData);
 
-		void			addLineToResponse(const std::string NewLine);
 		std::string 	getEntryFromMap(std::string	entry);
 
 		bool			isChunked;
@@ -56,7 +57,6 @@ class Respond
 		HashMap			_requestData;
 		std::string 	_header;
 		std::string 	_body;
-		std::string		_response;
 		int				_status_code;
 
         // Tijdeijk

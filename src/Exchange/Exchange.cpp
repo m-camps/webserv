@@ -8,11 +8,11 @@
 
 #pragma region "ctor & dtor"
 
-Exchange::Exchange(void) : _socketFD(0) {}
+Exchange::Exchange(void) : _socketFd(0) {}
 Exchange::~Exchange(void) {}
 
 Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
-    : _server(server), _socketFD(socketFd)
+    : _server(server), _socketFd(socketFd)
 {
 	Request request;
 	Respond	response(server);
@@ -20,10 +20,7 @@ Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
 
 	requestData = request.parseRequest(requestStr);
 	response.buildResponse(requestData);
-	if (response.isChunked)
-		sendToClientChunked(response.getResponse());
-    else
-	    sendToClient(response.getResponse());
+	sendToClient(response);
 }
 
 #pragma endregion ctoranddtor
@@ -34,7 +31,7 @@ Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
 
 Server 		Exchange::getServer(void) const { return (_server); }
 HashMap		Exchange::getRequestData(void) const { return (_requestData); }
-int32_t 	Exchange::getSocketFD(void) const { return (_socketFD); }
+int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 
 #pragma endregion getter
 
@@ -42,22 +39,28 @@ int32_t 	Exchange::getSocketFD(void) const { return (_socketFD); }
 
 /* ////////// Functions //////////// */
 
-void		Exchange::sendToClient(std::string response)
+void		Exchange::sendToClient(Respond& response)
 {
-	 ssize_t ret;
+	sendNormal(response.getHeader());
+	sendNormal(response.getBody());
+}
 
-     std::cout << response << std::endl;
-     ret = write(getSocketFD(), response.data(), response.length());
-    if (ret < 0 || ret != (ssize_t)response.length())
+void		Exchange::sendChunked(std::string strToSend)
+{
+	(void)strToSend;
+	return ;
+}
+
+void		Exchange::sendNormal(std::string strToSend)
+{
+	ssize_t ret;
+
+    std::cout << strToSend << std::endl;
+    ret = write(_socketFd, strToSend.data(), strToSend.length());
+    if (ret < 0 || ret != (ssize_t)strToSend.length())
     {
         std::string ErrorMsg = std::strerror(errno);
         throw (std::runtime_error(ErrorMsg));
     }
-}
-
-void		Exchange::sendToClientChunked(std::string response)
-{
-	(void)response;
-	return ;
 }
 #pragma endregion functions

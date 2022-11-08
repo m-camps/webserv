@@ -20,7 +20,6 @@ std::string		Respond::getBody(void) const { return _body; }
 HashMap			Respond::getRequestData(void) const { return _requestData; }
 int				Respond::getStatusCode(void) const { return _status_code; }
 Server			Respond::getServer(void) const { return _server; }
-std::string		Respond::getResponse(void) const {return _response; }
 
 void			Respond::setHeader(std::string& header) { _header = header; }
 void			Respond::setBody(std::string body) { _body = body; }
@@ -69,7 +68,6 @@ void 	Respond::buildResponse(HashMap requestData)
             if (Method == CompareMethods[i].Method) {
                 FuncPointer = CompareMethods[i].FuncPointer;
                 (this->*FuncPointer)();
-                addLineToResponse(_body);
                 return;
             }
         }
@@ -91,11 +89,11 @@ std::string Respond::getEntryFromMap(std::string entry)
         return (it->second);
 }
 
-void 		Respond::addLineToResponse(const std::string NewLine)
+void 		Respond::addToHeader(const std::string NewLine)
 {
-	std::string NewHeader = _response + NewLine;
+	std::string NewHeader = _header + NewLine;
 
-	_response = NewHeader;
+	_header = NewHeader;
 }
 
 std::string getFilename(std::string& MetaData)
