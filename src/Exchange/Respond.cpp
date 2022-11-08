@@ -77,22 +77,24 @@ void Respond::BuildGet(void)
 		}
 		else
 		{	//for now set statuscode manually, I have a bug somewhere, always gives 404 statuscode
-			FileContent = getCgiFileContent();
-			FileContent = defaultStatusPage(200);
+			//FileContent = getCgiFileContent();
+			FileContent = defaultStatusPage(200); //not sure we need this here
 			_Exchanger.setStatusCode(200);
+			//getCgiFileContent()
+			generateContentLength(getCgiFileContent().length());
 		}
 		if (StatusCode == e_Redir)
 		{
 			BuildGet_Redir();
 			return ;
 		}
-
 		generateStatus();
 		if (_Exchanger.getIsCgi() == false)
 		{
 			_Exchanger.setBody(FileContent);
+			generateContentLength(FileContent.length());
 		}
-		generateContentLength(FileContent.length());
+		//std::cout << _Exchanger.getBody() << "is exchanger body in get response. " << _Exchanger.getBody().length() << " iS GETBODYLEN IN BUILDGET" << std::endl;
 	}
 	catch (const std::exception& e)
 	{
@@ -286,20 +288,20 @@ void Respond::ResponseBuilder(void)
 /* for now just a checker function, probably should belong to respond */
 bool	correctCgiRequestLocationFound(Exchange& ExchangeRef, locIt& location) //check if 
 {
-	Server 										current = ExchangeRef.getServer();
-	locationsOfServer 							locationBlocksToCheck = current.getLocations();
+	Server 										currentServer = ExchangeRef.getServer();
+	locationBlocksOfServer 						locationBlocksToCheck = currentServer.getLocations();
 	locIt										it = locationBlocksToCheck.begin();
-	std::map<std::string, std::string> 			map = ExchangeRef.getHashMap();
 	std::string 								s1 = "Path";
+	std::map<std::string, std::string> 			map = ExchangeRef.getHashMap();
 
 	for (int i = 0; i < locationBlocksToCheck.size(); i++)
 	{
-		if (it->second.getCgiCompleteBool() == true) //check extension format
+		if (it->second.getCgiCompleteBool() == true)
 		{
 			if (map.find(s1) != map.end() && map[s1] == it->first)
 			{
 				location = it;
-				return true ;
+				return true;
 			}
 		}
 		it++;
@@ -324,29 +326,27 @@ void Respond::RespondToClient(Exchange& ExchangeRef)
 
 	if (correctCgiRequestLocationFound(ExchangeRef, location) == true)
 	{
-		Cgi		cgi;
+		Cgi	cgi;
 		cgiBody = cgi.executeScript(ExchangeRef, location);
-		setCgiFileContent(cgiBody);
-		_Exchanger.setIsCgi(true);
+		_Exchanger.setIsCgi(true); 	//setCgiFileContent(cgiBody);
 	}
-		
 	ResponseBuilder();
 	Header = _Exchanger.getHeader();
-	if (_Exchanger.getIsCgi() == false)
+	if (_Exchanger.getIsCgi() == true)
 	{
-		Body =  _Exchanger.getBody();
+		Body = ExchangeRef.getBody();
 	}
 	else
 	{
-		Body = getCgiFileContent();
+		Body =  _Exchanger.getBody();
 	}
-	generateContentLength(_Exchanger.getBody().length());
+	generateContentLength(Body.length());
 	std::string response =
 			Header +
 			"\r\n" +
 			Body;
 
-	_Exchanger.setIsCgi(false); //in any case, reset it
+	_Exchanger.setIsCgi(false); //should we set it somewhere else?
 	//std::cout << "Response: \n" << response << std::endl;
 	send(_Exchanger.getSocketFD(), response.c_str(), response.length(), 0);
 }

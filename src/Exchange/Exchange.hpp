@@ -52,6 +52,7 @@ private:
 	const Server 	_server;
 	const int32_t 	_SocketFD;
 	bool			_isCgi;
+	//envp?
 };
 
 std::ostream& operator<<(std::ostream&, const Exchange&);

@@ -1,27 +1,25 @@
 #include "../inc/Cgi.hpp"
 #include <iostream>
 #include <unistd.h>
+#include <stdlib.h> //check if we need this one
 
 const char*		buildCgiExecPath(Exchange& ExchangeRef, locIt& location)
 {
 	Server current = ExchangeRef.getServer();
+	char absolutePath[300]; //calloc, or static?
 
-	char absolutePath[300];
-	getcwd(absolutePath, sizeof(absolutePath));
-	
+	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL)
+	{
+		std::cout << "Could not enter to current working directory, closing program" << std::endl;
+		exit(1);
+	}
 	std::string executablePath(absolutePath); //../data/www/cgi-bin/filename+extension
 	executablePath += "/";
 	executablePath += current.getRoot(); //for now, will depend on the root of the location/server block
 	executablePath += "/cgi-bin";
-	executablePath += location->second.getLocationName();
+	executablePath += location->second.getLocationName(); //what happens if this isnt / but just like python
 	executablePath += "/";
 	executablePath += location->second.getLocationCgiName();
-
-	// bool locationcgiextension = location->second.getLocationCgiFileExtension() != "";
-	// bool locationcginame = location->second.getLocationCgiName() != "";
-	// std::cout << location->second.getLocationCgiFileExtension() << " is file extension " << std::endl;
-	// std::cout << locationcgiextension << " is extension bool, " << locationcginame << " is cginame bool" << std::endl;
-	//this evaluates as true which isnt the case with /cpp, tofix
 	if (location->second.getLocationCgiFileExtension() != "" && location->second.getLocationCgiName() != "")
 	{
 		executablePath += ".";
@@ -31,16 +29,41 @@ const char*		buildCgiExecPath(Exchange& ExchangeRef, locIt& location)
 	return execvePath;
 }
 
+char**			Cgi::createEnvVariables(Exchange& ExchangeRef, locIt& location)
+{
+	std::string	currentVal;
+	std::string currentKey;
+
+	char** envp = (char **)calloc(2, sizeof(char *));
+	envp[0] = (char*)calloc(23, sizeof(char));
+
+	//assigning servername to envp
+	currentVal = "SERVER_NAME=";
+	currentVal += ExchangeRef.getServer().getNames().at(0);
+	//currentKey =  //what happens with more server blocks?
+	
+	memcpy(envp[0],  currentVal.c_str(), currentVal.length());
+	return envp;
+}
+
 void			Cgi::childProcess(int *fds, Exchange& ExchangeRef, locIt& location)
 {
 	const char *path = buildCgiExecPath(ExchangeRef, location);
-		
+	//char **envp = createEnvVariables(ExchangeRef, location);
+	//int res = putenv(envp[0]); //to check if it worked
 	close(fds[0]);
 	close(STDIN_FILENO);
 	dup2(fds[1], STDOUT_FILENO);
+
+	//if I pass it here it works, if I create it above it doesnt for some reason
+	char** envp = (char**)malloc(2 * sizeof(char**));
+	envp[1] = NULL;
+	envp[0] = (char*)malloc(sizeof(char) * 22);
+	envp[0][21] = '\0';
+	envp[0] = "SERVER_NAME=LOCALHOST";
 	if (access(path, (X_OK | F_OK)) == 0)
 	{
-		execve(path, NULL, NULL);
+		execve(path, NULL, envp);
 	}
 	else
 	{
@@ -59,8 +82,10 @@ void			Cgi::parentProcess(Exchange& ExchangeRef, int* fds, int& stat)
 	{
 		static char buff[1024];
 		int ret = read(fds[0], buff, sizeof(buff));
+		//if ret <= 0 ? 
+		//if (ret == 0) //EOF
 		std::string cgiBody(buff);
-		ExchangeRef.setBody(cgiBody);
+		ExchangeRef.setBody(cgiBody); //exhangerefst body?
 	}
 	else
 	{

@@ -14,7 +14,7 @@ class Cgi
 		std::string		executeScript(Exchange& ExchangeRef, locIt& location);
 		void			parentProcess(Exchange& ExchangeRef, int* fds, int& stat);
 		void			childProcess(int* fds, Exchange& ExchangeRef, std::map<std::string, Location>::iterator& location);
-
+		char**			createEnvVariables(Exchange& ExchangeRef, locIt& location);
 		//i need to construct a header separate from the script
 			// VERSION & STATUSCODE FIRST
 			// ContentLength, if there is a body
