@@ -6,11 +6,11 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/07 12:23:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/08 13:50:25 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/Location.hpp"
+#include "Location.hpp"
 
 // Constructor with default values
 Location::Location()

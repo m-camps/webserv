@@ -70,7 +70,10 @@ class Respond
 		/* Build functions */
 		void 			BuildRedir(void);
 		void 			buildGet(void);
+
+		std::string		sendSuccesfulUpload(std::string);
 		void 			buildPost(void);
+
 		void 			buildDelete(void);
 
 		/* Helper functions */
@@ -96,5 +99,6 @@ enum e_statusCode
     e_Redir = 301,
     e_Forbidden = 401,
     e_NotFound = 404,
-    e_MethodNotFound = 405
+    e_MethodNotFound = 405,
+	e_InternalServerErrro = 500
 };

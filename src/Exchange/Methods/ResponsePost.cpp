@@ -2,11 +2,41 @@
 // Created by Xander Voorvaart on 11/7/22.
 //
 
-#include "Respond.hpp"
+#include "../Respond.hpp"
+
+std::string getFilename(std::string& MetaData)
+{
+    std::string line;
+    std::size_t found = MetaData.find("filename=");
+    if (found == std::string::npos)
+        throw (std::invalid_argument("File has no name"));
+
+    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
+    std::getline(issFile, line);
+
+    line.erase(line.length() - 1, 1);
+    return (line);
+}
+
+void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
+{
+    try
+    {
+        std::string Root = _server.getRoot();
+        std::ofstream File(Root + "/" + getFilename(MetaData));
+
+        File << Body;
+    }
+    catch (const std::exception& e)
+    {
+        throw (e);
+    }
+}
 
 std::string Respond::ParseBody(void)
 {
 	std::string ContentFile;
+
     try
     {
         std::size_t found;
@@ -19,7 +49,8 @@ std::string Respond::ParseBody(void)
         for (int32_t i = 0; i < 3; i++)
         {
             found = RequestBody.find(CRLF);
-             _MetaData += RequestBody.substr(0, found) + "\n";
+             _MetaData.append(RequestBody, 0, found);
+             _MetaData += "\n";
             RequestBody.erase(0, found + 2);
         }
         ContentFile = RequestBody.substr(0, RequestBody.length());
@@ -32,7 +63,16 @@ std::string Respond::ParseBody(void)
     return (ContentFile);
 }
 
-void 		Respond::buildPost(void)
+std::string Respond::sendSuccesfulUpload(std::string MetaData)
+{
+    std::string Root = _server.getRoot();
+    std::string FileName = getFilename(MetaData);
+    std::string RelativePath = Root + "/" + FileName;
+
+    return ("Saved upload to file <a href=\"" + FileName + "\">" + RelativePath + "</a> on disk");
+}
+
+void Respond::buildPost(void)
 {
     std::cout << "POST" << std::endl;
     try
@@ -42,14 +82,16 @@ void 		Respond::buildPost(void)
 
         addToHeader(Generator::generateStatus(*this));
         Body = ParseBody();
+        putBodyInFile(_MetaData, Body);
 
-        putBodyInFile(MetaData, Body);
-        setBody("");
-        addToHeader(Generator::generateContentLength(0));
+        std::string message = sendSuccesfulUpload(_MetaData);
+
+        setBody(message);
+        addToHeader(Generator::generateContentLength(message.length()));
     }
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        std::exit(EXIT_FAILURE);
+        throw (e);
     }
 }

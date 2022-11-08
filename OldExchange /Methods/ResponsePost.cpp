@@ -37,7 +37,7 @@ void Respond::BuildPost(void)
     try
     {
         std::string MetaData;
-        std::string Body = _Exchanger.getHashMapString("Body");
+        std::string Body = Map("Body");
 
         std::cout << "POST" << std::endl;
         Generator::generateStatus(_Exchanger);

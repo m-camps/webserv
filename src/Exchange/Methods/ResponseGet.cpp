@@ -6,7 +6,7 @@
 
 void Respond::BuildRedir(void)
 {
-    const std::string NewLocation = getServer().getIndex();
+    const std::string NewLocation = _server.getIndex();
 
     addToHeader(Generator::generateStatus(*this));
     addToHeader(Generator::generateLocation(NewLocation));
@@ -30,8 +30,8 @@ void Respond::buildGet(void)
         FileContent = getValidFile(Root, relativePath, _status_code);
 
         addToHeader(Generator::generateStatus(*this));
-        setBody(CRLF + FileContent);
-        addToHeader(Generator::generateContentLength(getBody().length() - 2));
+        setBody(FileContent);
+        addToHeader(Generator::generateContentLength(getBody().length()));
     }
     catch (const std::exception& e)
     {

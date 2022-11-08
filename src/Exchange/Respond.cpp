@@ -97,35 +97,6 @@ std::string Respond::getEntryFromMap(std::string entry)
         return (it->second);
 }
 
-std::string getFilename(std::string& MetaData)
-{
-    std::string line;
-    std::size_t found = MetaData.find("filename=");
-    if (found == std::string::npos)
-        throw (std::invalid_argument("File has no name"));
-
-    std::istringstream issFile(MetaData.substr(found + 10, MetaData.length()));
-    std::getline(issFile, line);
-
-    line.erase(line.length() - 1, 1);
-    return (line);
-}
-
-void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
-{
-    try
-    {
-        std::string Root = getServer().getRoot();
-        std::ofstream File(Root + "/" + getFilename(MetaData));
-
-        File << Body;
-    }
-    catch (const std::exception& e)
-    {
-        throw (e);
-    }
-}
-
 std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
 {
 	std::string FileContent;

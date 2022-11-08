@@ -14,13 +14,20 @@ Exchange::~Exchange(void) {}
 Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
     : _server(server), _socketFd(socketFd)
 {
-	Request request;
-	Respond	response(server);
-	HashMap	requestData;
+	try
+	{
+		Request request;
+		Respond	response(server);
+		HashMap	requestData;
 
-	requestData = request.parseRequest(requestStr);
-	response.buildResponse(requestData);
-	sendToClient(response);
+		requestData = request.parseRequest(requestStr);
+		response.buildResponse(requestData);
+		sendToClient(response);
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
 }
 
 #pragma endregion ctoranddtor
@@ -39,16 +46,17 @@ int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 
 /* ////////// Functions //////////// */
 
-void		Exchange::sendToClient(Respond& response)
+void	Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
-	if (!response.IsChunked())
+	sendNormal(CRLF);
+	if (response.IsChunked() == false)
 		sendNormal(response.getBody());
 	else
 		sendChunked(response.getBody());
 }
 
-void		Exchange::sendChunked(std::string str)
+void	Exchange::sendChunked(std::string str)
 {
 	(void)str;
 	return ;
@@ -58,7 +66,6 @@ void		Exchange::sendNormal(std::string str)
 {
 	ssize_t ret;
 
-    std::cout << str << std::endl;
     ret = write(_socketFd, str.data(), str.length());
     if (ret < 0 || ret != (ssize_t)str.length())
     {
