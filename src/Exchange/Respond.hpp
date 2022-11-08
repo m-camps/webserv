@@ -70,16 +70,15 @@ class Respond
 		/* Build functions */
 		void 			BuildRedir(void);
 		void 			buildGet(void);
-
-		std::string		sendSuccesfulUpload(std::string);
 		void 			buildPost(void);
-
 		void 			buildDelete(void);
 
 		/* Helper functions */
 		std::string 	getValidFile(std::string, std::string, uint32_t);
-		void 			putBodyInFile(std::string&, std::string&);
+		std::string		sendSuccesfulUpload(std::string);
 		std::string 	ParseBody(void);
+		void 			putBodyInFile(std::string&, std::string&);
+		void			createResponse(const std::string&);
 };
 
 /* --- Structs --- */
@@ -100,5 +99,5 @@ enum e_statusCode
     e_Forbidden = 401,
     e_NotFound = 404,
     e_MethodNotFound = 405,
-	e_InternalServerErrro = 500
+	e_InternalServerError = 500
 };

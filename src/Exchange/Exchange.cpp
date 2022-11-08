@@ -50,7 +50,7 @@ void	Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
 	sendNormal(CRLF);
-	if (response.IsChunked() == false)
+	if (response.getBody().length() < MAXBYTES)
 		sendNormal(response.getBody());
 	else
 		sendChunked(response.getBody());
@@ -58,8 +58,27 @@ void	Exchange::sendToClient(Respond& response)
 
 void	Exchange::sendChunked(std::string str)
 {
-	(void)str;
-	return ;
+    ssize_t ret;
+    std::string Body = Generator::generateChunk(str);
+
+    while (Body.length() > 7)
+    {
+        ret = write(_socketFd, Body.data(), Body.length());
+        if (ret < 0 || ret != (ssize_t) Body.length())
+        {
+            std::string StrError = std::strerror(errno);
+            throw (std::runtime_error(StrError));
+        }
+		Body.clear();
+        Body = Generator::generateChunk(str);
+    }
+	Body = "0\r\n\r\n";
+    ret = write(_socketFd, Body.data(), Body.length());
+    if (ret < 0)
+    {
+        std::string StrError = std::strerror(errno);
+        throw (std::runtime_error(StrError));
+    }
 }
 
 void		Exchange::sendNormal(std::string str)

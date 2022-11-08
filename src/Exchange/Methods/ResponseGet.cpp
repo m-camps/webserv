@@ -24,14 +24,11 @@ void Respond::buildGet(void)
         std::string Path = getEntryFromMap("Path");
 
         relativePath = Root + Path;
-        uint32_t StatusCode = modifyStatusCode(Path, relativePath);
-		_status_code = StatusCode;
+        _status_code = modifyStatusCode(Path, relativePath);
 
         FileContent = getValidFile(Root, relativePath, _status_code);
 
-        addToHeader(Generator::generateStatus(*this));
-        setBody(FileContent);
-        addToHeader(Generator::generateContentLength(getBody().length()));
+        createResponse(FileContent);
     }
     catch (const std::exception& e)
     {

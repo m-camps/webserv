@@ -10,7 +10,7 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Server& server) : _server(server), _isChunked(false) {}
+Respond::Respond(Server& server) : _server(server), _status_code(200), _isChunked(false) {}
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -57,6 +57,19 @@ uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
     return (e_OK);
 }
 
+/* //////////////////////////// */
+
+void    Respond::createResponse(const std::string& FileContent)
+{
+    addToHeader(Generator::generateStatus(*this));
+    setBody(FileContent);
+    if (FileContent.length() > MAXBYTES)
+        addToHeader(Generator::generateTransferEncoding());
+    addToHeader(Generator::generateContentLength(FileContent.length()));
+}
+
+/* //////////////////////////// */
+
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
@@ -80,7 +93,8 @@ void 	Respond::buildResponse(HashMap requestData)
             }
         }
 
-//        BuildHeader(); <-- 405 Method is not allowed
+        _status_code = e_MethodNotFound;
+        createResponse(Generator::generateDefaulPage(_status_code));
     }
     catch (const std::exception &e)
     {
@@ -100,7 +114,7 @@ std::string Respond::getEntryFromMap(std::string entry)
 std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
 {
 	std::string FileContent;
-    ErrorPageMap ErrorPages = getServer().getErrorPage();
+    ErrorPageMap ErrorPages = _server.getErrorPage();
     ErrorPageMap::iterator it = ErrorPages.find(StatusCode);
 
 	try
@@ -125,8 +139,7 @@ std::string Respond::getValidFile(std::string Root, std::string relativePath, ui
 	}
 	catch (const std::exception& e)
 	{
-		FileContent = Generator::generateDefaulPage(StatusCode);
+		FileContent = Generator::generateDefaulPage(e_InternalServerError);
 	}
 	return (FileContent);
 }
-

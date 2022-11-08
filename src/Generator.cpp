@@ -54,24 +54,21 @@ std::string ConvertDecimalToHex(size_t decimal)
     return (ss.str());
 }
 
-std::string Generator::generateChunk(Respond& Responder)
+std::string Generator::generateChunk(std::string& Body)
 {
     std::string Chunk;
-    std::string Body = Responder.getBody();
 
     if (Body.length() > MAXBYTES)
     {
         Chunk = ConvertDecimalToHex(MAXBYTES) + CRLF;
-        Chunk.append(Body, 0, MAXBYTES);
-        Chunk.append("\r\n\r\n");
-        Body.erase(0, MAXBYTES);
-        Responder.setBody(Body);
+        Chunk += Body.substr(0, MAXBYTES) + CRLF;
+        Body = Body.substr(MAXBYTES, Body.length() - MAXBYTES);
     }
     else
     {
         Chunk = ConvertDecimalToHex(Body.length()) + CRLF;
-        Chunk += Body.substr(0, Body.length()) + "\r\n\r\n";
-        Responder.setBody("");
+        Chunk += Body.substr(0, Body.length()) + CRLF;
+        Body.clear();
     }
 
     return (Chunk);
