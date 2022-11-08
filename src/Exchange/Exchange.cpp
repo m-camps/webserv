@@ -42,7 +42,7 @@ int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 void		Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
-	if (response.IsChunked())
+	if (!response.IsChunked())
 		sendNormal(response.getBody());
 	else
 		sendChunked(response.getBody());
