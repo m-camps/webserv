@@ -97,12 +97,14 @@ void Network::run()
                         close(cur.fd);
                         delFromPollFds(i);
                     }
-                    RequestStr.append(buff, ret);
-//                    std::size_t found = RequestStr.find(SEPERATOR);
-                    if (ret != BUFF)
+                    else
                     {
-                        Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
-                        RequestStr.erase();
+                        RequestStr.append(buff, ret);
+                        //                    std::size_t found = RequestStr.find(SEPERATOR);
+                        if (ret != BUFF) {
+                            Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
+                            RequestStr.erase();
+                        }
                     }
                 }
             }
