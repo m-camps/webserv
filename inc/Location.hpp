@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/07 12:20:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/09 12:01:56 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,17 +43,17 @@ class Location {
 		std::string					getReturnPath(void) const;
 
 		/* Setters */
-		void						setName(std::string& name);
-		void 						setRoot(std::string& root);
-		void						setIndex(std::string& index);
-		void						setAutoIndex(int& autoindex);
-		void						setCgiName(std::string& cgiName);
-		void						setCgiExt(std::string& cgiExt);
-		void						setReturnStatus(int& status);
-		void						setReturnPath(std::string& path);
+		void						setName(const std::string& name);
+		void 						setRoot(const std::string& root);
+		void						setIndex(const std::string& index);
+		void						setAutoIndex(const int& autoindex);
+		void						setCgiName(const std::string& cgiName);
+		void						setCgiExt(const std::string& cgiExt);
+		void						setReturnStatus(const int& status);
+		void						setReturnPath(const std::string& path);
 		
 		/* Adders */
-		void						addToAllowMethod(std::string& method);
+		void						addToAllowMethod(const std::string& method);
 };
 
 std::ostream& operator<<(std::ostream& stream, Location& location);

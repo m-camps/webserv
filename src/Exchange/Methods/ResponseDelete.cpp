@@ -10,7 +10,7 @@ void Respond::buildDelete(void)
     try
     {
 		std::string relativePath;
-		std::string Root = _server.getRoot();
+		std::string Root = "data/www"; // Needs to change to location root
 		std::string Path = getEntryFromMap("Path");
 
         relativePath = Root + Path;

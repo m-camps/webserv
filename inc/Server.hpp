@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/01 15:00:49 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/09 12:18:51 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,7 @@ class Server
 		/* Getters */
 		std::vector<int>					getPorts(void) const;
 		std::vector<std::string>			getNames(void) const;
-		std::string							getRoot(void) const;
-		std::string							getIndex(void) const;
 		int									getClientBodySize(void) const;
-		std::vector<std::string>			getMethods(void) const;
 		std::map<std::string, Location>		getLocations(void) const;
 		std::map<int, std::string>          getErrorPage(void) const;
 
@@ -47,14 +44,12 @@ class Server
 		std::vector<int>					getClientFds(void) const;
 
 		/* Setters */
-		void	setRoot(std::string& root);
-		void	setIndex(std::string& index);
 		void	setClientBody(int& client_body_size);
+		void	setLocations(std::map<std::string, Location>& locations);
 
 		/* Adders */
 		void	addToPorts(int &port);
 		void	addToNames(std::string& name);
-		void	addToMethods(std::string& method);
 		void	addToLocations(std::string& name, Location& location);
 		void	addToErrorPages(int& error_nb, std::string& error_page);
 
@@ -71,8 +66,6 @@ class Server
 	private:
 		std::vector<int>							_ports;
 		std::vector<std::string>					_names; 					// can be searching for multiple names
-		std::string									_root; 						// default = "/"
-		std::string									_index; 					// default = "index.html"
 		int											_client_body_size;			// default = 10;
 		std::vector<std::string>					_methods;					// default = ["GET", "POST", "DELETE"]
 		std::map<std::string, Location>				_locations;					// All locations of the Server
