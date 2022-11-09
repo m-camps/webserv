@@ -4,6 +4,7 @@ build/
 tester/build/
 .idea
 .vscode
+cmake-build-debug
 
 # Prerequisites
 *.d

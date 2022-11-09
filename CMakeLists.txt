@@ -32,6 +32,9 @@ set(SOURCES
         src/Exchange/Exchange.cpp
         src/Exchange/Request.cpp
         src/Exchange/Respond.cpp
+        src/Exchange/Methods/ResponsePost.cpp
+        src/Exchange/Methods/ResponseGet.cpp
+        src/Exchange/Methods/ResponseDelete.cpp
         src/Utilities/deleteFile.cpp
         src/Utilities/findCharLocation.cpp
         src/Utilities/readFile.cpp

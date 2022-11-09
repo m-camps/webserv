@@ -78,16 +78,15 @@ void Respond::buildPost(void)
     try
     {
         std::string MetaData;
+        std::string BodyContent;
         std::string Body = getEntryFromMap("Body");
 
-        addToHeader(Generator::generateStatus(*this));
         Body = ParseBody();
         putBodyInFile(_MetaData, Body);
 
-        std::string message = sendSuccesfulUpload(_MetaData);
+        BodyContent = sendSuccesfulUpload(_MetaData);
 
-        setBody(message);
-        addToHeader(Generator::generateContentLength(message.length()));
+        createResponse(BodyContent);
     }
     catch (const std::exception& e)
     {

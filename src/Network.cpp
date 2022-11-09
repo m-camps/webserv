@@ -60,48 +60,51 @@ void Network::setup(std::string file)
 /* do we need to use select with the bitflags? */
 void Network::run()
 {
-	char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::string RequestStr;
-	//check if both location is seen here
-	while (true)
-	{
-		if (poll(_fds, _total_fd, -1) == -1)
-		{
-			perror("In poll: ");
-			free(_fds);
-			exit(ERROR);
-		}
-		for (int i = 0; i < _total_fd; i++)
-		{
- 			struct pollfd cur = _fds[i];
-			if ((cur.revents & POLLIN))
-			{
-				if (isSocketFd(cur.fd))
-				{
-					Server *server = getServerBySocketFd(cur.fd);
-					int newFd = server->acceptConnection(cur.fd);
-					addToPollFds(newFd);
-					std::cout << "New connection" << "\n";
-					std::cout << "On FD " << newFd << std::endl;
-				}
-				else
-				{
-					ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0); // MSG_NOSIGNAL
-					if (ret <= 0)
-					{
-						RequestStr.clear();
-						if (ret == 0)
-							std::cout << "Client closed connection" << "\n";
-						else
-							perror("In recv: ");
-						close(cur.fd);
-						delFromPollFds(i);
-					}
-					RequestStr.append(buff, ret);
-					if (ret != BUFF && ret > 0)
-					{
-                        Exchange exchange(*getServerByClientFd(cur.fd),cur.fd, RequestStr);
-                        RequestStr.erase();
+    char buff[BUFF]; //  test buffer (can change later or keep it here)
+    std::string RequestStr;
+    //check if both location is seen here
+    while (true)
+    {
+        if (poll(_fds, _total_fd, -1) == -1)
+        {
+            perror("In poll: ");
+            free(_fds);
+            exit(ERROR);
+        }
+        for (int i = 0; i < _total_fd; i++)
+        {
+            struct pollfd cur = _fds[i];
+            if ((cur.revents & POLLIN))
+            {
+                if (isSocketFd(cur.fd))
+                {
+                    Server *server = getServerBySocketFd(cur.fd);
+                    int newFd = server->acceptConnection(cur.fd);
+                    addToPollFds(newFd);
+                    std::cout << "New connection" << "\n";
+                    std::cout << "On FD " << newFd << std::endl;
+                }
+                else
+                {
+                    ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
+                    if (ret <= 0)
+                    {
+                        RequestStr.clear();
+                        if (ret == 0)
+                            std::cout << "Client closed connection" << "\n";
+                        else
+                            std::perror("In recv: ");
+                        close(cur.fd);
+                        delFromPollFds(i);
+                    }
+                    else
+                    {
+                        RequestStr.append(buff, ret);
+                        //                    std::size_t found = RequestStr.find(SEPERATOR);
+                        if (ret != BUFF) {
+                            Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
+                            RequestStr.erase();
+                        }
                     }
                 }
             }

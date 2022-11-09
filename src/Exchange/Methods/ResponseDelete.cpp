@@ -2,7 +2,7 @@
 // Created by Xander Voorvaart on 11/7/22.
 //
 
-#include "../Respond.hpp"
+#include "Respond.hpp"
 
 void Respond::buildDelete(void)
 {
@@ -16,11 +16,8 @@ void Respond::buildDelete(void)
         relativePath = Root + Path;
         _status_code = modifyStatusCode(Path, relativePath);
 
-        addToHeader(Generator::generateStatus(*this));
-        setBody("");
-		
         deleteFile(relativePath);
-		addToHeader(Generator::generateContentLength(getBody().length()));
+        createResponse("");
     }
     catch (const std::exception& e)
     {

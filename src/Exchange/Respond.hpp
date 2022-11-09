@@ -21,14 +21,13 @@
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
 
-uint32_t modifyStatusCode(std::string, const std::string&);
+uint32_t modifyStatusCode(const std::string&, const std::string&);
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
 
 class Respond
 {
 	public:
-		Respond(Server& server);
-		Respond(const Respond&);
+		explicit Respond(Server& server);
 		~Respond(void);
 
 		/* Getters */
@@ -45,7 +44,7 @@ class Respond
 		void			setBody(std::string body);
 
 		/* Adders */
-		void			addToHeader(const std::string NewLine);
+		void			addToHeader(const std::string& NewLine);
 
 		/* Public build function*/
 		void 			buildResponse(HashMap	requestData);
@@ -55,6 +54,7 @@ class Respond
 
 	private:
 		Respond(void);
+		Respond(const Respond&);
 		Respond& operator=(const Respond&);
 
 		Server			_server;
@@ -70,16 +70,15 @@ class Respond
 		/* Build functions */
 		void 			BuildRedir(void);
 		void 			buildGet(void);
-
-		std::string		sendSuccesfulUpload(std::string);
 		void 			buildPost(void);
-
 		void 			buildDelete(void);
 
 		/* Helper functions */
-		std::string 	getValidFile(std::string, std::string, uint32_t);
-		void 			putBodyInFile(std::string&, std::string&);
+		std::string 	getValidFile(std::string, const std::string&, uint32_t);
+		std::string		sendSuccesfulUpload(std::string);
 		std::string 	ParseBody(void);
+		void 			putBodyInFile(std::string&, std::string&);
+		void			createResponse(const std::string&);
 };
 
 /* --- Structs --- */
@@ -100,5 +99,5 @@ enum e_statusCode
     e_Forbidden = 401,
     e_NotFound = 404,
     e_MethodNotFound = 405,
-	e_InternalServerErrro = 500
+	e_InternalServerError = 500
 };
