@@ -198,9 +198,10 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 			{"index", &Parse::parseIndex},
 			{"client_body_size", &Parse::parseClientBodySize},
 			{"error_page", &Parse::parseErrorPage},
+            {"", NULL}
 	};
 	
-	for (int i = 0; i < NR_OF_SERVER_DIRECTIVES; i++)
+	for (int i = 0; !dTable[i]._name.empty(); i++)
 	{
 		if (line[0] == dTable[i]._name)
 		{
@@ -407,11 +408,15 @@ std::invalid_argument Parse::ExceptionBuilder(std::string error)
 
 Line 	Parse::splitLineWithStrtok(std::string& line, const std::string& delimit)
 {
-	char	*c_line = strdup(const_cast<char *>(line.c_str()));
 	char	*word;
 	Line 	ret;
-	
+	char	*c_line = strdup(line.c_str());
 
+    if (!c_line)
+    {
+        std::perror("In malloc: ");
+        std::exit(EXIT_FAILURE);
+    }
 	word = strtok(c_line, delimit.c_str());
 	while (word != NULL)
 	{

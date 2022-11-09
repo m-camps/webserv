@@ -21,14 +21,13 @@
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
 
-uint32_t modifyStatusCode(std::string, const std::string&);
+uint32_t modifyStatusCode(const std::string&, const std::string&);
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
 
 class Respond
 {
 	public:
-		Respond(Server& server);
-		Respond(const Respond&);
+		explicit Respond(Server& server);
 		~Respond(void);
 
 		/* Getters */
@@ -45,7 +44,7 @@ class Respond
 		void			setBody(std::string body);
 
 		/* Adders */
-		void			addToHeader(const std::string NewLine);
+		void			addToHeader(const std::string& NewLine);
 
 		/* Public build function*/
 		void 			buildResponse(HashMap	requestData);
@@ -55,6 +54,7 @@ class Respond
 
 	private:
 		Respond(void);
+		Respond(const Respond&);
 		Respond& operator=(const Respond&);
 
 		Server			_server;
@@ -74,7 +74,7 @@ class Respond
 		void 			buildDelete(void);
 
 		/* Helper functions */
-		std::string 	getValidFile(std::string, std::string, uint32_t);
+		std::string 	getValidFile(std::string, const std::string&, uint32_t);
 		std::string		sendSuccesfulUpload(std::string);
 		std::string 	ParseBody(void);
 		void 			putBodyInFile(std::string&, std::string&);

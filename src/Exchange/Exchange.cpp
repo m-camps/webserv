@@ -50,10 +50,10 @@ void	Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
 	sendNormal(CRLF);
-	if (response.getBody().length() < MAXBYTES)
+//	if (response.getBody().length() < MAXBYTES)
 		sendNormal(response.getBody());
-	else
-		sendChunked(response.getBody());
+//	else
+//		sendChunked(response.getBody());
 }
 
 void	Exchange::sendChunked(std::string str)

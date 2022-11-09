@@ -14,6 +14,8 @@
 
 typedef std::map<std::string, std::string> HashMap;
 
+bool isPrintable(const char* str);
+
 class Request
 {
 public:
@@ -32,5 +34,5 @@ private:
     void		stringToMap(const std::string&);
     void 		splitMethod(std::string line);
     std::string AppendRequest(const std::string& Request);
-	void 		addHashMapNode(const std::string, const std::string);
+	void 		addHashMapNode(const std::string&, const std::string&);
 };

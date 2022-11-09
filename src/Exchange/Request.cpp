@@ -17,11 +17,14 @@ HashMap		Request::parseRequest(std::string requestStr)
 	try
 	{
 		const std::string Header = AppendRequest(requestStr);
+//        if (isPrintable(Header.c_str()) == false)
+//            throw (std::logic_error("Header has non-Printable characters"));
 		stringToMap(Header);
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+        throw (e);
 	}
 	return (_requestData);
 }
@@ -58,6 +61,8 @@ void Request::splitMethod(std::string line)
 	std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
 	std::vector<int>::iterator it = AllSpaceLocations.begin();
 
+    if (AllSpaceLocations.size() != 2)
+        return ;
 	try
 	{
         addHashMapNode("HTTPMethod", line.substr(0, *it));
@@ -95,7 +100,15 @@ void Request::stringToMap(const std::string& Header)
 	}
 }
 
-void Request::addHashMapNode(const std::string NameNode, const std::string ContentNode)
+void Request::addHashMapNode(const std::string& NameNode, const std::string& ContentNode)
 {
     _requestData[NameNode] = ContentNode;
+}
+
+bool isPrintable(const char* str)
+{
+    for (int32_t i = 0; str[i]; i++)
+        if (std::isprint(str[i]) == false)
+            return (false);
+    return (true);
 }

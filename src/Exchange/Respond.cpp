@@ -26,7 +26,7 @@ bool			Respond::IsChunked(void) const { return _isChunked; }
 void			Respond::setBody(std::string body) { _body = body; }
 
 
-void 		Respond::addToHeader(const std::string NewLine)
+void 		    Respond::addToHeader(const std::string& NewLine)
 {
 	std::string NewHeader = _header + NewLine;
 
@@ -46,7 +46,7 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
-uint32_t modifyStatusCode(std::string Path, const std::string& relativePath)
+uint32_t modifyStatusCode(const std::string& Path, const std::string& relativePath)
 {
     if (isForbiddenPath(Path))
         return (e_Forbidden);
@@ -63,8 +63,8 @@ void    Respond::createResponse(const std::string& FileContent)
 {
     addToHeader(Generator::generateStatus(*this));
     setBody(FileContent);
-    if (FileContent.length() > MAXBYTES)
-        addToHeader(Generator::generateTransferEncoding());
+//    if (FileContent.length() > MAXBYTES)
+//        addToHeader(Generator::generateTransferEncoding());
     addToHeader(Generator::generateContentLength(FileContent.length()));
 }
 
@@ -111,7 +111,7 @@ std::string Respond::getEntryFromMap(std::string entry)
         return (it->second);
 }
 
-std::string Respond::getValidFile(std::string Root, std::string relativePath, uint32_t StatusCode)
+std::string Respond::getValidFile(std::string Root, const std::string& relativePath, uint32_t StatusCode)
 {
 	std::string FileContent;
     ErrorPageMap ErrorPages = _server.getErrorPage();
