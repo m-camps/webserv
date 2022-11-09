@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/07 12:17:58 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/09 11:56:18 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ class Parse
 		void    				parseServerDirective(Line& line, Server &server);
 		void    				parseListen(Server& server, Line& line);
 		void    				parseServerName(Server& server, Line& line);
-		void    				parseRoot(Server& server, Line& line);
-		void    				parseIndex(Server& server, Line& line);
 		void    				parseClientBodySize(Server& server, Line& line);
 		void					parseErrorPage(Server& server, Line& line);
 

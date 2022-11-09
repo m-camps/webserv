@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/08 13:50:25 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/09 12:24:03 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,17 @@ int							Location::getReturnStatus(void) const { return _return_status; }
 std::string					Location::getReturnPath(void) const { return _return_path; }
 
 /* Setters */
-void						Location::setName(std::string& name) { _name = name; }
-void						Location::setRoot(std::string& root) { _root = root; }
-void						Location::setIndex(std::string& index) { _index = index; }
-void						Location::setAutoIndex(int& autoindex) { _autoindex = autoindex; }
-void						Location::setCgiName(std::string& cgiName) { _cgi_name = cgiName; }
-void						Location::setCgiExt(std::string& cgiExt) { _cgi_ext = cgiExt; }
-void						Location::setReturnStatus(int& status) { _return_status = status; }
-void						Location::setReturnPath(std::string& path) { _return_path = path; }
+void						Location::setName(const std::string& name) { _name = name; }
+void						Location::setRoot(const std::string& root) { _root = root; }
+void						Location::setIndex(const std::string& index) { _index = index; }
+void						Location::setAutoIndex(const int& autoindex) { _autoindex = autoindex; }
+void						Location::setCgiName(const std::string& cgiName) { _cgi_name = cgiName; }
+void						Location::setCgiExt(const std::string& cgiExt) { _cgi_ext = cgiExt; }
+void						Location::setReturnStatus(const int& status) { _return_status = status; }
+void						Location::setReturnPath(const std::string& path) { _return_path = path; }
 
 /* Adders */
-void 						Location::addToAllowMethod(std::string& method) { _methods.push_back(method); }
+void 						Location::addToAllowMethod(const std::string& method) { _methods.push_back(method); }
 
 std::ostream& operator<<(std::ostream& stream, Location& location)
 {

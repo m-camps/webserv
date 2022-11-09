@@ -162,9 +162,10 @@ bool isDirectory(std::string FileName)
 
 std::string Generator::generateAutoIndex(Respond& Responder)
 {
+	(void)Responder;
     DIR *dir;
     std::string AutoIndex;
-    std::string Root = Responder.getServer().getRoot();
+    std::string Root = "data/www"; // Needs to change to location root
     std::vector<std::string> DirectoryList = ListDir(&dir, Root);
     std::vector<std::string>::iterator it = DirectoryList.begin();
 

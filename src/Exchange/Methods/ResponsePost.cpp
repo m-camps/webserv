@@ -22,7 +22,7 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
     try
     {
-        std::string Root = _server.getRoot();
+        std::string Root = "data/www"; // Needs to change to location root
         std::ofstream File(Root + "/" + getFilename(MetaData));
 
         File << Body;
@@ -65,7 +65,7 @@ std::string Respond::ParseBody(void)
 
 std::string Respond::sendSuccesfulUpload(std::string MetaData)
 {
-    std::string Root = _server.getRoot();
+    std::string Root = "data/www"; // Needs to change to location root
     std::string FileName = getFilename(MetaData);
     std::string RelativePath = Root + "/" + FileName;
 

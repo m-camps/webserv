@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/07 17:03:37 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/09 12:24:34 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,8 +194,6 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 	{
 			{"listen", &Parse::parseListen},
 			{"server_name", &Parse::parseServerName},
-			{"root", &Parse::parseRoot},
-			{"index", &Parse::parseIndex},
 			{"client_body_size", &Parse::parseClientBodySize},
 			{"error_page", &Parse::parseErrorPage},
 	};
@@ -238,15 +236,6 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 }
 
 /* Dispatch Table Server Functions */
-void    Parse::parseRoot(Server& server, Line& line)
-{
-	if (line.size() != 2)
-		throw (ExceptionBuilder("root directive incorrect"));
-	else if(server.getRoot() != "")
-		throw (ExceptionBuilder("duplicate root"));
-	server.setRoot(line[1]);
-}
-
 void    Parse::parseListen(Server& server, Line& line)
 {
 	if (line.size() != 2)
@@ -260,15 +249,6 @@ void    Parse::parseListen(Server& server, Line& line)
 	if (std::find(ports.begin(), ports.end(), port) != ports.end())
 		throw (ExceptionBuilder("Duplicate port"));
 	server.addToPorts(port);
-}
-
-void    Parse::parseIndex(Server& server, Line& line)
-{
-	if (line.size() != 2)
-		throw (ExceptionBuilder("index directive incorrect"));
-	else if(server.getIndex() != "")
-		throw (ExceptionBuilder("duplicate index"));
-	server.setIndex(line[1]);
 }
 
 void    Parse::parseServerName(Server& server, Line& line)
@@ -354,11 +334,11 @@ void	Parse::parseLocationAllowMethod(Location& location, Line& line)
 
 void	Parse::parseLocationAutoIndex(Location& location, Line& line)
 {
-	int		autoindex = -1;
+	int		autoindex = 0;
 	
 	if (line.size() != 2)
 		throw (ExceptionBuilder("autoindex location directive incorrect"));
-	else if(location.getAutoIndex() != -1)
+	if(location.getAutoIndex() != -1)
 		throw (ExceptionBuilder("duplicate autoindex in location"));
 	if (line[1] == "on")
 		autoindex = 1;
@@ -442,16 +422,15 @@ bool Parse::isNumber(const std::string& s)
 
 bool    Parse::isServerDirective(std::string& directive)
 {
-	return (directive == "server_name" || directive == "root" || \
-			directive == "index" || directive == "client_body_size" || \
-			directive == "listen" || directive == "error_page" || directive == "allow_methods");
+	return (directive == "server_name" || directive == "client_body_size" || \
+			directive == "listen" || directive == "error_page");
 }
 
 bool    Parse::isLocationDirective(std::string& directive)
 {
 	return (directive == "root" || directive == "index" ||
 			directive == "allow_methods" || directive == "autoindex" ||
-			directive == "cgi_name" || directive == "cgi_ext");
+			directive == "cgi_name" || directive == "cgi_ext" || directive == "return");
 }
 
 std::invalid_argument Parse::ValidateException(std::string error, int block)
@@ -483,10 +462,6 @@ void	Parse::validateServer(Server& server, int block)
 		throw(ValidateException("Ports not set", block));
 	else if (server.getNames().empty())
 		throw(ValidateException("Server name not set", block));
-	else if (server.getRoot() == "")
-		throw(ValidateException("Root not set", block));
-	else if (server.getIndex() == "")
-		throw(ValidateException("Index not set", block));
 	else if (server.getClientBodySize() == -1)
 		throw(ValidateException("ClientBodySize not set", block));
 
@@ -497,22 +472,23 @@ void	Parse::validateServer(Server& server, int block)
 			throw(ValidateException("Location name not set", block));
 		validateLocation(it->second, block);
 	}
+	server.setLocations(locations);
 }
 
 void	Parse::validateLocation(Location& location, int block)
 {
 	if (location.getName() == "")
 		throw(ValidateException("Location name not set in", block));
-	else if (location.getRoot() == "")
-		throw(ValidateException("Location root not set in location: " + location.getName(), block));
-	else if (location.getIndex() == "")
-		throw(ValidateException("Location index not set in location: " + location.getName(), block));
-	else if (location.getAutoIndex() == -1)
-		throw(ValidateException("Location autoindex not set in location: " + location.getName(), block));
-	else if (location.getAllowMethods().empty())
-		throw(ValidateException("Location allow_methods not set in location: " + location.getName(), block));
-	else if (location.getCgiFileExtension() == "")
-		throw(ValidateException("Location cgi_ext not set in location: " + location.getName(), block));
-	else if (location.getCgiName() == "")
-		throw(ValidateException("Location cgi_name not set in location: " + location.getName(), block));
+	if (location.getRoot() == "")
+		location.setRoot("data/www");
+	if (location.getIndex() == "")
+		location.setIndex("index.html");
+	if (location.getAllowMethods().empty())
+	{ 
+		location.addToAllowMethod("POST");
+		location.addToAllowMethod("GET");
+		location.addToAllowMethod("DELETE");
+	}
+	if (location.getAutoIndex() == -1)
+		location.setAutoIndex(0);
 }

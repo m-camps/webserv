@@ -6,7 +6,7 @@
 
 void Respond::BuildRedir(void)
 {
-    const std::string NewLocation = _server.getIndex();
+    const std::string NewLocation = "index.html"; // Needs to change to location index
 
     addToHeader(Generator::generateStatus(*this));
     addToHeader(Generator::generateLocation(NewLocation));
@@ -20,7 +20,7 @@ void Respond::buildGet(void)
     {
         std::string FileContent;
         std::string relativePath;
-        std::string Root = _server.getRoot();
+        std::string Root = "data/www"; // Needs to change to location root
         std::string Path = getEntryFromMap("Path");
 
         relativePath = Root + Path;
