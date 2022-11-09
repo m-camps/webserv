@@ -1,0 +1,15 @@
+
+
+- Parse Config File
+- Make sockets in Network based on total ports
+- Distribute port fd's to servers who need it
+- Poll()
+- If socket fd: Accept Connection based on fd
+- If client fd: Extract all possible servers based on the fd
+- Send to Exchange -> all possible servers (std::vector<Servers>), current_fd(int), requestStr(std::string)
+- Exchange:
+	- Parse requestStr
+	- Based on requestData matchServer() -> returns Server(Server)
+	- Based on requestData and server matchLocation() -> returns locationName(std::string)
+	- Response(requestData(map<std::string, std::string>), server(Server), locationName(std::string))
+	
