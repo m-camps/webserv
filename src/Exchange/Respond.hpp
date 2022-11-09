@@ -22,12 +22,12 @@ typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
 
 uint32_t modifyStatusCode(const std::string&, const std::string&);
-bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods);
 
 class Respond
 {
 	public:
-		explicit Respond(Server& server);
+		explicit Respond(Server& server, Location& location);
 		~Respond(void);
 
 		/* Getters */
@@ -57,11 +57,12 @@ class Respond
 		Respond(const Respond&);
 		Respond& operator=(const Respond&);
 
-		Server			_server;
+		const Server	_server;
+        const Location  _location;
 		HashMap			_requestData;
 		std::string 	_header;
 		std::string 	_body;
-		int				_status_code;
+		int32_t			_status_code;
 		bool			_isChunked;
 
         // Tijdeijk
@@ -79,6 +80,7 @@ class Respond
 		std::string 	ParseBody(void);
 		void 			putBodyInFile(std::string&, std::string&);
 		void			createResponse(const std::string&);
+        void            parseLocation(void);
 };
 
 /* --- Structs --- */

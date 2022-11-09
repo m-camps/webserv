@@ -6,11 +6,8 @@
 
 void Respond::BuildRedir(void)
 {
-    const std::string NewLocation = "index.html"; // Needs to change to location index
-
-    addToHeader(Generator::generateStatus(*this));
-    addToHeader(Generator::generateLocation(NewLocation));
-    setBody("");
+    createResponse("");
+    addToHeader(Generator::generateLocation(_location.getIndex())); // Needs to change to location index
 }
 
 void Respond::buildGet(void)

@@ -16,8 +16,13 @@ Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
 {
 	try
 	{
+        std::map<std::string, Location> Locations = _server.getLocations();
+        std::map<std::string, Location>::iterator it = Locations.find("/php");
+        if (it == Locations.end())
+            throw (std::runtime_error("Location does not exists"));
+
 		Request request;
-		Respond	response(server);
+		Respond	response(server, it->second);
 		HashMap	requestData;
 
 		requestData = request.parseRequest(requestStr);

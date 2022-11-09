@@ -100,8 +100,9 @@ void Network::run()
                     else
                     {
                         RequestStr.append(buff, ret);
-                        //                    std::size_t found = RequestStr.find(SEPERATOR);
-                        if (ret != BUFF) {
+                        std::size_t found = RequestStr.find(SEPERATOR);
+                        if (ret != BUFF && found != std::string::npos)
+                        {
                             Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
                             RequestStr.erase();
                         }

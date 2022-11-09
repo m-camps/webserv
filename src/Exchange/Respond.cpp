@@ -10,7 +10,8 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Server& server) : _server(server), _status_code(200), _isChunked(false) {}
+Respond::Respond(Server& server, Location& location)
+    : _server(server), _location(location) ,_status_code(200), _isChunked(false) {}
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -70,6 +71,26 @@ void    Respond::createResponse(const std::string& FileContent)
 
 /* //////////////////////////// */
 
+void Respond::parseLocation(void)
+{
+}
+
+/* //////////////////////////// */
+
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods)
+{
+    std::vector<std::string>::iterator it = AllowedMethods.begin();
+
+    for (; it != AllowedMethods.end(); it++)
+    {
+        if (Method == *it)
+            return (true);
+    }
+    return (false);
+}
+
+/* //////////////////////////// */
+
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
@@ -85,14 +106,16 @@ void 	Respond::buildResponse(HashMap requestData)
                 {"DELETE", &Respond::buildDelete}
         };
 
-        for (int32_t i = 0; i < 3; i++) {
-            if (Method == CompareMethods[i].Method) {
-                FuncPointer = CompareMethods[i].FuncPointer;
-                (this->*FuncPointer)();
-                return;
+        if (MethodIsAllowed(Method, _location.getAllowMethods()) == true)
+        {
+            for (int32_t i = 0; i < 3; i++) {
+                if (Method == CompareMethods[i].Method) {
+                    FuncPointer = CompareMethods[i].FuncPointer;
+                    (this->*FuncPointer)();
+                    return;
+                }
             }
         }
-
         _status_code = e_MethodNotFound;
         createResponse(Generator::generateDefaulPage(_status_code));
     }
