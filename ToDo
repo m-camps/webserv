@@ -13,3 +13,6 @@
 	- Based on requestData and server matchLocation() -> returns locationName(std::string)
 	- Response(requestData(map<std::string, std::string>), server(Server), locationName(std::string))
 	
+TODO:
+- Make recv only stop on seperator(CLRF)
+- No default location add location
