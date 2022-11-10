@@ -12,13 +12,12 @@ Request::~Request(void) {}
 
 ////////////// Functions //////////////
 
-HashMap		Request::parseRequest(std::string requestStr)
+HashMap		Request::parseRequest(const std::string& requestStr)
 {
 	try
 	{
+        std::cout << requestStr << std::endl;
 		const std::string Header = AppendRequest(requestStr);
-//        if (isPrintable(Header.c_str()) == false)
-//            throw (std::logic_error("Header has non-Printable characters"));
 		stringToMap(Header);
 	}
 	catch(const std::exception& e)
