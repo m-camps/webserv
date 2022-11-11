@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 18:00:58 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 11:57:11 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void Network::setup(std::string file)
 	// {
 	// 	std::cout << _servers.at(i) << "\n";
 	// }
-	createFds();
+	createPoll();
 	_max_fd = _total_fd;
 }
 
@@ -93,6 +93,7 @@ void			Network::setupSocketFds(void)
 		_total_fd++;
 	}
 }
+
 int		Network::createSocket(void)
 {
 	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
@@ -165,22 +166,21 @@ void Network::run()
     //check if both location is seen here
     while (true)
     {
-        if (poll(_fds, _total_fd, -1) == -1)
+        if (poll(_poll.data(), _poll.size(), -1) == -1)
         {
             perror("In poll: ");
-            free(_fds);
             exit(ERROR);
         }
-        for (int i = 0; i < _total_fd; i++)
+        for (size_t i = 0; i < _poll.size(); i++)
         {
-            struct pollfd cur = _fds[i];
+            struct pollfd cur = _poll.at(i);
             if ((cur.revents & POLLIN))
             {
                 if (isSocketFd(cur.fd))
                 {
                     Server *server = getServerBySocketFd(cur.fd);
                     int newFd = server->acceptConnection(cur.fd);
-                    addToPollFds(newFd);
+					_poll.push_back(newPoll(newFd));
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << newFd << std::endl;
                 }
@@ -195,7 +195,8 @@ void Network::run()
                         else
                             std::perror("In recv: ");
                         close(cur.fd);
-                        delFromPollFds(i);
+						_poll.erase(_poll.begin() + i);
+						break ;
                     }
                     else
                     {
@@ -212,52 +213,13 @@ void Network::run()
     }
 }
 
-void	Network::createFds(void)
+void	Network::createPoll(void)
 {
-	_fds = (pollfd*)malloc((_total_fd) * sizeof(pollfd));
-	if (!_fds)
-	{
-		perror("Malloc: ");
-		exit(EXIT_FAILURE);
-	}
-	
-	int j = 0;
 	for (std::map<int, int>::iterator it = _port_fds.begin(); it != _port_fds.end();it++)
-	{
-		_fds[j] = createNewPollfd(it->second);
-		j++;
-	}
-	if (1)
-	{
-		std::cout << "File descriptors in use: [";
-		for (int i = 0; i < _total_fd; i++)
-			std::cout << ((i != 0) ? "," : "") << _fds[i].fd;
-		std::cout << "]\n";
-	}
+		_poll.push_back(newPoll(it->second));
 }
 
-void	Network::addToPollFds(int fd)
-{
-	if (_total_fd >= _max_fd)
-	{
-		_max_fd *= 2;
-		struct pollfd *tmp = (pollfd*)realloc(_fds, _max_fd * sizeof(pollfd));
-		if (!tmp)
-			exit(ERROR);
-		_fds = tmp;
-	}
-	_fds[_total_fd] = createNewPollfd(fd);
-	_buffer.insert(std::pair<int, std::string>(fd, ""));
-	_total_fd++;
-}
-
-void	Network::delFromPollFds(int i)
-{
-	_fds[i] = _fds[_total_fd - 1];
-	_total_fd--;
-}
-
-struct pollfd Network::createNewPollfd(int fd)
+struct pollfd Network::newPoll(int fd)
 {
 	struct pollfd newFd;
 

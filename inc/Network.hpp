@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 17:59:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 11:56:21 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Network
 		std::vector<Server> 					_servers; 			// All the servers
 		ServerConfig 							_serverConfigs; 	// Vector that holds the server configs (can be deleted later on)
 		struct pollfd*							_fds; 				// Struct used for the FD's poll monitors
+		std::vector<struct pollfd>				_poll;
 		int										_total_fd;			// Total active fd's
 		std::map<int, int>						_port_fds;			// All ports linked to a fd
 		int										_max_fd; 			// Max total fd's
@@ -45,9 +46,9 @@ class Network
 		void	createFds();
 
 		/* _fds manipulation */
-		void				addToPollFds(int fd);
-		void				delFromPollFds(int i);
-		struct pollfd 		createNewPollfd(int fd);
+		// void				addToPollFds(int fd);
+		// void				delFromPollFds(int i);
+		// struct pollfd 		createNewPollfd(int fd);
 
 		/* Setup Sockets*/
 		void					setupSocketFds(void);
@@ -59,6 +60,9 @@ class Network
 		void					listen(int socket_fd);
 
 		void					linkSocketsToServers(void);
+
+		struct pollfd 			newPoll(int fd);
+		void					createPoll(void);
 
 		/* Helper methods */
 		bool		isSocketFd(int fd);
