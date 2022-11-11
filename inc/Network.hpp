@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:18:17 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:26:33 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ class Network
 	private:
 		Servers 								_servers; 			// All the servers
 		std::vector<struct pollfd>				_poll;				// Vector containing all poll structs
-		std::map<int, int>						_port_fds;			// <port, fd>		
+		std::map<int, int>						_port_fds;			// <port, fd>
+		std::vector<int>						_socket_fds;				
 		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
 		std::map<int, Servers>					_servers_in_socket; // <fd,std::vector<Server>> all servers corrosponding with that fd
 		

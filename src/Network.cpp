@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:19:10 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:28:47 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void Network::setup(std::string file)
 	
 	try
 	{
-		std::vector<Server> servers;
+		Servers servers;
 		
 		_servers = parser.parseNetwork(file, servers);
 		std::cout << "----PARSING COMPLETE----" << std::endl;
@@ -52,7 +52,7 @@ void Network::setup(std::string file)
 	createPoll();
 }
 
-void			Network::linkSocketsToServers(void)
+void			Network::linkSocketsToServers(void)/* DELETE SOON */
 {
 	for (std::vector<Server>::iterator serv_it = _servers.begin(); serv_it != _servers.end(); serv_it++)
 	{
@@ -84,7 +84,8 @@ void			Network::setupSocketFds(void)
 		listen(socket_fd);
 		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 		setupServersInSocket(port, socket_fd);
-		_port_fds.insert(std::pair<int, int>(port, socket_fd));
+		_port_fds.insert(std::pair<int, int>(port, socket_fd)); /* DELETE SOON */
+		_socket_fds.push_back(socket_fd);
 	}
 }
 
@@ -234,8 +235,8 @@ void Network::run()
 
 void	Network::createPoll(void)
 {
-	for (std::map<int, int>::iterator it = _port_fds.begin(); it != _port_fds.end();it++)
-		_poll.push_back(newPoll(it->second));
+	for (std::map<int, Servers>::iterator it = _servers_in_socket.begin(); it != _servers_in_socket.end(); it++)
+		_poll.push_back(newPoll(it->first));
 }
 
 struct pollfd Network::newPoll(int fd)
@@ -251,12 +252,18 @@ struct pollfd Network::newPoll(int fd)
 /* Helper functions */ 
 bool	Network::isSocketFd(int fd)
 {
-	for (int i = 0; i < (int)_servers.size(); i++)
+	for (std::vector<int>::iterator it = _socket_fds.begin(); it != _socket_fds.end(); it++)
 	{
-		if (_servers.at(i).isSocketFdInServer(fd))
+		if (*it == fd)
 			return true;
 	}
 	return false;
+	// for (int i = 0; i < (int)_servers.size(); i++)
+	// {
+	// 	if (_servers.at(i).isSocketFdInServer(fd))
+	// 		return true;
+	// }
+	// return false;
 }
 
 Server*	Network::getServerBySocketFd(int fd)
