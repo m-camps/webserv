@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 11:57:11 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 12:00:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@ void Network::setup(std::string file)
 	Parse				parser;
 	std::vector<Server> tmp;
 	
-	_total_fd = 0;
 	try
 	{
 		_servers = parser.parseNetwork(file, tmp);
@@ -49,13 +48,7 @@ void Network::setup(std::string file)
 
 	setupSocketFds();
 	linkSocketsToServers();
-
-	// for (size_t i = 0; i < _servers.size(); i++)
-	// {
-	// 	std::cout << _servers.at(i) << "\n";
-	// }
 	createPoll();
-	_max_fd = _total_fd;
 }
 
 void			Network::linkSocketsToServers(void)
@@ -90,7 +83,6 @@ void			Network::setupSocketFds(void)
 		listen(socket_fd);
 		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 		_port_fds.insert(std::pair<int, int>(port, socket_fd));
-		_total_fd++;
 	}
 }
 
