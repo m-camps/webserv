@@ -16,10 +16,10 @@ Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
 {
 	try
 	{
-        std::map<std::string, Location> Locations = _server.getLocations();
-        std::map<std::string, Location>::iterator it = Locations.find("/php");
-        if (it == Locations.end())
-            throw (std::runtime_error("Location does not exists"));
+        // std::map<std::string, Location> Locations = _server.getLocations();
+        // std::map<std::string, Location>::iterator it = Locations.find("/php");
+        // if (it == Locations.end())
+        //     throw (std::runtime_error("Location does not exists"));
 
 		Request request;
 		HashMap	requestData;
@@ -29,7 +29,7 @@ Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
 		Server server = matchServer(servers, requestData);
 		Location location = matchLocation(server, requestData);
 
-		Respond	response(server);
+		Respond	response(server, location);
 		response.buildResponse(requestData);
 		sendToClient(response);
 	}
