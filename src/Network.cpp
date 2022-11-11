@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 12:10:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:19:10 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Network::~Network() {}
 void Network::setup(std::string file)
 {
 	Parse				parser;
-	
 	
 	try
 	{
@@ -84,8 +83,36 @@ void			Network::setupSocketFds(void)
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
 		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
+		setupServersInSocket(port, socket_fd);
 		_port_fds.insert(std::pair<int, int>(port, socket_fd));
 	}
+}
+
+void	Network::setupServersInSocket(int port, int socket_fd)
+{
+	Servers servers;
+
+	for (Servers::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		std::vector<int> ports = (*it).getPorts();
+		if (std::find(ports.begin(), ports.end(), port) != ports.end())
+		{
+			servers.push_back(*it);
+		}
+	}
+	_servers_in_socket.insert(std::pair<int, Servers >(socket_fd, servers));
+}
+
+void	Network::addClientToServersInSocket(int socket_fd, int client_fd)
+{
+	Servers servers = _servers_in_socket.find(socket_fd)->second;
+
+	_servers_in_socket.insert(std::pair<int, Servers >(client_fd, servers));
+}
+
+void	Network::delClientFromServersInSocket(int client_fd)
+{
+	_servers_in_socket.erase(client_fd);
 }
 
 int		Network::createSocket(void)
@@ -133,9 +160,9 @@ struct sockaddr_in *	Network::makeSocketAddr(int port)
 std::vector<int> Network::extractListens(void)
 {
 	std::vector<int>	listens;
-	for (std::vector<Server>::iterator serv_it = _servers.begin(); serv_it != _servers.end(); serv_it++)
+	for (std::vector<Server>::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		std::vector<int> ports = (*serv_it).getPorts();
+		std::vector<int> ports = (*it).getPorts();
 		for (std::vector<int>::iterator it = ports.begin(); it != ports.end(); it++)
 		{
 			if (std::find(listens.begin(), listens.end(), *it) == listens.end())
@@ -149,10 +176,10 @@ std::vector<int> Network::extractListens(void)
 /* do we need to use select with the bitflags? */
 void Network::run()
 {
-	for (size_t i = 0; i < _servers.size(); i++)
-	{
-		std::cout << _servers.at(i) << "\n";
-	}
+	// for (size_t i = 0; i < _servers.size(); i++)
+	// {
+	// 	std::cout << _servers.at(i) << "\n";
+	// }
     char buff[BUFF]; //  test buffer (can change later or keep it here)
     std::string RequestStr;
     //check if both location is seen here
