@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:26:33 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:34:39 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,12 @@ class Network
 		void					bind(int socket_fd, struct sockaddr_in* address_in);
 		void					listen(int socket_fd);
 
+		int						acceptConnection(int socket_fd);
 		void					linkSocketsToServers(void);
 
 		/* Helper methods */
 		bool		isSocketFd(int fd);
 		Server* 	getServerBySocketFd(int fd);
 		Server*		getServerByClientFd(int fd);
+		Servers		getServersByFd(int fd);
 };

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:28:47 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:38:35 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,22 @@ void Network::setup(std::string file)
 	setupSocketFds();
 	linkSocketsToServers();
 	createPoll();
+}
+
+int		Network::acceptConnection(int socket_fd)
+{
+	struct  sockaddr_in			client_addr;
+	socklen_t					client_addrlen = sizeof(client_addr);
+	
+	int	client_fd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
+	if (client_fd == -1)
+	{
+		std::perror("In accept: ");
+		std::exit(EXIT_FAILURE);
+	}
+	addClientToServersInSocket(socket_fd, client_fd);
+	_poll.push_back(newPoll(client_fd));
+	return (client_fd);
 }
 
 void			Network::linkSocketsToServers(void)/* DELETE SOON */
@@ -198,9 +214,7 @@ void Network::run()
             {
                 if (isSocketFd(cur.fd))
                 {
-                    Server *server = getServerBySocketFd(cur.fd);
-                    int client_fd = server->acceptConnection(cur.fd);
-					_poll.push_back(newPoll(client_fd));
+					int client_fd = acceptConnection(cur.fd);
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << client_fd << std::endl;
                 }
@@ -223,8 +237,9 @@ void Network::run()
                         RequestStr.append(buff, ret);
                         //                    std::size_t found = RequestStr.find(SEPERATOR);
                         if (ret != BUFF) {
-                            Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
+                            Exchange exchange(getServersByFd(cur.fd).front(), cur.fd, RequestStr);
                             RequestStr.erase();
+							std::cout << "Reponse on fd: " << cur.fd << std::endl;
                         }
                     }
                 }
@@ -284,4 +299,9 @@ Server*	Network::getServerByClientFd(int fd)
 			return &_servers.at(i);
 	}
 	return NULL;
+}
+
+Servers	Network::getServersByFd(int fd)
+{
+	return (_servers_in_socket.find(fd)->second);
 }
