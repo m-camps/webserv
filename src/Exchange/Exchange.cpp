@@ -11,16 +11,20 @@
 Exchange::Exchange(void) : _socketFd(0) {}
 Exchange::~Exchange(void) {}
 
-Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
-    : _server(server), _socketFd(socketFd)
+Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
+    : _socketFd(socketFd)
 {
 	try
 	{
 		Request request;
-		Respond	response(server);
 		HashMap	requestData;
 
 		requestData = request.parseRequest(requestStr);
+
+		Server server = matchServer(servers, requestData);
+		Location location = matchLocation(server, requestData);
+
+		Respond	response(server);
 		response.buildResponse(requestData);
 		sendToClient(response);
 	}
@@ -28,6 +32,69 @@ Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
 	{
 		std::cerr << e.what() << std::endl;
 	}
+}
+
+Server		Exchange::matchServer(Servers servers, HashMap requestData)
+{
+	Server		server = servers.front();
+	std::string host = requestData.find("Host")->second;
+
+	for (Servers::iterator it = servers.begin(); it != servers.end(); it++)
+	{
+		std::vector<std::string> names = (*it).getNames();
+		if (std::find(names.begin(), names.end(), host) != names.end())
+			return (*it);
+	}
+	return (server);
+}
+
+std::vector<std::string> 	splitLineWithStrtok(std::string& line, const std::string& delimit)
+{
+	char						*word;
+	std::vector<std::string> 	ret;
+	char						*c_line = strdup(line.c_str());
+
+    if (!c_line)
+    {
+        std::perror("In malloc: ");
+        std::exit(EXIT_FAILURE);
+    }
+	word = strtok(c_line, delimit.c_str());
+	while (word != NULL)
+	{
+		ret.push_back(word);
+		word = strtok(NULL, delimit.c_str());
+	}
+	free(c_line);
+	return ret;
+}
+
+Location	Exchange::matchLocation(Server server, HashMap requestData)
+{
+	Locations locations = server.getLocations();
+	std::string route = requestData.find("Path")->second;
+	std::string loc = "/";
+	std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
+	int longestMatch = 0;
+
+	for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
+	{
+		std::string name = it->first;
+		std::vector<std::string> splitName = splitLineWithStrtok(name, "/");
+		int match = 0;
+		
+		for (size_t i = 0; i < splitRoute.size() && i < splitName.size(); i++)
+		{
+			if (splitRoute[i] == splitName[i])
+				match++;
+		}
+		if (match > longestMatch)
+		{
+			longestMatch = match;
+			loc = name;
+		}
+	}
+	return (server.getLocations().find(loc)->second);
 }
 
 #pragma endregion ctoranddtor

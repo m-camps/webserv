@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:47:40 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 14:39:59 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,5 +59,6 @@ class Server
 		std::map<int, std::string>					_error_pages;				// Map of error pages
 };
 
+typedef std::vector<Server>	Servers;
 /* Stream overload */
 std::ostream& operator<<(std::ostream& stream, const Server& Server);

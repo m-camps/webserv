@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 14:26:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 14:39:26 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,6 @@
 #include <poll.h>
 #include <iostream>
 #include <fstream>
-
-typedef std::vector<Server>	Servers;
 
 class Network
 {

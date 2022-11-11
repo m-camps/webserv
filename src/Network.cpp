@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 14:27:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 14:59:34 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,9 @@ void Network::run()
                     else
                     {
                         RequestStr.append(buff, ret);
-                        //                    std::size_t found = RequestStr.find(SEPERATOR);
-                        if (ret != BUFF) {
-                            Exchange exchange(getServersByFd(cur.fd).front(), cur.fd, RequestStr);
+                    	std::size_t found = RequestStr.find(SEPERATOR);
+                        if (ret != BUFF && found != std::string::npos) {
+                            Exchange exchange(getServersByFd(cur.fd), cur.fd, RequestStr);
                             RequestStr.erase();
 							std::cout << "Reponse on fd: " << cur.fd << std::endl;
                         }
