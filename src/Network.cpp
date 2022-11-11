@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 12:00:02 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 12:10:03 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,13 @@ Network::~Network() {}
 void Network::setup(std::string file)
 {
 	Parse				parser;
-	std::vector<Server> tmp;
+	
 	
 	try
 	{
-		_servers = parser.parseNetwork(file, tmp);
+		std::vector<Server> servers;
+		
+		_servers = parser.parseNetwork(file, servers);
 		std::cout << "----PARSING COMPLETE----" << std::endl;
 	}
 	catch(std::exception& e)
@@ -65,7 +67,7 @@ void			Network::linkSocketsToServers(void)
 	}
 	for (std::map<int,int>::iterator it = _port_fds.begin(); it != _port_fds.end(); it++)
 	{
-		std::cout << it->first << "," << it->second << std::endl;
+		std::cout << "Port: "<< it->first << " linked to fd: " << it->second << std::endl;
 	}
 }
 
@@ -140,8 +142,6 @@ std::vector<int> Network::extractListens(void)
 				listens.push_back(*it);
 		}
 	}
-	for (std::vector<int>::iterator it = listens.begin(); it != listens.end(); it++)
-		std::cout << *it << "," <<  std::endl;
 	return (listens);
 }
 
@@ -171,10 +171,10 @@ void Network::run()
                 if (isSocketFd(cur.fd))
                 {
                     Server *server = getServerBySocketFd(cur.fd);
-                    int newFd = server->acceptConnection(cur.fd);
-					_poll.push_back(newPoll(newFd));
+                    int client_fd = server->acceptConnection(cur.fd);
+					_poll.push_back(newPoll(client_fd));
                     std::cout << "New connection" << "\n";
-                    std::cout << "On FD " << newFd << std::endl;
+                    std::cout << "On FD " << client_fd << std::endl;
                 }
                 else
                 {

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 12:00:12 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 12:03:58 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Network
 	private:
 		std::vector<Server> 					_servers; 			// All the servers
 		std::vector<struct pollfd>				_poll;
-		std::map<int, int>						_port_fds;			// All ports linked to a fd
+		std::map<int, int>						_port_fds;			// <port, fd>
 		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
 		
 		/* Orthodox canonical class BS */
