@@ -14,7 +14,7 @@ void Respond::buildDelete(void)
 		std::string Path = getEntryFromMap("Path");
 
         relativePath = Root + Path;
-        _status_code = modifyStatusCode(Path, relativePath);
+        getStatuscode(Path, relativePath);
 
         deleteFile(relativePath);
         createResponse("");

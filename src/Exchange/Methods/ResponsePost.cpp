@@ -33,34 +33,36 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
     }
 }
 
-std::string Respond::ParseBody(void)
+std::string Respond::removeBoundry(void)
 {
-	std::string ContentFile;
-
     try
     {
-        std::size_t found;
         std::string RequestBody = getEntryFromMap("Body");
         std::string Boundry = Generator::generateBoundry(*this);
 
         RequestBody.erase(0, Boundry.length() + 5);
         RequestBody.erase(RequestBody.length() - Boundry.length() - 6, Boundry.length() + 6);
-
-        for (int32_t i = 0; i < 3; i++)
-        {
-            found = RequestBody.find(CRLF);
-             _MetaData.append(RequestBody, 0, found);
-             _MetaData += "\n";
-            RequestBody.erase(0, found + 2);
-        }
-        ContentFile = RequestBody.substr(0, RequestBody.length());
+        return (RequestBody);
     }
     catch (const std::exception& e)
     {
-        throw (std::logic_error("POST could not be handled"));
+        throw (std::runtime_error("Could not find boundry"));
     }
+}
 
-    return (ContentFile);
+std::string Respond::parseMetadata(std::string& RequestBody)
+{
+    std::size_t found;
+    std::string MetaData;
+
+    for (int32_t i = 0; i < 3; i++)
+    {
+        found = RequestBody.find(CRLF);
+        MetaData.append(RequestBody, 0, found);
+        MetaData += "\n";
+        RequestBody.erase(0, found + 2);
+    }
+    return (MetaData);
 }
 
 std::string Respond::sendSuccesfulUpload(std::string MetaData)
@@ -78,19 +80,20 @@ void Respond::buildPost(void)
     try
     {
         std::string MetaData;
-        std::string BodyContent;
         std::string Body = getEntryFromMap("Body");
 
-        Body = ParseBody();
-        putBodyInFile(_MetaData, Body);
+        Body = removeBoundry();
+        MetaData = parseMetadata(Body);
+        putBodyInFile(MetaData, Body);
 
-        BodyContent = sendSuccesfulUpload(_MetaData);
-
-        createResponse(BodyContent);
+        Body.clear();
+        Body = sendSuccesfulUpload(MetaData);
+        createResponse(Body);
     }
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-        throw (e);
+        _status_code = e_InternalServerError;
+        createResponse(Generator::generateDefaulPage(_status_code));
     }
 }

@@ -16,6 +16,11 @@ Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
 {
 	try
 	{
+        std::map<std::string, Location> Locations = _server.getLocations();
+        std::map<std::string, Location>::iterator it = Locations.find("/php");
+        if (it == Locations.end())
+            throw (std::runtime_error("Location does not exists"));
+
 		Request request;
 		HashMap	requestData;
 
@@ -117,10 +122,10 @@ void	Exchange::sendToClient(Respond& response)
 {
 	sendNormal(response.getHeader());
 	sendNormal(CRLF);
-//	if (response.getBody().length() < MAXBYTES)
+	if (response.IsChunked() == false)
 		sendNormal(response.getBody());
-//	else
-//		sendChunked(response.getBody());
+	else
+		sendChunked(response.getBody());
 }
 
 void	Exchange::sendChunked(std::string str)

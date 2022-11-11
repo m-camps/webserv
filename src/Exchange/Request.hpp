@@ -23,7 +23,7 @@ public:
     Request(const Request&);
     ~Request(void);
 
-	HashMap		parseRequest(std::string requestStr);
+	HashMap		parseRequest(const std::string& requestStr);
 
 private:
    

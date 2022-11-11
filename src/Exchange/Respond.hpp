@@ -21,13 +21,12 @@
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
 
-uint32_t modifyStatusCode(const std::string&, const std::string&);
-bool MethodIsAllowed(const std::string& Method, std::vector<std::string>& AllowedMethods);
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods);
 
 class Respond
 {
 	public:
-		explicit Respond(Server& server);
+		explicit Respond(Server& server, Location& location);
 		~Respond(void);
 
 		/* Getters */
@@ -50,22 +49,20 @@ class Respond
 		void 			buildResponse(HashMap	requestData);
 
 		/* Interface */
-		std::string 	getEntryFromMap(std::string	entry);
+		std::string 	getEntryFromMap(const std::string&	entry);
 
 	private:
 		Respond(void);
 		Respond(const Respond&);
 		Respond& operator=(const Respond&);
 
-		Server			_server;
+		const Server	_server;
+        const Location  _location;
 		HashMap			_requestData;
 		std::string 	_header;
 		std::string 	_body;
-		int				_status_code;
+		int32_t			_status_code;
 		bool			_isChunked;
-
-        // Tijdeijk
-        std::string _MetaData;
 
 		/* Build functions */
 		void 			BuildRedir(void);
@@ -74,11 +71,15 @@ class Respond
 		void 			buildDelete(void);
 
 		/* Helper functions */
-		std::string 	getValidFile(std::string, const std::string&, uint32_t);
+		std::string 	getValidFile(const std::string&);
 		std::string		sendSuccesfulUpload(std::string);
-		std::string 	ParseBody(void);
 		void 			putBodyInFile(std::string&, std::string&);
 		void			createResponse(const std::string&);
+        std::string     removeBoundry();
+        std::string     parseMetadata(std::string&);
+        void            parsePath(std::string&);
+        void            getStatuscode(const std::string&, const std::string&);
+
 };
 
 /* --- Structs --- */
@@ -99,5 +100,6 @@ enum e_statusCode
     e_Forbidden = 401,
     e_NotFound = 404,
     e_MethodNotFound = 405,
-	e_InternalServerError = 500
+	e_InternalServerError = 500,
+    e_NotImplemented = 501
 };

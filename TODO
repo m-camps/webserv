@@ -11,7 +11,7 @@
 	- Parse requestStr
 	- Based on requestData matchServer() -> returns Server(Server)
 	- Based on requestData and server matchLocation() -> returns locationName(std::string)
-	- Response(requestData(map<std::string, std::string>), server(Server), locationName(std::string))
+	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
 - Make recv only stop on seperator(CLRF)
@@ -22,3 +22,5 @@ TODO:
 
 1 socket_fd multiple servers
 1 client_fd multiple possible Servers
+
+	

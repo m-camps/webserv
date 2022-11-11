@@ -6,11 +6,18 @@
 
 void Respond::BuildRedir(void)
 {
-    const std::string NewLocation = "index.html"; // Needs to change to location index
+    createResponse("");
+    addToHeader(Generator::generateLocation(_location.getIndex()));
+}
 
-    addToHeader(Generator::generateStatus(*this));
-    addToHeader(Generator::generateLocation(NewLocation));
-    setBody("");
+void Respond::parsePath(std::string& Path)
+{
+    const std::string LocationName = _location.getName();
+    std::size_t found = Path.find(LocationName);
+
+    if (found == std::string::npos)
+        return ;
+    Path.erase(0, found + LocationName.size());
 }
 
 void Respond::buildGet(void)
@@ -20,14 +27,13 @@ void Respond::buildGet(void)
     {
         std::string FileContent;
         std::string relativePath;
-        std::string Root = "data/www"; // Needs to change to location root
+        std::string Root = _location.getRoot();
         std::string Path = getEntryFromMap("Path");
 
+        parsePath(Path);
         relativePath = Root + Path;
-        _status_code = modifyStatusCode(Path, relativePath);
-
-        FileContent = getValidFile(Root, relativePath, _status_code);
-
+        getStatuscode(Path, relativePath); // Change name
+        FileContent = getValidFile(relativePath);
         createResponse(FileContent);
     }
     catch (const std::exception& e)

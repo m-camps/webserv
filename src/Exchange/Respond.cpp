@@ -10,7 +10,8 @@
 
 ////////// Ctor & Dtor ///////////
 
-Respond::Respond(Server& server) : _server(server), _status_code(200), _isChunked(false) {}
+Respond::Respond(Server& server, Location& location)
+    : _server(server), _location(location) ,_status_code(200), _isChunked(false) {}
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -46,15 +47,24 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
-uint32_t modifyStatusCode(const std::string& Path, const std::string& relativePath)
+void Respond::getStatuscode(const std::string& Path, const std::string& relativePath)
 {
-    if (isForbiddenPath(Path))
-        return (e_Forbidden);
+    if (isForbiddenPath(Path) == true)
+    {
+        _status_code = e_Forbidden;
+        return ;
+    }
     if ("/" == Path)
-        return (e_Redir);
+    {
+        _status_code = e_Redir;
+        return ;
+    }
     if (access(relativePath.c_str(), R_OK) != 0)
-        return (e_NotFound);
-    return (e_OK);
+    {
+        _status_code = e_NotFound;
+        return ;
+    }
+    _status_code = e_OK;
 }
 
 /* //////////////////////////// */
@@ -70,9 +80,39 @@ void    Respond::createResponse(const std::string& FileContent)
 
 /* //////////////////////////// */
 
+bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods)
+{
+    std::vector<std::string>::iterator it = AllowedMethods.begin();
+
+    for (; it != AllowedMethods.end(); it++)
+    {
+        if (Method == *it)
+            return (true);
+    }
+    return (false);
+}
+
+bool MethodIsImplemented(const std::string& Method)
+{
+    std::string ImplementedMethods[] = {
+            "GET",
+            "POST",
+            "DELETE"
+    };
+
+    for (int32_t i = 0; i < 3 ; i++)
+    {
+        if (Method == ImplementedMethods[i])
+            return (true);
+    }
+    return (false);
+}
+
+/* //////////////////////////// */
+
 void 	Respond::buildResponse(HashMap requestData)
 {
-	_requestData = requestData;
+	_requestData = std::move(requestData);
 
     try
     {
@@ -85,24 +125,31 @@ void 	Respond::buildResponse(HashMap requestData)
                 {"DELETE", &Respond::buildDelete}
         };
 
-        for (int32_t i = 0; i < 3; i++) {
-            if (Method == CompareMethods[i].Method) {
-                FuncPointer = CompareMethods[i].FuncPointer;
-                (this->*FuncPointer)();
-                return;
+        if (MethodIsAllowed(Method, _location.getAllowMethods()) == true)
+        {
+            for (int32_t i = 0; i < 3; i++) {
+                if (Method == CompareMethods[i].Method) {
+                    FuncPointer = CompareMethods[i].FuncPointer;
+                    (this->*FuncPointer)();
+                    return;
+                }
             }
         }
 
-        _status_code = e_MethodNotFound;
+        if (MethodIsImplemented(Method) == true)
+            _status_code = e_MethodNotFound;
+        else
+            _status_code = e_NotImplemented;
         createResponse(Generator::generateDefaulPage(_status_code));
     }
     catch (const std::exception &e)
     {
-        throw (e);
+        _status_code = e_InternalServerError;
+        createResponse(Generator::generateDefaulPage(_status_code));
     }
 }
 
-std::string Respond::getEntryFromMap(std::string entry)
+std::string Respond::getEntryFromMap(const std::string& entry)
 {
 	HashMap::iterator it = _requestData.find(entry);
 
@@ -111,20 +158,20 @@ std::string Respond::getEntryFromMap(std::string entry)
         return (it->second);
 }
 
-std::string Respond::getValidFile(std::string Root, const std::string& relativePath, uint32_t StatusCode)
+std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
     ErrorPageMap ErrorPages = _server.getErrorPage();
-    ErrorPageMap::iterator it = ErrorPages.find(StatusCode);
+    ErrorPageMap::iterator it = ErrorPages.find(_status_code);
 
 	try
 	{
         if (it != ErrorPages.end())
         {
-            FileContent = readFile(Root + it->second);
+            FileContent = readFile(_location.getRoot() + it->second);
             return (FileContent);
         }
-        switch (StatusCode)
+        switch (_status_code)
 		{
 			case e_OK:
 				FileContent = readFile(relativePath);
@@ -133,13 +180,15 @@ std::string Respond::getValidFile(std::string Root, const std::string& relativeP
                 BuildRedir();
                 break ;
             default:
-                FileContent = Generator::generateDefaulPage(StatusCode);
+                FileContent = Generator::generateDefaulPage(_status_code);
                 break ;
 		}
 	}
 	catch (const std::exception& e)
 	{
-		FileContent = Generator::generateDefaulPage(e_InternalServerError);
+        std::cerr << e.what() << std::endl;
+        _status_code = e_InternalServerError;
+		FileContent = Generator::generateDefaulPage(_status_code);
 	}
 	return (FileContent);
 }
