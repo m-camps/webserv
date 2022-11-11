@@ -16,6 +16,9 @@
 TODO:
 - Make recv only stop on seperator(CLRF)
 - No default location add location
-- Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc
+- Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct)
 - make std::map<int, std::vector<Server&>> to easily send Exchange matching filedescriptors
 - rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
+
+1 socket_fd multiple servers
+1 client_fd multiple possible Servers
