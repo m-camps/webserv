@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:34:39 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 14:26:42 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,43 +26,38 @@ class Network
 		Network();
 		~Network();
 		void setup(std::string file);
-		void run();
+		void run(void);
 
 	private:
 		Servers 								_servers; 			// All the servers
 		std::vector<struct pollfd>				_poll;				// Vector containing all poll structs
-		std::map<int, int>						_port_fds;			// <port, fd>
 		std::vector<int>						_socket_fds;				
 		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
-		std::map<int, Servers>					_servers_in_socket; // <fd,std::vector<Server>> all servers corrosponding with that fd
+		std::map<int, Servers>					_fds; // <fd,std::vector<Server>> all servers corrosponding with that fd
 		
 		/* Orthodox canonical class BS */
 		Network(const Network &obj);
 		Network &operator=(const Network &obj);
-
-		/* Poll */
-		struct pollfd 			newPoll(int fd);
-		void					createPoll(void);
 		
-		/* ServersInSocket */
-		void					setupServersInSocket(int port, int socket_fd);
-		void					addClientToServersInSocket(int socket_fd, int client_fd);
-		void					delClientFromServersInSocket(int client_fd);
+		/* Fds */
+		void					setupFds(int port, int socket_fd);
+		void					addClientToFds(int socket_fd, int client_fd);
+		void					delClientFromFds(int client_fd);
 
 		/* Setup Sockets*/
-		void					setupSocketFds(void);
+		int						acceptConnection(int socket_fd);
 		std::vector<int>		extractListens(void);
+		void					setupSockets(void);
 		int						createSocket(void);
 		struct sockaddr_in *	makeSocketAddr(int port);
 		void					bind(int socket_fd, struct sockaddr_in* address_in);
 		void					listen(int socket_fd);
 
-		int						acceptConnection(int socket_fd);
-		void					linkSocketsToServers(void);
+		/* Poll */
+		void					createPoll(void);
+		struct pollfd 			newPoll(int fd);
 
 		/* Helper methods */
 		bool		isSocketFd(int fd);
-		Server* 	getServerBySocketFd(int fd);
-		Server*		getServerByClientFd(int fd);
 		Servers		getServersByFd(int fd);
 };

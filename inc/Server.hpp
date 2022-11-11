@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 17:57:32 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 13:47:40 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,15 @@ class Server
 		std::map<std::string, Location>		getLocations(void) const;
 		std::map<int, std::string>          getErrorPage(void) const;
 
-		std::vector<int>					getSocketFds(void) const;
-		std::vector<int>					getClientFds(void) const;
-
 		/* Setters */
 		void	setClientBody(int& client_body_size);
 		void	setLocations(std::map<std::string, Location>& locations);
 
 		/* Adders */
-		void	addToSocketFds(int socket_fd);
 		void	addToPorts(int &port);
 		void	addToNames(std::string& name);
 		void	addToLocations(std::string& name, Location& location);
 		void	addToErrorPages(int& error_nb, std::string& error_page);
-
-		int		acceptConnection(int& socket_fd);
-		bool	isClientFdInServer(int fd);
-		bool	isSocketFdInServer(int fd);
 
 	private:
 		std::vector<int>							_ports;
@@ -65,10 +57,6 @@ class Server
 		std::vector<std::string>					_methods;					// default = ["GET", "POST", "DELETE"]
 		std::map<std::string, Location>				_locations;					// All locations of the Server
 		std::map<int, std::string>					_error_pages;				// Map of error pages
-		
-		std::vector<int>							_socket_fds; 				// Socket FD the server is running on
-		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
-
 };
 
 /* Stream overload */
