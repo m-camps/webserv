@@ -16,15 +16,14 @@ Exchange::Exchange(Server& server, int32_t socketFd, std::string& requestStr)
 {
 	try
 	{
-        std::map<std::string, Location> Locations = _server.getLocations();
-        std::map<std::string, Location>::iterator it = Locations.find("/php");
+        HashMap	requestData;
+        LocationMap Locations = _server.getLocations();
+        LocationMap::iterator it = Locations.find("/");
         if (it == Locations.end())
             throw (std::runtime_error("Location does not exists"));
 
 		Request request;
 		Respond	response(server, it->second);
-		HashMap	requestData;
-
 		requestData = request.parseRequest(requestStr);
 		response.buildResponse(requestData);
 		sendToClient(response);
@@ -53,12 +52,19 @@ int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 
 void	Exchange::sendToClient(Respond& response)
 {
-	sendNormal(response.getHeader());
-	sendNormal(CRLF);
-	if (response.IsChunked() == false)
-		sendNormal(response.getBody());
-	else
-		sendChunked(response.getBody());
+    try
+    {
+        sendNormal(response.getHeader());
+        sendNormal(CRLF);
+        if (response.IsChunked() == false)
+            sendNormal(response.getBody());
+        else
+            sendChunked(response.getBody());
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 void	Exchange::sendChunked(std::string str)
@@ -86,7 +92,7 @@ void	Exchange::sendChunked(std::string str)
     }
 }
 
-void		Exchange::sendNormal(std::string str)
+void    Exchange::sendNormal(const std::string& str) const
 {
 	ssize_t ret;
 

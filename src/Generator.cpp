@@ -159,10 +159,9 @@ bool isDirectory(std::string FileName)
 
 std::string Generator::generateAutoIndex(Respond& Responder)
 {
-	(void)Responder;
     DIR *dir;
     std::string AutoIndex;
-    std::string Root = "data/www"; // Needs to change to location root
+    std::string Root = Responder.getLocation().getRoot();
     std::vector<std::string> DirectoryList = ListDir(&dir, Root);
     std::vector<std::string>::iterator it = DirectoryList.begin();
 
@@ -173,7 +172,8 @@ std::string Generator::generateAutoIndex(Respond& Responder)
         "<meta charset=\"UTF-8\">\n"
         "<title>Auto Index of " + Root + "</title>\n"
         "</head>\n"
-        "<body>\n";
+        "<body>\n"
+        "<h1>Auto Index of " + Root + "</h1>";
         for (; it != DirectoryList.end(); it++)
         {
             if (isDirectory(*it) == true)
@@ -188,6 +188,5 @@ std::string Generator::generateAutoIndex(Respond& Responder)
         perror("In closedir: ");
         throw ("idk");
     }
-    std::cout << AutoIndex << std::endl;
     return (AutoIndex);
 }

@@ -35,6 +35,7 @@ class Respond
 		HashMap			getRequestData(void) const;
 		int				getStatusCode(void) const;
 		Server			getServer(void) const;
+        Location        getLocation(void) const;
 
 		/* Flags */
 		bool			IsChunked(void) const;
@@ -65,7 +66,7 @@ class Respond
 		bool			_isChunked;
 
 		/* Build functions */
-		void 			BuildRedir(void);
+		void 			buildRedir(void);
 		void 			buildGet(void);
 		void 			buildPost(void);
 		void 			buildDelete(void);
@@ -78,7 +79,7 @@ class Respond
         std::string     removeBoundry();
         std::string     parseMetadata(std::string&);
         void            parsePath(std::string&);
-        void            getStatuscode(const std::string&, const std::string&);
+        void            modifyStatuscode(const std::string&, const std::string&);
 
 };
 

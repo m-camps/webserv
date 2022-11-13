@@ -2,7 +2,7 @@
 // Created by Xander Voorvaart on 11/7/22.
 //
 
-#include "../Respond.hpp"
+#include "Respond.hpp"
 
 std::string getFilename(std::string& MetaData)
 {
@@ -22,7 +22,7 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 {
     try
     {
-        std::string Root = "data/www"; // Needs to change to location root
+        std::string Root = _location.getRoot();
         std::ofstream File(Root + "/" + getFilename(MetaData));
 
         File << Body;
@@ -67,7 +67,7 @@ std::string Respond::parseMetadata(std::string& RequestBody)
 
 std::string Respond::sendSuccesfulUpload(std::string MetaData)
 {
-    std::string Root = "data/www"; // Needs to change to location root
+    std::string Root = _location.getRoot();
     std::string FileName = getFilename(MetaData);
     std::string RelativePath = Root + "/" + FileName;
 

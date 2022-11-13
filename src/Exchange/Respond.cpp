@@ -12,6 +12,7 @@
 
 Respond::Respond(Server& server, Location& location)
     : _server(server), _location(location) ,_status_code(200), _isChunked(false) {}
+
 Respond::~Respond(void) {}
 
 #pragma endregion "ctor & dtor"
@@ -21,6 +22,7 @@ std::string		Respond::getBody(void) const { return _body; }
 HashMap			Respond::getRequestData(void) const { return _requestData; }
 int				Respond::getStatusCode(void) const { return _status_code; }
 Server			Respond::getServer(void) const { return _server; }
+Location        Respond::getLocation() const { return _location; }
 
 bool			Respond::IsChunked(void) const { return _isChunked; }
 
@@ -47,14 +49,16 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
-void Respond::getStatuscode(const std::string& Path, const std::string& relativePath)
+void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
+    std::cout << "PATH: " << Path << std::endl;
+
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
         return ;
     }
-    if ("/" == Path)
+    if ("/" == Path || Path.empty() == true)
     {
         _status_code = e_Redir;
         return ;
@@ -144,6 +148,7 @@ void 	Respond::buildResponse(HashMap requestData)
     }
     catch (const std::exception &e)
     {
+        std::cerr << e.what() << std::endl;
         _status_code = e_InternalServerError;
         createResponse(Generator::generateDefaulPage(_status_code));
     }
@@ -161,12 +166,14 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
+    std::string LocationIndex = _location.getRoot() + "/" + _location.getIndex();
     ErrorPageMap ErrorPages = _server.getErrorPage();
     ErrorPageMap::iterator it = ErrorPages.find(_status_code);
 
 	try
 	{
-        if (it != ErrorPages.end())
+        if (it != ErrorPages.end() &&
+            (_status_code != e_NotFound && _location.getAutoIndex() != true && LocationIndex != relativePath))
         {
             FileContent = readFile(_location.getRoot() + it->second);
             return (FileContent);
@@ -177,7 +184,13 @@ std::string Respond::getValidFile(const std::string& relativePath)
 				FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
-                BuildRedir();
+                buildRedir();
+                break ;
+            case e_NotFound:
+                if (_location.getAutoIndex() == true && LocationIndex == relativePath)
+                    FileContent = Generator::generateAutoIndex(*this);
+                else
+                    FileContent = Generator::generateDefaulPage(_status_code);
                 break ;
             default:
                 FileContent = Generator::generateDefaulPage(_status_code);

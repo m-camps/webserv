@@ -6,10 +6,11 @@
 
 #include <iostream>
 
-#include "Server.hpp" // Server class
+#include "Server.hpp"
 #include "Respond.hpp"
 
-typedef std::map<std::string, std::string> HashMap;
+typedef std::map<std::string, std::string>  HashMap;
+typedef std::map<std::string, Location>     LocationMap;
 
 class Respond ;
 
@@ -27,7 +28,7 @@ public:
 	/* Send */
 	void			sendToClient(Respond& response);
 	void			sendChunked(std::string str);
-	void			sendNormal(std::string str);
+	void			sendNormal(const std::string& str) const;
 
 private:
     Exchange(void);

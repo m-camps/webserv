@@ -4,10 +4,17 @@
 
 #include "Respond.hpp"
 
-void Respond::BuildRedir(void)
+void Respond::buildRedir(void)
 {
+    std::string LocationName = _location.getName();
+    std::string NewLocation;
+    if (LocationName == "/")
+        NewLocation = Generator::generateLocation(_location.getIndex());
+    else
+        NewLocation = Generator::generateLocation(LocationName + "/" + _location.getIndex());
+
     createResponse("");
-    addToHeader(Generator::generateLocation(_location.getIndex()));
+    addToHeader(NewLocation);
 }
 
 void Respond::parsePath(std::string& Path)
@@ -32,7 +39,7 @@ void Respond::buildGet(void)
 
         parsePath(Path);
         relativePath = Root + Path;
-        getStatuscode(Path, relativePath); // Change name
+        modifyStatuscode(Path, relativePath); // Change name
         FileContent = getValidFile(relativePath);
         createResponse(FileContent);
     }
