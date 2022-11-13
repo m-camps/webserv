@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 12:18:51 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/09 17:57:32 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,12 @@ class Server
 		void	setLocations(std::map<std::string, Location>& locations);
 
 		/* Adders */
+		void	addToSocketFds(int socket_fd);
 		void	addToPorts(int &port);
 		void	addToNames(std::string& name);
 		void	addToLocations(std::string& name, Location& location);
 		void	addToErrorPages(int& error_nb, std::string& error_page);
 
-		/* Delete */
-		void	removeFromClientFds(int fd);
-
-		/* Public Functions */
-		void	changePort(std::string newPort);
-		int		setup();
 		int		acceptConnection(int& socket_fd);
 		bool	isClientFdInServer(int fd);
 		bool	isSocketFdInServer(int fd);
@@ -74,10 +69,6 @@ class Server
 		std::vector<int>							_socket_fds; 				// Socket FD the server is running on
 		std::vector<int>							_client_fds;				// Client FD's currently associated to this server
 
-		/* Helper Functions */
-		struct sockaddr_in*	makeSocketAddr(int& port);
-		int					createSocket(void);
-		void				setupSocket(int& socket_fd, struct sockaddr_in* address_in);
 };
 
 /* Stream overload */
