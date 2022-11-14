@@ -137,8 +137,8 @@ std::vector<std::string> ListDir(DIR **dir, std::string Root)
     *dir = opendir(Root.c_str());
     if (!*dir)
     {
-        perror("In opendir: ");
-        throw ("idk");
+        std::string StrError = std::strerror(errno);
+        throw (std::logic_error(StrError));
     }
 
     while ((t_dirlist = readdir(*dir)) != NULL)
@@ -146,15 +146,6 @@ std::vector<std::string> ListDir(DIR **dir, std::string Root)
         DirectoryList.push_back(t_dirlist->d_name);
     }
     return (DirectoryList);
-}
-
-bool isDirectory(std::string FileName)
-{
-    struct stat t_status;
-
-    if (stat(FileName.c_str(), &t_status) == 0)
-        return (true);
-    return (false);
 }
 
 std::string Generator::generateAutoIndex(Respond& Responder)
@@ -185,8 +176,8 @@ std::string Generator::generateAutoIndex(Respond& Responder)
 
     if (closedir(dir) < 0)
     {
-        perror("In closedir: ");
-        throw ("idk");
+        std::string StrError = std::strerror(errno);
+        throw (std::logic_error(StrError));
     }
     return (AutoIndex);
 }

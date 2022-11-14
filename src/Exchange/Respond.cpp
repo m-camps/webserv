@@ -3,8 +3,8 @@
 //
 
 #include "Respond.hpp"
-
-#define ERROR 1
+#include "../../inc/Cgi.hpp"
+#include "../../inc/Server.hpp"
 
 #pragma region "ctor & dtor"
 
@@ -51,14 +51,12 @@ bool isForbiddenPath(const std::string& Path)
 
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
-    std::cout << "PATH: " << Path << std::endl;
-
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
         return ;
     }
-    if ("/" == Path || Path.empty() == true)
+    if ("/" == Path || Path.empty() == true || isDirectory(relativePath) == true)
     {
         _status_code = e_Redir;
         return ;
@@ -86,14 +84,14 @@ void    Respond::createResponse(const std::string& FileContent)
 
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods)
 {
-    std::vector<std::string>::iterator it = AllowedMethods.begin();
+	std::vector<std::string>::iterator it = AllowedMethods.begin();
 
-    for (; it != AllowedMethods.end(); it++)
-    {
-        if (Method == *it)
-            return (true);
-    }
-    return (false);
+	for (; it != AllowedMethods.end(); it++)
+	{
+		if (Method == *it)
+			return (true);
+	}
+	return (false);
 }
 
 bool MethodIsImplemented(const std::string& Method)
@@ -172,11 +170,15 @@ std::string Respond::getValidFile(const std::string& relativePath)
 
 	try
 	{
-        if (it != ErrorPages.end() &&
-            (_status_code != e_NotFound && _location.getAutoIndex() != true && LocationIndex != relativePath))
+        // Needs to be fixed
+        if (it != ErrorPages.end())
         {
-            FileContent = readFile(_location.getRoot() + it->second);
-            return (FileContent);
+//            std::cout << relativePath << std::endl;
+            if (access(it->second.c_str(), R_OK) == 0)
+            {
+                FileContent = readFile(_location.getRoot() + it->second);
+                return (FileContent);
+            }
         }
         switch (_status_code)
 		{

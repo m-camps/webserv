@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:38:48 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 17:42:33 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "Exchange/Exchange.hpp"
 #include "Exchange/Request.hpp"
 #include <iostream>
+#include "../inc/Cgi.hpp"
 
 #define BUFF 10000
 /* Default constructor */
@@ -85,7 +86,7 @@ void Network::run()
                     if (ret <= 0)
                     {
                         if (ret == 0)
-                            std::cout << "Client closed connection fd: " << cur.fd <<"\n";
+                            std::cout << "Client closed connection fd: " << cur.fd << "\n";
                         else
                             std::perror("In recv: ");
                         close(cur.fd);

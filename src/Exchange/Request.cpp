@@ -16,7 +16,6 @@ HashMap		Request::parseRequest(const std::string& requestStr)
 {
 	try
 	{
-        std::cout << requestStr << std::endl;
 		const std::string Header = AppendRequest(requestStr);
 		stringToMap(Header);
 	}
@@ -33,7 +32,7 @@ HashMap		Request::parseRequest(const std::string& requestStr)
  */
 std::string Request::AppendRequest(const std::string& Request)
 {
-    std::string Body;
+	std::string Body;
 	std::string Header;
 
 	std::size_t found = Request.find("\r\n\r\n");
@@ -56,7 +55,7 @@ std::string Request::AppendRequest(const std::string& Request)
  */
 void Request::splitMethod(std::string line)
 {
-    int32_t last_it;
+	int32_t last_it;
 	std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
 	std::vector<int>::iterator it = AllSpaceLocations.begin();
 

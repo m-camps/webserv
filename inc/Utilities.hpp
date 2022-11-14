@@ -26,6 +26,8 @@ std::string readFile(const std::istringstream& Body);
 
 void deleteFile(std::string& filePath);
 
+bool isDirectory(const std::string& FileName);
+
 template <typename T>
 std::string ToString(T Number)
 {

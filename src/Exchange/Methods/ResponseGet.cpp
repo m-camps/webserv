@@ -27,6 +27,18 @@ void Respond::parsePath(std::string& Path)
     Path.erase(0, found + LocationName.size());
 }
 
+bool	Respond::correctCgiRequestAllowed(void)
+{
+    std::string cgiExt = _location.getCgiFileExtension();
+    std::string cgiName = _location.getCgiName();
+
+    if (cgiName != "" && cgiExt != "")
+    {
+        return (true);
+    }
+	return (false);
+}
+
 void Respond::buildGet(void)
 {
     std::cout << "GET" << std::endl;
@@ -37,6 +49,13 @@ void Respond::buildGet(void)
         std::string Root = _location.getRoot();
         std::string Path = getEntryFromMap("Path");
 
+        if (correctCgiRequestAllowed() == true)
+        {
+            Cgi	cgi;
+            FileContent = cgi.executeScript(*this);
+            createResponse(FileContent);
+            return ;
+        }
         parsePath(Path);
         relativePath = Root + Path;
         modifyStatuscode(Path, relativePath); // Change name
@@ -45,7 +64,8 @@ void Respond::buildGet(void)
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Fatal Error: " << e.what() << std::endl;
-        std::exit(ERROR);
+        std::cerr << "Internal Server Error: " << e.what() << std::endl;
+        _status_code = e_InternalServerError;
+        createResponse(Generator::generateDefaulPage(_status_code));
     }
 }

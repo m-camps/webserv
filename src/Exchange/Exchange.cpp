@@ -16,18 +16,14 @@ Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
 {
 	try
 	{
-        // std::map<std::string, Location> Locations = _server.getLocations();
-        // std::map<std::string, Location>::iterator it = Locations.find("/php");
-        // if (it == Locations.end())
-        //     throw (std::runtime_error("Location does not exists"));
-
 		Request request;
+        Server server;
+        Location location;
 		HashMap	requestData;
 
 		requestData = request.parseRequest(requestStr);
-
-		Server server = matchServer(servers, requestData);
-		Location location = matchLocation(server, requestData);
+		server = matchServer(servers, requestData);
+		location = matchLocation(server, requestData);
 
 		Respond	response(server, location);
 		response.buildResponse(requestData);
@@ -171,4 +167,5 @@ void    Exchange::sendNormal(const std::string& str) const
         throw (std::runtime_error(ErrorMsg));
     }
 }
-#pragma endregion functions
+
+#pragma endregion adders

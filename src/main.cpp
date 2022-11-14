@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/30 15:53:06 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/14 15:08:46 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int32_t	main(int argc, char *argv[])
 	}
 
 	Network network;
-
+	
 	network.setup(argv[1]);
 	network.run();
 	return (0);
