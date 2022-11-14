@@ -17,7 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 
-#define BUFF 200000
+#define BUFF 20000
 /* Default constructor */
 Network::Network() {}
 
@@ -85,7 +85,7 @@ void Network::run()
                     {
                         RequestStr.clear();
                         if (ret == 0)
-                            std::cout << "Client closed connection fd: " << cur.fd <<"\n";
+                            std::cout << "Client closed connection fd: " << cur.fd << "\n";
                         else
                             std::perror("In recv: ");
                         close(cur.fd);
@@ -95,8 +95,7 @@ void Network::run()
                     else
                     {
                         RequestStr.append(buff, ret);
-                    	std::size_t found = RequestStr.find(SEPERATOR);
-                        if (ret != BUFF && found != std::string::npos) 
+                        if (ret != BUFF)
 						{
                             Exchange exchange(getServersByFd(cur.fd), cur.fd, RequestStr);
                             RequestStr.erase();

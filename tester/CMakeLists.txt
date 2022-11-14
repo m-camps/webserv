@@ -36,7 +36,7 @@ src/ConfTest.cpp
         ../src/Utilities/deleteFile.cpp
 ../src/Utilities/findCharLocation.cpp
 ../src/Utilities/readFile.cpp
-)
+        ../src/Utilities/isDirectory.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

@@ -77,8 +77,16 @@ std::string Respond::sendSuccesfulUpload(std::string MetaData)
 void Respond::buildPost(void)
 {
     std::cout << "POST" << std::endl;
+    std::string BodySize = getEntryFromMap("Content-Length");
+
     try
     {
+        if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
+        {
+            _status_code = e_PayloadTooLarge;
+            createResponse(Generator::generateDefaulPage(_status_code));
+            return ;
+        }
         std::string MetaData;
         std::string Body = getEntryFromMap("Body");
 
@@ -92,7 +100,7 @@ void Respond::buildPost(void)
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "Internal Server Error: " << e.what() << std::endl;
         _status_code = e_InternalServerError;
         createResponse(Generator::generateDefaulPage(_status_code));
     }

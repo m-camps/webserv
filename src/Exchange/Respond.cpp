@@ -4,8 +4,6 @@
 
 #include "Respond.hpp"
 
-#define ERROR 1
-
 #pragma region "ctor & dtor"
 
 ////////// Ctor & Dtor ///////////
@@ -51,14 +49,12 @@ bool isForbiddenPath(const std::string& Path)
 
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
-    std::cout << "PATH: " << Path << std::endl;
-
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
         return ;
     }
-    if ("/" == Path || Path.empty() == true)
+    if ("/" == Path || Path.empty() == true || isDirectory(relativePath) == true)
     {
         _status_code = e_Redir;
         return ;
@@ -172,11 +168,15 @@ std::string Respond::getValidFile(const std::string& relativePath)
 
 	try
 	{
-        if (it != ErrorPages.end() &&
-            (_status_code != e_NotFound && _location.getAutoIndex() != true && LocationIndex != relativePath))
+        // Needs to be fixed
+        if (it != ErrorPages.end())
         {
-            FileContent = readFile(_location.getRoot() + it->second);
-            return (FileContent);
+//            std::cout << relativePath << std::endl;
+            if (access(it->second.c_str(), R_OK) == 0)
+            {
+                FileContent = readFile(_location.getRoot() + it->second);
+                return (FileContent);
+            }
         }
         switch (_status_code)
 		{

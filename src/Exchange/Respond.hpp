@@ -101,6 +101,7 @@ enum e_statusCode
     e_Forbidden = 401,
     e_NotFound = 404,
     e_MethodNotFound = 405,
+    e_PayloadTooLarge = 413,
 	e_InternalServerError = 500,
     e_NotImplemented = 501
 };

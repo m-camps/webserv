@@ -45,7 +45,8 @@ void Respond::buildGet(void)
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Fatal Error: " << e.what() << std::endl;
-        std::exit(ERROR);
+        std::cerr << "Internal Server Error: " << e.what() << std::endl;
+        _status_code = e_InternalServerError;
+        createResponse(Generator::generateDefaulPage(_status_code));
     }
 }

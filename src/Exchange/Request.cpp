@@ -16,7 +16,6 @@ HashMap		Request::parseRequest(const std::string& requestStr)
 {
 	try
 	{
-        std::cout << requestStr << std::endl;
 		const std::string Header = AppendRequest(requestStr);
 		stringToMap(Header);
 	}
