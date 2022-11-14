@@ -23,4 +23,7 @@ TODO:
 1 socket_fd multiple servers
 1 client_fd multiple possible Servers
 
+Something goes wrong when you try to GET or DELETE a file with a spacebar in between.
+Example: "GET /space\ test.html HTTP/1.1"
+
 	

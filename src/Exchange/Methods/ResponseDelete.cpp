@@ -4,6 +4,11 @@
 
 #include "Respond.hpp"
 
+std::string sendSuccesfulDelete(const std::string& relativePath)
+{
+    return ("Succesfully deleted " + relativePath + " on disk\n");
+}
+
 void Respond::buildDelete(void)
 {
 	std::cout << "DELETE" << std::endl;
@@ -15,9 +20,21 @@ void Respond::buildDelete(void)
 
         parsePath(Path);
         relativePath = Root + Path;
+        if (isDirectory(relativePath) == true)
+        {
+            _status_code = e_Forbidden;
+            createResponse(Generator::generateDefaulPage(_status_code));
+            return ;
+        }
+
         modifyStatuscode(Path, relativePath);
+        if (_status_code != e_OK)
+        {
+            createResponse(Generator::generateDefaulPage(_status_code));
+            return;
+        }
         deleteFile(relativePath);
-        createResponse("");
+        createResponse(sendSuccesfulDelete(relativePath));
     }
     catch (const std::exception& e)
     {

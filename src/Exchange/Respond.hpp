@@ -21,7 +21,6 @@
 
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
-typedef std::map<std::string, Location>		locationBlocksOfServer;
 
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods);
 
@@ -67,27 +66,31 @@ class Respond
 		int32_t			_status_code;
 		bool			_isChunked;
 
-		/* Build functions */
-		void 			buildRedir(void);
-		void 			buildGet(void);
+        /* POST Functions */
 		void 			buildPost(void);
+		void 			putBodyInFile(std::string&, std::string&);
+        bool            isPostValid(void);
+		std::string		sendSuccesfulUpload(std::string);
+        std::string     removeBoundry();
+        std::string     parseMetadata(std::string&);
+
+        /* GET Functions */
+		void 			buildGet(void);
+		void 			buildRedir(void);
+		bool			correctCgiRequestAllowed(void);
+		std::string 	getValidFile(const std::string&);
+
+        /* DELETE Functions */
 		void 			buildDelete(void);
 
 		/* Helper functions */
-		std::string 	getValidFile(const std::string&);
-		std::string		sendSuccesfulUpload(std::string);
-		void 			putBodyInFile(std::string&, std::string&);
 		void			createResponse(const std::string&);
-        std::string     removeBoundry();
-        std::string     parseMetadata(std::string&);
         void            parsePath(std::string&);
         void            modifyStatuscode(const std::string&, const std::string&);
-		bool			correctCgiRequestAllowed(void);
 
 };
 
 /* --- Structs --- */
-
 struct s_Methods
 {
     std::string Method;
@@ -101,10 +104,12 @@ enum e_statusCode
 	e_Accepted = 202,
 	e_NoContent = 204,
     e_Redir = 301,
-    e_Forbidden = 401,
+    e_Unauthorized = 401,
+    e_Forbidden = 403,
     e_NotFound = 404,
     e_MethodNotFound = 405,
     e_PayloadTooLarge = 413,
+    e_UnsupportedMediaType = 415,
 	e_InternalServerError = 500,
     e_NotImplemented = 501
 };

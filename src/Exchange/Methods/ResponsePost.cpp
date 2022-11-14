@@ -74,21 +74,45 @@ std::string Respond::sendSuccesfulUpload(std::string MetaData)
     return ("Saved upload to file <a href=\"" + FileName + "\">" + RelativePath + "</a> on disk");
 }
 
-void Respond::buildPost(void)
+bool Respond::isPostValid(void)
 {
-    std::cout << "POST" << std::endl;
-    std::string BodySize = getEntryFromMap("Content-Length");
-
     try
     {
+        std::string BodySize = getEntryFromMap("Content-Length");
+        std::string ContentType = getEntryFromMap("Content-Type");
+        std::size_t found = ContentType.find(';');
+
+        if (found == std::string::npos)
+        {
+            _status_code = e_UnsupportedMediaType;
+            createResponse(Generator::generateDefaulPage(_status_code));
+            return (false);
+        }
         if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
         {
             _status_code = e_PayloadTooLarge;
             createResponse(Generator::generateDefaulPage(_status_code));
-            return ;
+            return (false);
         }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        throw (std::runtime_error("error in isPostValid()"));
+    }
+    return (true);
+}
+
+void Respond::buildPost(void)
+{
+    std::cout << "POST" << std::endl;
+    try
+    {
         std::string MetaData;
         std::string Body = getEntryFromMap("Body");
+
+        if (isPostValid() == false)
+            return ;
 
         Body = removeBoundry();
         MetaData = parseMetadata(Body);
