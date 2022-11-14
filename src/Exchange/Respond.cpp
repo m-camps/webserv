@@ -3,6 +3,8 @@
 //
 
 #include "Respond.hpp"
+#include "../../inc/Cgi.hpp"
+#include "../../inc/Server.hpp"
 
 #pragma region "ctor & dtor"
 
@@ -82,14 +84,14 @@ void    Respond::createResponse(const std::string& FileContent)
 
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods)
 {
-    std::vector<std::string>::iterator it = AllowedMethods.begin();
+	std::vector<std::string>::iterator it = AllowedMethods.begin();
 
-    for (; it != AllowedMethods.end(); it++)
-    {
-        if (Method == *it)
-            return (true);
-    }
-    return (false);
+	for (; it != AllowedMethods.end(); it++)
+	{
+		if (Method == *it)
+			return (true);
+	}
+	return (false);
 }
 
 bool MethodIsImplemented(const std::string& Method)

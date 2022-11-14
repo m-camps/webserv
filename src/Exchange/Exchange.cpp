@@ -167,4 +167,10 @@ void    Exchange::sendNormal(const std::string& str) const
         throw (std::runtime_error(ErrorMsg));
     }
 }
-#pragma endregion functions
+
+void Exchange::setIsCgi(bool value)
+{
+	_isCgi = value;
+}
+
+#pragma endregion adders

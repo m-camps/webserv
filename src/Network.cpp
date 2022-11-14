@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 17:14:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 14:28:15 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "Exchange/Exchange.hpp"
 #include "Exchange/Request.hpp"
 #include <iostream>
+#include "../inc/Cgi.hpp"
 
 #define BUFF 20000
 /* Default constructor */

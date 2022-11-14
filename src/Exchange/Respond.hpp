@@ -14,12 +14,14 @@
 #include "Server.hpp" // Server class
 #include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
 #include "Generator.hpp"
+#include "Cgi.hpp"
 
 #define CRLF "\r\n"
 #define SEPERATOR "\r\n\r\n"
 
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
+typedef std::map<std::string, Location>		locationBlocksOfServer;
 
 bool MethodIsAllowed(const std::string& Method, std::vector<std::string> AllowedMethods);
 
@@ -80,6 +82,7 @@ class Respond
         std::string     parseMetadata(std::string&);
         void            parsePath(std::string&);
         void            modifyStatuscode(const std::string&, const std::string&);
+		bool			correctCgiRequestAllowed(void);
 
 };
 

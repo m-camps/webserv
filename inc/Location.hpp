@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 15:17:56 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 14:27:50 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Location {
 		int							_return_status;
 		std::string					_return_path;
 
+		//if there is a cginame and cgi extension then its a cgi request
 	public:
 		Location();
 		~Location();

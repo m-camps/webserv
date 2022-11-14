@@ -16,7 +16,7 @@
 
 #include "Network.hpp"
 
-int32_t	main(int argc, char *argv[])
+int32_t	main(int argc, char *argv[], char **envp)
 {
 	if (argc != 2)
 	{
@@ -25,8 +25,18 @@ int32_t	main(int argc, char *argv[])
 	}
 
 	Network network;
-
+	
 	network.setup(argv[1]);
+
+	// char *p = "SERVER_NAME=LOCALHOST";
+	// putenv(p);
+	// for (char **env = envp; *env != 0; env++)
+	// {
+	// 	char *thisEnv = *env;
+	// 	printf("%s\n", thisEnv); 
+	// 	//add some serveretc stuff to this env because of CGI  
+	// }
+	
 	network.run();
 	return (0);
 }
