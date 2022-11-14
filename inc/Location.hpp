@@ -6,13 +6,14 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 12:01:56 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 15:17:56 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include <vector>
 #include <iostream>
+#include <map>
 
 class Location {
 	private:
@@ -55,5 +56,7 @@ class Location {
 		/* Adders */
 		void						addToAllowMethod(const std::string& method);
 };
+
+typedef std::map<std::string, Location> Locations;
 
 std::ostream& operator<<(std::ostream& stream, Location& location);

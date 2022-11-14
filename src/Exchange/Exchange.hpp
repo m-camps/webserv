@@ -17,7 +17,7 @@ class Respond ;
 class Exchange
 {
 public:
-    Exchange(Server&, int32_t, std::string&);
+    Exchange(Servers, int32_t, std::string&);
     ~Exchange(void);
 
     /* Getters */
@@ -30,13 +30,18 @@ public:
 	void			sendChunked(std::string str);
 	void			sendNormal(const std::string& str) const;
 
+	/* Matching */
+	Server			matchServer(Servers servers, HashMap requestData);
+	Location		matchLocation(Server server, HashMap requestData);
+
+
 private:
     Exchange(void);
     Exchange& operator=(const Exchange&);
 
 	std::string		_requestStr;
     HashMap 		_requestData;
-    const Server 	_server;
+    Server 			_server;
     const int32_t 	_socketFd;
 };
 

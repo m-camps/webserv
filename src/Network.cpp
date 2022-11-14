@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 18:00:58 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/11 17:14:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ Network::Network() {}
 /* Default deconstructor */
 Network::~Network() {}
 
-
 /***
  * Setup for the network
  * (right now just starting a basic server with default constructor)
@@ -33,12 +32,12 @@ Network::~Network() {}
 void Network::setup(std::string file)
 {
 	Parse				parser;
-	std::vector<Server> tmp;
 	
-	_total_fd = 0;
 	try
 	{
-		_servers = parser.parseNetwork(file, tmp);
+		Servers servers;
+		
+		_servers = parser.parseNetwork(file, servers);
 		std::cout << "----PARSING COMPLETE----" << std::endl;
 	}
 	catch(std::exception& e)
@@ -46,37 +45,129 @@ void Network::setup(std::string file)
 		std::cout << e.what() << std::endl;
 		std::exit(0);
 	}
-
-	setupSocketFds();
-	linkSocketsToServers();
-
-	// for (size_t i = 0; i < _servers.size(); i++)
-	// {
-	// 	std::cout << _servers.at(i) << "\n";
-	// }
-	createFds();
-	_max_fd = _total_fd;
+	setupSockets();
+	createPoll();
+	for (size_t i = 0; i < _servers.size(); i++)
+	{
+		std::cout << _servers.at(i) << "\n";
+	}
 }
 
-void			Network::linkSocketsToServers(void)
+/* Poll() loop of the network */
+/* do we need to use select with the bitflags? */
+void Network::run()
 {
-	for (std::vector<Server>::iterator serv_it = _servers.begin(); serv_it != _servers.end(); serv_it++)
+    char buff[BUFF]; //  test buffer (can change later or keep it here)
+    std::string RequestStr;
+    //check if both location is seen here
+    while (true)
+    {
+        if (poll(_poll.data(), _poll.size(), -1) == -1)
+        {
+            perror("In poll: ");
+            exit(ERROR);
+        }
+        for (size_t i = 0; i < _poll.size(); i++)
+        {
+            struct pollfd cur = _poll.at(i);
+            if ((cur.revents & POLLIN))
+            {
+                if (isSocketFd(cur.fd))
+                {
+					int client_fd = acceptConnection(cur.fd);
+                    std::cout << "New connection" << "\n";
+                    std::cout << "On FD " << client_fd << std::endl;
+                }
+                else
+                {
+                    ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
+                    if (ret <= 0)
+                    {
+                        RequestStr.clear();
+                        if (ret == 0)
+                            std::cout << "Client closed connection fd: " << cur.fd <<"\n";
+                        else
+                            std::perror("In recv: ");
+                        close(cur.fd);
+						_poll.erase(_poll.begin() + i);
+						break ;
+                    }
+                    else
+                    {
+                        RequestStr.append(buff, ret);
+                    	std::size_t found = RequestStr.find(SEPERATOR);
+                        if (ret != BUFF && found != std::string::npos) 
+						{
+                            Exchange exchange(getServersByFd(cur.fd), cur.fd, RequestStr);
+                            RequestStr.erase();
+							std::cout << "Reponse on fd: " << cur.fd << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void	Network::setupFds(int port, int socket_fd)
+{
+	Servers servers;
+
+	for (Servers::iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		std::vector<int> ports = (*serv_it).getPorts();
-		for (std::vector<int>::iterator it = ports.begin(); it != ports.end(); it++)
+		std::vector<int> ports = (*it).getPorts();
+		if (std::find(ports.begin(), ports.end(), port) != ports.end())
 		{
-			std::map<int, int>::iterator found = _port_fds.find(*it);
-			if (found != _port_fds.end())
-				(*serv_it).addToSocketFds(found->second);
+			servers.push_back(*it);
 		}
 	}
-	for (std::map<int,int>::iterator it = _port_fds.begin(); it != _port_fds.end(); it++)
-	{
-		std::cout << it->first << "," << it->second << std::endl;
-	}
+	_fds.insert(std::pair<int, Servers >(socket_fd, servers));
 }
 
-void			Network::setupSocketFds(void)
+void	Network::addClientToFds(int socket_fd, int client_fd)
+{
+	Servers servers = _fds.find(socket_fd)->second;
+
+	_fds.insert(std::pair<int, Servers >(client_fd, servers));
+}
+
+void	Network::delClientFromFds(int client_fd)
+{
+	_fds.erase(client_fd);
+}
+
+int		Network::acceptConnection(int socket_fd)
+{
+	struct  sockaddr_in			client_addr;
+	socklen_t					client_addrlen = sizeof(client_addr);
+	
+	int	client_fd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
+	if (client_fd == -1)
+	{
+		std::perror("In accept: ");
+		std::exit(EXIT_FAILURE);
+	}
+	addClientToFds(socket_fd, client_fd);
+	_poll.push_back(newPoll(client_fd));
+	return (client_fd);
+}
+
+std::vector<int> Network::extractListens(void)
+{
+	std::vector<int>	listens;
+	for (Servers::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		std::vector<int> ports = (*it).getPorts();
+		for (std::vector<int>::iterator it = ports.begin(); it != ports.end(); it++)
+		{
+			if (std::find(listens.begin(), listens.end(), *it) == listens.end())
+				listens.push_back(*it);
+		}
+	}
+	return (listens);
+}
+
+void	Network::setupSockets(void)
 {
 	std::vector<int> listens = extractListens();
 
@@ -89,10 +180,11 @@ void			Network::setupSocketFds(void)
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
 		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
-		_port_fds.insert(std::pair<int, int>(port, socket_fd));
-		_total_fd++;
+		setupFds(port, socket_fd);
+		_socket_fds.push_back(socket_fd);
 	}
 }
+
 int		Network::createSocket(void)
 {
 	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
@@ -104,6 +196,17 @@ int		Network::createSocket(void)
 	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
    		std::perror("setsockopt(SO_REUSEADDR) failed");
 	return socket_fd;
+}
+
+struct sockaddr_in *	Network::makeSocketAddr(int port)
+{
+	struct sockaddr_in *address = new sockaddr_in();
+
+	address->sin_family = AF_INET;
+	address->sin_port = htons(port);
+	address->sin_addr.s_addr = INADDR_ANY;
+	memset(address->sin_zero, 0, sizeof(address->sin_zero));
+	return address;
 }
 
 void	Network::bind(int socket_fd, struct sockaddr_in* address_in)
@@ -124,141 +227,13 @@ void	Network::listen(int socket_fd)
 	}
 }
 
-struct sockaddr_in *	Network::makeSocketAddr(int port)
+void			Network::createPoll(void)
 {
-	struct sockaddr_in *address = new sockaddr_in();
-
-	address->sin_family = AF_INET;
-	address->sin_port = htons(port);
-	address->sin_addr.s_addr = INADDR_ANY;
-	memset(address->sin_zero, 0, sizeof(address->sin_zero));
-	return address;
+	for (std::map<int, Servers>::iterator it = _fds.begin(); it != _fds.end(); it++)
+		_poll.push_back(newPoll(it->first));
 }
 
-std::vector<int> Network::extractListens(void)
-{
-	std::vector<int>	listens;
-	for (std::vector<Server>::iterator serv_it = _servers.begin(); serv_it != _servers.end(); serv_it++)
-	{
-		std::vector<int> ports = (*serv_it).getPorts();
-		for (std::vector<int>::iterator it = ports.begin(); it != ports.end(); it++)
-		{
-			if (std::find(listens.begin(), listens.end(), *it) == listens.end())
-				listens.push_back(*it);
-		}
-	}
-	for (std::vector<int>::iterator it = listens.begin(); it != listens.end(); it++)
-		std::cout << *it << "," <<  std::endl;
-	return (listens);
-}
-
-/* Poll() loop of the network */
-/* do we need to use select with the bitflags? */
-void Network::run()
-{
-	for (size_t i = 0; i < _servers.size(); i++)
-	{
-		std::cout << _servers.at(i) << "\n";
-	}
-    char buff[BUFF]; //  test buffer (can change later or keep it here)
-    std::string RequestStr;
-    //check if both location is seen here
-    while (true)
-    {
-        if (poll(_fds, _total_fd, -1) == -1)
-        {
-            perror("In poll: ");
-            free(_fds);
-            exit(ERROR);
-        }
-        for (int i = 0; i < _total_fd; i++)
-        {
-            struct pollfd cur = _fds[i];
-            if ((cur.revents & POLLIN))
-            {
-                if (isSocketFd(cur.fd))
-                {
-                    Server *server = getServerBySocketFd(cur.fd);
-                    int newFd = server->acceptConnection(cur.fd);
-                    addToPollFds(newFd);
-                    std::cout << "New connection" << "\n";
-                    std::cout << "On FD " << newFd << std::endl;
-                }
-                else
-                {
-                    ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
-                    if (ret <= 0)
-                    {
-                        RequestStr.clear();
-                        if (ret == 0)
-                            std::cout << "Client closed connection" << "\n";
-                        else
-                            std::perror("In recv: ");
-                        close(cur.fd);
-                        delFromPollFds(i);
-                    }
-                    else
-                    {
-                        RequestStr.append(buff, ret);
-//                        std::size_t found = RequestStr.find(SEPERATOR); <-- This ain't it
-                        if (ret != BUFF)
-                        {
-                            Exchange exchange(*getServerByClientFd(cur.fd), cur.fd, RequestStr);
-                            RequestStr.erase();
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-void	Network::createFds(void)
-{
-	_fds = (pollfd*)malloc((_total_fd) * sizeof(pollfd));
-	if (!_fds)
-	{
-		perror("Malloc: ");
-		exit(EXIT_FAILURE);
-	}
-	
-	int j = 0;
-	for (std::map<int, int>::iterator it = _port_fds.begin(); it != _port_fds.end();it++)
-	{
-		_fds[j] = createNewPollfd(it->second);
-		j++;
-	}
-	if (1)
-	{
-		std::cout << "File descriptors in use: [";
-		for (int i = 0; i < _total_fd; i++)
-			std::cout << ((i != 0) ? "," : "") << _fds[i].fd;
-		std::cout << "]\n";
-	}
-}
-
-void	Network::addToPollFds(int fd)
-{
-	if (_total_fd >= _max_fd)
-	{
-		_max_fd *= 2;
-		struct pollfd *tmp = (pollfd*)realloc(_fds, _max_fd * sizeof(pollfd));
-		if (!tmp)
-			exit(ERROR);
-		_fds = tmp;
-	}
-	_fds[_total_fd] = createNewPollfd(fd);
-	_buffer.insert(std::pair<int, std::string>(fd, ""));
-	_total_fd++;
-}
-
-void	Network::delFromPollFds(int i)
-{
-	_fds[i] = _fds[_total_fd - 1];
-	_total_fd--;
-}
-
-struct pollfd Network::createNewPollfd(int fd)
+struct pollfd 	Network::newPoll(int fd)
 {
 	struct pollfd newFd;
 
@@ -271,30 +246,15 @@ struct pollfd Network::createNewPollfd(int fd)
 /* Helper functions */ 
 bool	Network::isSocketFd(int fd)
 {
-	for (int i = 0; i < (int)_servers.size(); i++)
+	for (std::vector<int>::iterator it = _socket_fds.begin(); it != _socket_fds.end(); it++)
 	{
-		if (_servers.at(i).isSocketFdInServer(fd))
+		if (*it == fd)
 			return true;
 	}
 	return false;
 }
 
-Server*	Network::getServerBySocketFd(int fd)
+Servers	Network::getServersByFd(int fd)
 {
-	for (int i = 0; i < (int)_servers.size(); i++)
-	{
-		if (_servers.at(i).isSocketFdInServer(fd))
-			return &_servers.at(i);
-	}
-	return NULL;
-}
-
-Server*	Network::getServerByClientFd(int fd)
-{
-	for (int i = 0; i < (int)_servers.size(); i++)
-	{
-		if (_servers.at(i).isClientFdInServer(fd))
-			return &_servers.at(i);
-	}
-	return NULL;
+	return (_fds.find(fd)->second);
 }
