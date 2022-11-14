@@ -168,9 +168,4 @@ void    Exchange::sendNormal(const std::string& str) const
     }
 }
 
-void Exchange::setIsCgi(bool value)
-{
-	_isCgi = value;
-}
-
 #pragma endregion adders

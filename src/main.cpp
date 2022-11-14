@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/10/30 15:53:06 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/14 15:08:46 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #include "Network.hpp"
 
-int32_t	main(int argc, char *argv[], char **envp)
+int32_t	main(int argc, char *argv[])
 {
 	if (argc != 2)
 	{
@@ -27,16 +27,6 @@ int32_t	main(int argc, char *argv[], char **envp)
 	Network network;
 	
 	network.setup(argv[1]);
-
-	// char *p = "SERVER_NAME=LOCALHOST";
-	// putenv(p);
-	// for (char **env = envp; *env != 0; env++)
-	// {
-	// 	char *thisEnv = *env;
-	// 	printf("%s\n", thisEnv); 
-	// 	//add some serveretc stuff to this env because of CGI  
-	// }
-	
 	network.run();
 	return (0);
 }

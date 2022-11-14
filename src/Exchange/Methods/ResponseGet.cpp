@@ -52,8 +52,9 @@ void Respond::buildGet(void)
         if (correctCgiRequestAllowed() == true)
         {
             Cgi	cgi;
-            cgiBody = cgi.executeScript(*this);
-            _Exchanger.setIsCgi(true); 	//setCgiFileContent(cgiBody);
+            FileContent = cgi.executeScript(*this);
+            createResponse(FileContent);
+            return ;
         }
         parsePath(Path);
         relativePath = Root + Path;

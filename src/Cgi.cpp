@@ -13,6 +13,7 @@ const char*		buildCgiExecPath(Respond& ResponderRef)
 		std::cout << "Could not enter to current working directory, closing program" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	std::string relativePath = current.getRoot() + ResponderRef.getEntryFromMap("Path");
 	std::string executablePath(absolutePath); //../data/www/cgi-bin/filename+extension
 	executablePath += "/";
 	executablePath += current.getRoot(); //for now, will depend on the root of the location/server block
@@ -25,12 +26,14 @@ const char*		buildCgiExecPath(Respond& ResponderRef)
 		executablePath += ".";
 		executablePath += current.getCgiFileExtension();
 	}
-	const char* execvePath = executablePath.c_str();
+	const char* execvePath = executablePath.data();
+	std::cout << execvePath << std::endl;
 	return execvePath;
 }
 
 char**			Cgi::createEnvVariables(Respond& ResponderRef)
 {
+	(void) ResponderRef;
 	std::string	currentVal;
 	std::string currentKey;
 
@@ -60,16 +63,10 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 	envp[1] = NULL;
 	envp[0] = (char*)malloc(sizeof(char) * 22);
 	envp[0][21] = '\0';
-	envp[0] = "SERVER_NAME=LOCALHOST";
-	if (access(path, (X_OK | F_OK)) == 0)
-	{
-		execve(path, NULL, envp);
-	}
-	else
-	{
-		std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
-		exit(1);
-	}
+	envp[0] = (char *)"SERVER_NAME=LOCALHOST";
+	execve(path, NULL, NULL);
+	std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
+	exit(1);
 }
 
 
@@ -82,8 +79,8 @@ void			Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 	{
 		static char buff[1024];
 		int ret = read(fds[0], buff, sizeof(buff));
-		//if ret <= 0 ? 
-		//if (ret == 0) //EOF
+		if (ret == 0) //EOF
+			std::cout << "EOF" << std::endl;
 		std::string cgiBody(buff);
 		ResponderRef.setBody(cgiBody); //exhangerefst body?
 	}
