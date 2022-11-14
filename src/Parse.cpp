@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 12:24:34 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 17:06:39 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,7 +329,7 @@ void	Parse::parseLocationAllowMethod(Location& location, Line& line)
 	if (method != "GET" && method != "POST" && method != "DELETE")
 		throw (ExceptionBuilder("allow_methods value invalid"));
 	else if (std::find(methods.begin(), methods.end(), method) != methods.end())
-		throw (ExceptionBuilder("Duplicate port"));
+		throw (ExceptionBuilder("Duplicate method"));
 	location.addToAllowMethod(method);
 }
 
@@ -465,8 +465,6 @@ void	Parse::validateServer(Server& server, int block)
 {
 	if (server.getPorts().empty())
 		throw(ValidateException("Ports not set", block));
-	else if (server.getNames().empty())
-		throw(ValidateException("Server name not set", block));
 	else if (server.getClientBodySize() == -1)
 		throw(ValidateException("ClientBodySize not set", block));
 

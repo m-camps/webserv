@@ -14,11 +14,17 @@
 	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
-- Make recv only stop on seperator(CLRF)
-- No default location add location
+- (Xander) Make recv first parse only header then parse body based on content length
+- (Max) No default location add location (parser)
+- (Max) (Done) Setup server names or not
+- (Max) Make a buffer for all the messages
+- Invalid location if /php/
+- Location block return (redirection)
+- Check allow_methods for cgi
+
 - (Done) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
-- make std::map<int, std::vector<Server&>> to easily send Exchange matching filedescriptors
-- rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
+- (Done) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
+- (Done) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
 
 1 socket_fd multiple servers
 1 client_fd multiple possible Servers

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 17:14:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 16:59:14 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 
-#define BUFF 200000
+#define BUFF 10000
 /* Default constructor */
 Network::Network() {}
 
