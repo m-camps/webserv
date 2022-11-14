@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:06:39 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 17:24:29 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -474,6 +474,10 @@ void	Parse::validateServer(Server& server, int block)
 		if (it->first == "")
 			throw(ValidateException("Location name not set", block));
 		validateLocation(it->second, block);
+	}
+	if (locations.empty() == true)
+	{
+		locations.insert(std::pair<std::string, Location>("/", Location(true)));
 	}
 	server.setLocations(locations);
 }

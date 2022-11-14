@@ -15,9 +15,8 @@
 	
 TODO:
 - (Xander) Make recv first parse only header then parse body based on content length
-- (Max) No default location add location (parser)
-- (Max) (Done) Setup server names or not
-- (Max) Make a buffer for all the messages
+- (Max)(Done) No default location add location (parser) 
+- (Max)(DONE) Make a buffer for all the messages
 - Invalid location if /php/
 - Location block return (redirection)
 - Check allow_methods for cgi

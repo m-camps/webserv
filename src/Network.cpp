@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 16:59:14 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/14 17:38:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void Network::setup(std::string file)
 void Network::run()
 {
     char buff[BUFF]; //  test buffer (can change later or keep it here)
-    std::string RequestStr;
+	std::map<int, std::string> requestStrings;
     //check if both location is seen here
     while (true)
     {
@@ -75,6 +75,7 @@ void Network::run()
                 if (isSocketFd(cur.fd))
                 {
 					int client_fd = acceptConnection(cur.fd);
+					requestStrings.insert(std::pair<int, std::string>(client_fd, ""));
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << client_fd << std::endl;
                 }
@@ -83,23 +84,23 @@ void Network::run()
                     ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
                     if (ret <= 0)
                     {
-                        RequestStr.clear();
                         if (ret == 0)
                             std::cout << "Client closed connection fd: " << cur.fd <<"\n";
                         else
                             std::perror("In recv: ");
                         close(cur.fd);
 						_poll.erase(_poll.begin() + i);
+						requestStrings.erase(cur.fd);
 						break ;
                     }
                     else
                     {
-                        RequestStr.append(buff, ret);
-                    	std::size_t found = RequestStr.find(SEPERATOR);
+						requestStrings.find(cur.fd)->second.append(buff, ret);
+                    	std::size_t found = requestStrings.find(cur.fd)->second.find(SEPERATOR);
                         if (ret != BUFF && found != std::string::npos) 
 						{
-                            Exchange exchange(getServersByFd(cur.fd), cur.fd, RequestStr);
-                            RequestStr.erase();
+                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestStrings.find(cur.fd)->second);
+							requestStrings.find(cur.fd)->second.clear();
 							std::cout << "Reponse on fd: " << cur.fd << std::endl;
                         }
                     }
