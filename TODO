@@ -14,14 +14,20 @@
 	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
-- Make recv only stop on seperator(CLRF)
-- No default location add location
-- (Done) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
-- make std::map<int, std::vector<Server&>> to easily send Exchange matching filedescriptors
-- rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
+- (Xander) Make recv first parse only header then parse body based on content length
+- (Bence) Invalid location if /php/
+- (Bence) Location block return (redirection)
+- (Bence) Check allow_methods for cgi
 
-1 socket_fd multiple servers
-1 client_fd multiple possible Servers
+
+
+
+
+
+- (Done) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
+- (Done) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
+- (Done) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
+
 
 Something goes wrong when you try to GET or DELETE a file with a spacebar in between.
 Example: "GET /space\ test.html HTTP/1.1"

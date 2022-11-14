@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 14:27:50 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/14 17:41:43 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Location {
 	public:
 		Location();
 		~Location();
+		Location(bool);
 
 		/* Getters */
 		std::string					getName(void) const;
