@@ -27,6 +27,18 @@ void Respond::parsePath(std::string& Path)
     Path.erase(0, found + LocationName.size());
 }
 
+bool	Respond::correctCgiRequestAllowed(void)
+{
+    std::string cgiExt = _location.getCgiFileExtension();
+    std::string cgiName = _location.getCgiName();
+
+    if (cgiName != "" && cgiExt != "")
+    {
+        return (true);
+    }
+	return (false);
+}
+
 void Respond::buildGet(void)
 {
     std::cout << "GET" << std::endl;
@@ -37,6 +49,12 @@ void Respond::buildGet(void)
         std::string Root = _location.getRoot();
         std::string Path = getEntryFromMap("Path");
 
+        if (correctCgiRequestAllowed() == true)
+        {
+            Cgi	cgi;
+            cgiBody = cgi.executeScript(*this);
+            _Exchanger.setIsCgi(true); 	//setCgiFileContent(cgiBody);
+        }
         parsePath(Path);
         relativePath = Root + Path;
         modifyStatuscode(Path, relativePath); // Change name
