@@ -130,7 +130,6 @@ void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 		int exit_status = WEXITSTATUS(stat);
 		if (exit_status == BAD_GATEWAY_EXIT_CODE)
 		{	
-			std::cout << "HERE" << std::endl;
 			return (createFailedSysCallResponse(ResponderRef, e_BadGateway));
 		}
 		int ret = read(fds[0], buff, sizeof(buff));
