@@ -49,7 +49,8 @@ void Network::setup(std::string file)
 /* Poll() loop of the network */
 /* do we need to use select with the bitflags? */
 void Network::run()
-{
+{;
+    std::size_t found;
     char buff[BUFF]; //  test buffer (can change later or keep it here)
 	std::map<int, std::string> requestStrings;
     //check if both location is seen here
@@ -87,13 +88,34 @@ void Network::run()
                     }
                     else
                     {
+                        HashMap requestData;
+
 						requestStrings.find(cur.fd)->second.append(buff, ret);
-                    	std::size_t found = requestStrings.find(cur.fd)->second.find(SEPERATOR);
-                        if (ret != BUFF && found != std::string::npos) 
-						{
-                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestStrings.find(cur.fd)->second);
-							requestStrings.find(cur.fd)->second.clear();
-							std::cout << "Reponse on fd: " << cur.fd << std::endl;
+                    	found = requestStrings.find(cur.fd)->second.find(SEPERATOR);
+
+                        // Make Header
+                        if (found != std::string::npos && requestData.empty())
+                        {
+                            Request request;
+                            requestData = request.parseRequest(requestStrings.find(cur.fd)->second);
+                        }
+
+                        HashMap::iterator ContentLength = requestData.find("Content-Length");
+                        if (requestData.empty() == false && ContentLength == requestData.end())
+                        {
+                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestData);
+                            requestStrings.find(cur.fd)->second.clear();
+                            requestData.clear();
+                            std::cout << "Reponse on fd: " << cur.fd << std::endl;
+                        }
+
+                        if (requestData.empty() == false && ContentLength != requestData.end() &&
+                            ft_strol(ContentLength->second) <= requestStrings.find(cur.fd)->second.length())
+                        {
+                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestData);
+                            requestStrings.find(cur.fd)->second.clear();
+                            requestData.clear();
+                            std::cout << "Reponse on fd: " << cur.fd << std::endl;
                         }
                     }
                 }
