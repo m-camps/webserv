@@ -21,7 +21,8 @@ Location::Location()
 
 Location::Location(bool isEmpty)
 {
-	isEmpty = true;
+	//isEmpty = true;
+	(void)isEmpty;
 	_autoindex = 0;
 	_return_status = -1;
 	_index = "index.html";

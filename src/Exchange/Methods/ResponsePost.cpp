@@ -94,7 +94,6 @@ bool Respond::isPostValid(void)
             createResponse(Generator::generateDefaulPage(_status_code));
             return (false);
         }
-        }
     }
     catch (const std::exception& e)
     {

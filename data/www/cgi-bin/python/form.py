@@ -1,44 +1,20 @@
-#!/usr/bin/env python
-#for this one we would need to set up the meta variables in parent process
-
-'''
 import os
-import cgi, cgitb
-cgitb.enable()
-form = cgi.FieldStorage()
 
+#print(cgi.test())
+path_info = os.getenv("PATH_INFO", default=None)
+script_name = os.getenv("SCRIPT_NAME", default=None)
 print("<!DOCTYPE html>")
 print("<html>")
-print("<head>")
-print('<meta charset="UTF-8">')
-print("<title>Index</title>")
-#print(form["username"])
-print(os.environ['HOME'])
-print("</head>")
+print("<head>First CGI program</head>")
 print("<body>")
-'''
-
-import cgi, cgitb
-cgitb.enable()
-input_data = cgi.FieldStorage()
-# name = input_data.getvalue('fname')
-# print("Name of the user is:",name)
-name = input_data.getvalue('SERVER_NAME')
-
-#print("name is :", name)
-#print("name of the user is INSIDE FORM:", name)
-
-print(cgi.test())
-#print("the name is %s, ", name)
-# print("<!DOCTYPE html>")
-# print("<html>")
-# print("<head>First CGI program</head>")
-# print("<body>")
-# print("<p>It seems to be working inside CGI.")
-# print("<form>Fill me out</form>")
-# print('<input type="checkbox" name="item" value="1" />')
-# print('<input type="checkbox" name="item" value="2" />')
-# print("</p>")
-# print(cgi.print_environ_usage())
-# print("</body>")
-# print("</html>")
+print("<p>It seems to be working inside CGI.")
+print("</p>")
+print("<p>")
+print("Value of env variable 'PATH_INFO': {} ".format(path_info))
+print("Value of env variable 'SCRIPT_NAME': {} ".format(script_name))
+print("</p>")
+print("<p>")
+print("IF THE VALUES ABOVE WERE PRINTED CORRECTLY, PASSING ENV VARIABLES VIA CGI IS SUFFICIENTLY FUNCTIONING.\n")
+print("</p>")
+print("</body>")
+print("</html>")

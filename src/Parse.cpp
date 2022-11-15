@@ -160,6 +160,8 @@ void		Parse::parseLocationName(Server& server, ServerBlock::iterator& it, Server
 	if (locations.count(name) > 0)
 		throw (ExceptionBuilder("duplicate location name in server"));
 	location = parseLocation(location_block, location);
+	if (name.length() != 1 && name.back() == '/')
+		throw (ExceptionBuilder("Incorrect end of locationblock. Please remove the trailing / after the name."));
 	location.setName(name);
 	server.addToLocations(name, location);
 }

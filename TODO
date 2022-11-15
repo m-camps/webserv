@@ -15,14 +15,12 @@
 	
 TODO:
 - (Xander) Make recv first parse only header then parse body based on content length
-- (Bence) Invalid location if /php/
+- (Bence) Invalid location if /php/ - DONE
 - (Bence) Location block return (redirection)
-- (Bence) Check allow_methods for cgi
-
-
-
-
-
+- (Bence) Check allow_methods for cgi - DONE 
+- (Bence) Denied permisson of the script - DONE
+- (Bence) Chaining together the correct path based on location name+root+rest_of_url
+- Check all system calls, handle return of error (-1)
 
 - (Done) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
 - (Done) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
@@ -33,3 +31,10 @@ Something goes wrong when you try to GET or DELETE a file with a spacebar in bet
 Example: "GET /space\ test.html HTTP/1.1"
 
 	
+/python/index.html
+data/www/index.html
+
+python index.py ->
+
+/python/test/test
+data/www/test

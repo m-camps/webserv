@@ -1,72 +1,95 @@
 #include "../inc/Cgi.hpp"
 #include <iostream>
 #include <unistd.h>
-#include <stdlib.h> //check if we need this one
+#include <vector>
+#include <string.h>
 
-const char*		buildCgiExecPath(Respond& ResponderRef)
+std::string		buildCgiExecPath(Respond& ResponderRef)
 {
 	Location current = ResponderRef.getLocation();
-	char absolutePath[300]; //calloc, or static?
+	char absolutePath[300];
 
-	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL)
+	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL) //navigate to the directory of cgibin
 	{
 		std::cout << "Could not enter to current working directory, closing program" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	std::string relativePath = current.getRoot() + ResponderRef.getEntryFromMap("Path");
-	std::string executablePath(absolutePath); //../data/www/cgi-bin/filename+extension
-	executablePath += "/";
-	executablePath += current.getRoot(); //for now, will depend on the root of the location/server block
-	executablePath += "/cgi-bin";
-	executablePath += current.getName(); //what happens if this isnt / but just like python
-	executablePath += "/";
-	executablePath += current.getCgiName();
+	std::string executablePath(absolutePath);
+	executablePath += "/" + current.getRoot() + "/cgi-bin" + current.getName() + "/" + current.getCgiName();
 	if (current.getCgiFileExtension() != "" && current.getCgiName() != "")
 	{
 		executablePath += ".";
 		executablePath += current.getCgiFileExtension();
 	}
-	const char* execvePath = executablePath.data();
-	std::cout << execvePath << std::endl;
-	return execvePath;
+	return executablePath;
 }
 
-char**			Cgi::createEnvVariables(Respond& ResponderRef)
+char**			createArgv(Respond& ResponderRef)
 {
-	(void) ResponderRef;
-	std::string	currentVal;
-	std::string currentKey;
+	std::string 				requestedFilePath = buildCgiExecPath(ResponderRef);
+	std::string					interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
+	std::vector<std::string>	argvString;
 
-	char** envp = (char **)calloc(2, sizeof(char *));
-	envp[0] = (char*)calloc(23, sizeof(char));
+	argvString.push_back(interpreterPath);
+	argvString.push_back(requestedFilePath);
 
-	//assigning servername to envp
-	// currentVal = "SERVER_NAME=";
-	// currentVal += ExchangeRef.getServer().getNames().at(0);
-	//currentKey =  //what happens with more server blocks?
-	
-	memcpy(envp[0],  currentVal.c_str(), currentVal.length());
+	char **argv = new (std::nothrow) char*[3];
+	if (argv == nullptr)
+	{
+		std::cerr << "New allocation failed for argv, returning" << std::endl;
+		return (nullptr);
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		argv[i] = strdup(static_cast<const char*>(argvString[i].data()));
+	}
+	argv[2] = NULL;
+	return argv;
+}
+
+char**			createEnvp(Respond& ResponderRef)
+{
+	std::vector<std::string>	envpStrig;
+	std::string					pathInfo = "PATH_INFO=" + ResponderRef.getLocation().getName(); //we could here add full path, donno why is it needed tho
+	std::string					scriptName = "SCRIPT_NAME=/cgi-bin";
+
+	envpStrig.push_back(pathInfo);
+	envpStrig.push_back(scriptName);
+
+	char **envp = new (std::nothrow) char*[3];
+	if (envp == nullptr)
+	{
+		std::cerr << "New allocation failed for envp, returning" << std::endl;
+		return (nullptr);
+	}
+	for (int i = 0; i < 2; i++)
+	{
+		envp[i] = strdup(static_cast<const char*>(envpStrig[i].data()));
+	}
+	envp[2] = NULL;
 	return envp;
 }
 
+
 void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 {
-	const char *path = buildCgiExecPath(ResponderRef);
-	//char **envp = createEnvVariables(ResponderRef, location);
-	//int res = putenv(envp[0]); //to check if it worked
 	close(fds[0]);
 	close(STDIN_FILENO);
 	dup2(fds[1], STDOUT_FILENO);
 
-	//if I pass it here it works, if I create it above it doesnt for some reason
-	char** envp = (char**)malloc(2 * sizeof(char**));
-	envp[1] = NULL;
-	envp[0] = (char*)malloc(sizeof(char) * 22);
-	envp[0][21] = '\0';
-	envp[0] = (char *)"SERVER_NAME=LOCALHOST";
-	execve(path, NULL, NULL);
-	std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
-	exit(1);
+	char**	argv = createArgv(ResponderRef);
+	char**	envp = createEnvp(ResponderRef);
+
+	if (access(argv[1], (X_OK | F_OK)) == 0)
+	{
+		execve(argv[0], argv, envp);
+	}
+	else
+	{
+		std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
+		exit(1);
+	}
 }
 
 
@@ -79,10 +102,12 @@ void			Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 	{
 		static char buff[1024];
 		int ret = read(fds[0], buff, sizeof(buff));
-		if (ret == 0) //EOF
-			std::cout << "EOF" << std::endl;
+		if (ret == 0)
+		{
+			//std::cout << "EOF" << std::endl;
+		}
 		std::string cgiBody(buff);
-		ResponderRef.setBody(cgiBody); //exhangerefst body?
+		ResponderRef.setBody(cgiBody);
 	}
 	else
 	{
@@ -158,7 +183,15 @@ https://serverfault.com/questions/853559/nginx-place-a-prefix-in-my-url
 // 	std::cout << std::endl;
 // 	return ;
 // }
-
+	// const char *envp[] =
+	// {
+	// 	"HOME=/",
+	// 	"PATH=/bin:/usr/bin",
+	// 	"TZ=UTC0",
+	// 	"USER=beelzebub",
+	// 	"LOGNAME=tarzan",
+	// 	0
+	// };
 // void	Cgi::createCgiResponse(void)
 // {
 // 	std::cout << "Content-type:text/html\r\n\r\n";
