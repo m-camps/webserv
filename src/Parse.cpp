@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:35:53 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 11:59:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,7 +277,8 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 	else if(server.getClientBodySize() != -1)
 		throw (ExceptionBuilder("Duplicate client_body_size"));
 
-	int clientBodySize = std::stoi(line[1], nullptr, 10);
+	int clientBodySize;
+	std::istringstream(line[1]) >> clientBodySize;
 	if (clientBodySize == 0)
 		throw (ExceptionBuilder("client_body_size can't be 0"));
 	server.setClientBody(clientBodySize);
@@ -290,7 +291,8 @@ void	Parse::parseErrorPage(Server& server, Line& line)
 	else if (!isNumber(line[1]))
 		throw (ExceptionBuilder("status_code is not a number"));
 
-	int status_code = std::stoi(line[1], nullptr, 10);
+	int status_code;
+	std::istringstream(line[1]) >> status_code;
 	std::string page = line[2];
 
 	if (status_code < 100 || status_code > 599)
@@ -372,10 +374,17 @@ void	Parse::parseLocationCgiExt(Location& location, Line& line)
 
 void	Parse::parseLocationReturn(Location& location, Line& line)
 {
-	if (line.size() != 2 || line.size() != 3)
+	if (line.size() != 2 && line.size() != 3)
 		throw (ExceptionBuilder("return location directive incorrect"));
 	else if (location.getReturnPath() != "" || location.getReturnStatus() != -1)
 		throw (ExceptionBuilder("duplicate return in location"));
+	else if (!isNumber(line[1])) 
+		throw (ExceptionBuilder("return status code directive not a number"));
+	int status_code;
+	std::istringstream(line[1]) >> status_code;
+	location.setReturnStatus(status_code);
+	if (line.size() == 3)
+		location.setReturnPath(line[2]);
 }
 
 /* Helper Functions */

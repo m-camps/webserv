@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/09 11:56:18 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 11:54:01 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef std::vector<Line>					Block;
 typedef std::vector<Line>					File;
 
 #define NR_OF_SERVER_DIRECTIVES 6 //will be more later
-#define NR_OF_LOCATION_DIRECTIVES 6 //will be more later
+#define NR_OF_LOCATION_DIRECTIVES 7 //will be more later
 
 class Parse
 {
