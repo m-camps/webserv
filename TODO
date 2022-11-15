@@ -16,18 +16,19 @@
 TODO:
 - (Xander) Make recv first parse only header then parse body based on content length
 - (Bence) Chaining together the correct path based on location name+root+rest_of_url
+- (Bence) Restructure file passed to CGI
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
 - (Xander) Limit the upload size to 100mb? (suggestions are welcome)
-- Set default file for a directory
-- Add default file to parser
-- HTML landing page
+- (Xander) Set default file for a directory
+- (Max) Add default file to parser
+- (Max) HTML landing page
+- (Bence) Check relinking of Makefile
+- (Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) 
 
 TOCHECKLAST:
-- Check all system calls, handle return of error (-1) anything in 
 - Check for forbidden functions (ex. std::stoi)
-- Check relinking of Makefile
-- Check for leaks
-- Check all respond codes
+- (Max) Check for leaks
+- (Xander) Check all respond codes
 - Clean up the repo
 
 DONE:
