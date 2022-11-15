@@ -15,27 +15,32 @@
 	
 TODO:
 - (Xander) Make recv first parse only header then parse body based on content length
-- (Bence) Invalid location if /php/ - DONE
-- (Bence) Location block return (redirection)
-- (Bence) Check allow_methods for cgi - DONE 
-- (Bence) Denied permisson of the script - DONE
 - (Bence) Chaining together the correct path based on location name+root+rest_of_url
-- Check all system calls, handle return of error (-1)
+- (Max/Xander) If read/write fails close connection (still need to implement on write)
+- (Xander) Limit the upload size to 100mb? (suggestions are welcome)
+- Set default file for a directory
+- Add default file to parser
+- HTML landing page
+
+TOCHECKLAST:
+- Check all system calls, handle return of error (-1) anything in 
 - Check for forbidden functions (ex. std::stoi)
+- Check relinking of Makefile
+- Check for leaks
+- Check all respond codes
+- Clean up the repo
 
-- (Done) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
-- (Done) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
-- (Done) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
-
+DONE:
+- (DONE)(XANDER) Method like HEAD should return (501 Not implemented)
+- (DONE)(Max) Location block return (redirection)
+- (DONE)(Bence) Invalid location if /php/
+- (DONE)(Bence) Denied permisson of the script 
+- (DONE)(Bence) Check allow_methods for cgi
+- (Done)(Max) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
+- (Done)(Max) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
+- (Done)(Max) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
 
 Something goes wrong when you try to GET or DELETE a file with a spacebar in between.
 Example: "GET /space\ test.html HTTP/1.1"
 
-	
-/python/index.html
-data/www/index.html
 
-python index.py ->
-
-/python/test/test
-data/www/test

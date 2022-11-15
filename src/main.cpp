@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/13 16:55:08 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 15:08:46 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/15 13:54:20 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,18 @@ int32_t	main(int argc, char *argv[])
 		std::exit(EXIT_FAILURE);
 	}
 
+	
 	Network network;
 	
-	network.setup(argv[1]);
+	try
+	{	
+		network.setup(argv[1]);
+	}
+	catch(std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		std::exit(ERROR);
+	}
 	network.run();
 	return (0);
 }
