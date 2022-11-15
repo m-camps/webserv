@@ -55,30 +55,55 @@ std::string Request::AppendRequest(const std::string& Request)
  */
 void Request::splitMethod(std::string line)
 {
-	int32_t last_it;
-	std::vector<int> AllSpaceLocations = findCharLocation(line, ' ');
-	std::vector<int>::iterator it = AllSpaceLocations.begin();
+    try
+    {
+        size_t found;
+        std::string temp;
 
-    if (AllSpaceLocations.size() != 2)
-        return ;
-	try
-	{
-        addHashMapNode("HTTPMethod", line.substr(0, *it));
-        last_it = *it + 1;
-        addHashMapNode("Path", line.substr(*it + 1, *++it - last_it));
-        last_it = *it;
-        addHashMapNode("HTTPVersion", line.substr(*it + 1, line.length() - last_it - 2));
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-		std::exit(EXIT_FAILURE);
-	}
+        found = line.find_first_of(' ');
+        if (found == std::string::npos)
+        {
+            addHashMapNode("HTTPMethod", "ERROR");
+            addHashMapNode("HTTPVersion", "ERROR");
+            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+        }
+
+        temp = line.substr(0, found);
+        addHashMapNode("HTTPMethod", temp);
+        line.erase(0, found + 1);
+        temp.clear();
+
+        found = line.find_last_of(' ');
+        if (found == std::string::npos)
+        {
+            addHashMapNode("HTTPMethod", "ERROR");
+            addHashMapNode("HTTPVersion", "ERROR");
+            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+        }
+
+        temp = line.substr(found + 1, line.length() - found - 2);
+        addHashMapNode("HTTPVersion", temp);
+        line.erase(found);
+        temp.clear();
+
+        found = line.find('/');
+        if (found == std::string::npos)
+        {
+            addHashMapNode("HTTPMethod", "ERROR");
+            addHashMapNode("HTTPVersion", "ERROR");
+            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+        }
+        addHashMapNode("Path", line);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 }
 
 /*
  * I created a HashMap by using std::map.
- * You can use std::map::find() to find the data you are looking for. \n
+ * You can use std::map::find() to find the data you are looking for.
  */
 void Request::stringToMap(const std::string& Header)
 {

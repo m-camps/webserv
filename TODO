@@ -38,3 +38,12 @@ python index.py ->
 
 /python/test/test
 data/www/test
+
+
+
+
+Xander:
+Eerste line van Header anders parsen
+Header en Body los parsen
+Dubbel "/" wegwerken
+Error page goed handelen

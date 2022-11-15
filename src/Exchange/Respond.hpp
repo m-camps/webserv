@@ -104,6 +104,7 @@ enum e_statusCode
 	e_Accepted = 202,
 	e_NoContent = 204,
     e_Redir = 301,
+    e_Badrequest = 400,
     e_Unauthorized = 401,
     e_Forbidden = 403,
     e_NotFound = 404,

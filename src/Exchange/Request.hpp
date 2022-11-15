@@ -29,7 +29,7 @@ private:
    
     Request& operator=(const Request& ref);
 
-	HashMap			_requestData;
+	HashMap		_requestData;
 
     void		stringToMap(const std::string&);
     void 		splitMethod(std::string line);
