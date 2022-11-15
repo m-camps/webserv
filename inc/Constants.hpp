@@ -8,7 +8,7 @@
 #define BUFFER_SIZE 10000
 #define ERROR 1
 #define SUCCES 0
-
+#define MAX_PORT 65535
 
 #define DEFAULT_ROOT "data/www/"
 #define DEFAULT_INDEX "index.html"

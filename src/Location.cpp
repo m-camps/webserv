@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:29:48 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 12:45:10 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,5 +72,7 @@ std::ostream& operator<<(std::ostream& stream, Location& location)
 	stream << "]\n";
 	stream << "\tCgiName: [" <<  location.getCgiName() << "]\n";
 	stream << "\tCgiExtension: [" <<  location.getCgiFileExtension() << "]\n";
+	stream << "\tReturnStatus: [" <<  location.getReturnStatus() << "]\n";
+	stream << "\tReturnRedirUrl: [" <<  location.getReturnPath() << "]\n";
 	return (stream);
 }

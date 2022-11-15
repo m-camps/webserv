@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:59:02 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 13:02:38 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,31 +241,38 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 /* Dispatch Table Server Functions */
 void    Parse::parseListen(Server& server, Line& line)
 {
-	if (line.size() != 2)
-		throw (ExceptionBuilder("listen directive incorrect"));
-	else if (!isNumber(line[1]))
-		throw (ExceptionBuilder("listen directive not a number"));
-		
-	int port = strtol(line[1].c_str(), nullptr, 10); // CHECK THIS
-	std::vector<int> ports = server.getPorts();
-	
-	if (std::find(ports.begin(), ports.end(), port) != ports.end())
-		throw (ExceptionBuilder("Duplicate port"));
-	server.addToPorts(port);
+	if (line.size() < 2)
+		throw (ExceptionBuilder("listen directive empty"));
+
+	for (size_t i = 1; i < line.size(); i++)
+	{
+		if (!isNumber(line[i]))
+			throw (ExceptionBuilder("listen directive not a number"));
+		int port;
+		std::istringstream(line[i]) >> port;
+		std::vector<int> ports = server.getPorts();
+		if (std::find(ports.begin(), ports.end(), port) != ports.end())
+			throw (ExceptionBuilder("Duplicate port"));
+		if (port > MAX_PORT)
+			throw (ExceptionBuilder("Port number to high"));
+		server.addToPorts(port);
+	}
 }
 
 void    Parse::parseServerName(Server& server, Line& line)
 {
-	if (line.size() != 2)
-		throw (ExceptionBuilder("server_name directive incorrect"));
+	if (line.size() < 2)
+		throw (ExceptionBuilder("server_name directive empty"));
 
-	std::string server_name = line[1];
-	std::vector<std::string> names = server.getNames();
-
-	if (std::find(names.begin(), names.end(), server_name) != names.end())
-		throw (ExceptionBuilder("Duplicate server_name"));
-		
-	server.addToNames(server_name);
+	for (size_t i = 1; i < line.size(); i++)
+	{
+		std::string server_name = line[i];
+		std::vector<std::string> names = server.getNames();
+		if (std::find(names.begin(), names.end(), server_name) != names.end())
+			throw (ExceptionBuilder("Duplicate server_name"));
+			
+		server.addToNames(server_name);
+	}
 }
 
 void    Parse::parseClientBodySize(Server& server, Line& line)
@@ -324,17 +331,19 @@ void	Parse::parseLocationIndex(Location& location, Line& line)
 
 void	Parse::parseLocationAllowMethod(Location& location, Line& line)
 {
-	if (line.size() != 2)
-		throw (ExceptionBuilder("allow_methods directive incorrect"));
+	if (line.size() < 2)
+		throw (ExceptionBuilder("location allow_method directive empty"));
 
-	std::string method = line[1];
-	std::vector<std::string> methods = location.getAllowMethods();
-	
-	if (method != "GET" && method != "POST" && method != "DELETE")
-		throw (ExceptionBuilder("allow_methods value invalid"));
-	else if (std::find(methods.begin(), methods.end(), method) != methods.end())
-		throw (ExceptionBuilder("Duplicate method"));
-	location.addToAllowMethod(method);
+	for (size_t i = 1; i < line.size();i++)
+	{
+		std::vector<std::string> methods = location.getAllowMethods();
+		std::string method = line[i];
+		if ( method != "GET" && method != "POST" && method != "DELETE")
+			throw (ExceptionBuilder("allow_methods variable invalid"));
+		if (std::find(methods.begin(), methods.end(), method) != methods.end())
+			throw (ExceptionBuilder("Duplicate method"));
+		location.addToAllowMethod(line[i]);
+	}
 }
 
 void	Parse::parseLocationAutoIndex(Location& location, Line& line)
