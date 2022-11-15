@@ -44,3 +44,14 @@ Something goes wrong when you try to GET or DELETE a file with a spacebar in bet
 Example: "GET /space\ test.html HTTP/1.1"
 
 
+/python/test/test
+data/www/test
+
+
+
+
+Xander:
+Eerste line van Header anders parsen
+Header en Body los parsen
+Dubbel "/" wegwerken
+Error page goed handelen

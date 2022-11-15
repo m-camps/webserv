@@ -28,6 +28,8 @@ void deleteFile(std::string& filePath);
 
 bool isDirectory(const std::string& FileName);
 
+size_t ft_strol(const std::string& line);
+
 template <typename T>
 std::string ToString(T Number)
 {

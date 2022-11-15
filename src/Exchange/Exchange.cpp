@@ -11,17 +11,14 @@
 Exchange::Exchange(void) : _socketFd(0) {}
 Exchange::~Exchange(void) {}
 
-Exchange::Exchange(Servers servers, int32_t socketFd, std::string& requestStr)
+Exchange::Exchange(Servers servers, int32_t socketFd, const HashMap& requestData)
     : _socketFd(socketFd)
 {
 	try
 	{
-		Request request;
         Server server;
         Location location;
-		HashMap	requestData;
 
-		requestData = request.parseRequest(requestStr);
 		server = matchServer(servers, requestData);
 		location = matchLocation(server, requestData);
 

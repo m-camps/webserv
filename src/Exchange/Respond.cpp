@@ -140,6 +140,8 @@ void 	Respond::buildResponse(HashMap requestData)
 
         if (MethodIsImplemented(Method) == true)
             _status_code = e_MethodNotFound;
+        else if (Method == "ERROR")
+            _status_code = e_Badrequest;
         else
             _status_code = e_NotImplemented;
         createResponse(Generator::generateDefaulPage(_status_code));
