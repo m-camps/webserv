@@ -53,7 +53,7 @@ char**			createArgv(Respond& ResponderRef)
 	if (argv == nullptr)
 	{
 		std::cerr << "New allocation failed for argv, returning" << std::endl;
-		return (nullptr);
+		exit(BAD_GATEWAY_EXIT_CODE); //debatable
 	}
 	for (int i = 0; i < 2; i++)
 	{
@@ -78,7 +78,7 @@ char**			createEnvp(Respond& ResponderRef)
 	if (envp == nullptr)
 	{
 		std::cerr << "New allocation failed for envp, returning" << std::endl;
-		return (nullptr);
+		exit(BAD_GATEWAY_EXIT_CODE); //debatable
 	}
 	for (int i = 0; i < 2; i++)
 	{
@@ -129,7 +129,10 @@ void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 		static char buff[1024];
 		int exit_status = WEXITSTATUS(stat);
 		if (exit_status == BAD_GATEWAY_EXIT_CODE)
+		{	
+			std::cout << "HERE" << std::endl;
 			return (createFailedSysCallResponse(ResponderRef, e_BadGateway));
+		}
 		int ret = read(fds[0], buff, sizeof(buff));
 		if (ret == -1)
 			return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
