@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 13:02:38 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 13:11:04 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,8 +302,8 @@ void	Parse::parseErrorPage(Server& server, Line& line)
 	std::istringstream(line[1]) >> status_code;
 	std::string page = line[2];
 
-	if (status_code < 100 || status_code > 599)
-		throw (ExceptionBuilder("error_page out of range (100-599)"));
+	if (status_code < 400 || status_code > 599)
+		throw (ExceptionBuilder("error_page out of range (400-599)"));
 	std::map<int, std::string> errorPages = server.getErrorPage();
 	if (errorPages.count(status_code) > 0)
 		throw (ExceptionBuilder("duplicate error_page in server"));
