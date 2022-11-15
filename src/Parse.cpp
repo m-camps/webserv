@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:30:20 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 11:35:53 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -468,7 +468,7 @@ void	Parse::validateServer(Server& server, int block)
 	if (server.getPorts().empty())
 		throw(ValidateException("Ports not set", block));
 	else if (server.getClientBodySize() == -1)
-		throw(ValidateException("ClientBodySize not set", block));
+		server.setClientBody(DEFAULT_CLIENT_BODY_SIZE);
 
 	std::map<std::string, Location>	locations = server.getLocations();
 	for (std::map<std::string, Location>::iterator it = locations.begin(); it != locations.end(); it++)

@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 15:36:19 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 13:47:08 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 11:36:17 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ std::map<std::string, Location> 				Server::getLocations(void) const { return _l
 std::map<int, std::string> 						Server::getErrorPage(void) const { return _error_pages; }
 
 /* Setters */
-void	Server::setClientBody(int& client_body_size) { _client_body_size = client_body_size; }
+void	Server::setClientBody(int client_body_size) { _client_body_size = client_body_size; }
 void	Server::setLocations(std::map<std::string, Location>& locations) { _locations = locations; }
 
 /* Adders */

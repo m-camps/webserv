@@ -8,6 +8,8 @@
 #define BUFFER_SIZE 10000
 #define ERROR 1
 #define SUCCES 0
+
+
 #define DEFAULT_ROOT "data/www/"
 #define DEFAULT_INDEX "index.html"
-
+#define DEFAULT_CLIENT_BODY_SIZE 10
