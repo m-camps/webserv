@@ -75,8 +75,11 @@ void    Respond::createResponse(const std::string& FileContent)
 {
     addToHeader(Generator::generateStatus(*this));
     setBody(FileContent);
-//    if (FileContent.length() > MAXBYTES)
-//        addToHeader(Generator::generateTransferEncoding());
+    if (FileContent.length() > MAXBYTES)
+    {
+        _isChunked = true;
+        addToHeader(Generator::generateTransferEncoding());
+    }
     addToHeader(Generator::generateContentLength(FileContent.length()));
 }
 

@@ -128,7 +128,7 @@ void	Exchange::sendToClient(Respond& response)
     }
 }
 
-void	Exchange::sendChunked(std::string str)
+void	Exchange::sendChunked(std::string str) const
 {
     ssize_t ret;
     std::string Body = Generator::generateChunk(str);
@@ -144,9 +144,8 @@ void	Exchange::sendChunked(std::string str)
 		Body.clear();
         Body = Generator::generateChunk(str);
     }
-	Body = "0\r\n\r\n";
     ret = write(_socketFd, Body.data(), Body.length());
-    if (ret < 0)
+    if (ret < 0 || ret != (ssize_t)Body.length())
     {
         std::string StrError = std::strerror(errno);
         throw (std::runtime_error(StrError));

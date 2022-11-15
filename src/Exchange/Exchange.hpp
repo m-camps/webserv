@@ -27,7 +27,7 @@ public:
 
 	/* Send */
 	void			sendToClient(Respond& response);
-	void			sendChunked(std::string str);
+	void			sendChunked(std::string str) const;
 	void			sendNormal(const std::string& str) const;
 
 	/* Matching */

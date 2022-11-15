@@ -93,7 +93,6 @@ void Network::run()
 						requestStrings.find(cur.fd)->second.append(buff, ret);
                     	found = requestStrings.find(cur.fd)->second.find(SEPERATOR);
 
-                        // Make Header
                         if (found != std::string::npos && requestData.empty())
                         {
                             Request request;
@@ -208,6 +207,8 @@ int		Network::createSocket(void)
 	int reuse = 1;
 	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
    		throw std::runtime_error("setsockopt(SO_REUSEADDR) failed");
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_NOSIGPIPE, &reuse, sizeof(int)) < 0)
+   		throw std::runtime_error("setsockopt(SO_REUSEPIPE) failed");
 	return socket_fd;
 }
 
