@@ -55,7 +55,7 @@ std::vector<std::string> 	splitLineWithStrtok(std::string& line, const std::stri
     if (!c_line)
     {
         std::perror("In malloc: ");
-        std::exit(EXIT_FAILURE);
+        throw (std::logic_error("Malloc error"));
     }
 	word = strtok(c_line, delimit.c_str());
 	while (word != NULL)
@@ -69,30 +69,38 @@ std::vector<std::string> 	splitLineWithStrtok(std::string& line, const std::stri
 
 Location	Exchange::matchLocation(Server server, HashMap requestData)
 {
-	Locations locations = server.getLocations();
-	std::string route = requestData.find("Path")->second;
-	std::string loc = "/";
-	std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
-	int longestMatch = 0;
+    int32_t longestMatch = 0;
+    std::string loc = "/";
+    std::string route = requestData.find("Path")->second;
+    Locations locations = server.getLocations();
 
-	for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
-	{
-		std::string name = it->first;
-		std::vector<std::string> splitName = splitLineWithStrtok(name, "/");
-		int match = 0;
-		
-		for (size_t i = 0; i < splitRoute.size() && i < splitName.size(); i++)
-		{
-			if (splitRoute[i] == splitName[i])
-				match++;
-		}
-		if (match > longestMatch)
-		{
-			longestMatch = match;
-			loc = name;
-		}
-	}
-	return (server.getLocations().find(loc)->second);
+    try
+    {
+        std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
+
+        for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
+        {
+            std::string name = it->first;
+            std::vector<std::string> splitName = splitLineWithStrtok(name, "/");
+            int match = 0;
+
+            for (size_t i = 0; i < splitRoute.size() && i < splitName.size(); i++)
+            {
+                if (splitRoute[i] == splitName[i])
+                    match++;
+            }
+            if (match > longestMatch)
+            {
+                longestMatch = match;
+                loc = name;
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        // Internal Error;
+    }
+    return (server.getLocations().find(loc)->second);
 }
 
 #pragma endregion ctoranddtor
