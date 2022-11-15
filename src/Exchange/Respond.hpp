@@ -43,7 +43,7 @@ class Respond
 
 		/* Setters */
 		void			setBody(std::string body);
-
+		void			setStatusCode(int statusCode);
 		/* Adders */
 		void			addToHeader(const std::string& NewLine);
 
@@ -111,5 +111,6 @@ enum e_statusCode
     e_PayloadTooLarge = 413,
     e_UnsupportedMediaType = 415,
 	e_InternalServerError = 500,
-    e_NotImplemented = 501
+    e_NotImplemented = 501,
+	e_BadGateway = 502
 };

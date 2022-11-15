@@ -4,6 +4,21 @@
 #include <vector>
 #include <string.h>
 
+
+std::string		createServerErrorBody(Respond& ResponderRef, e_statusCode errorCode)
+{
+	ResponderRef.setStatusCode(errorCode);
+	std::string defaultServerErrorBody = Generator::generateDefaulPage(ResponderRef.getStatusCode());
+	return	defaultServerErrorBody;
+}
+
+void		createFailedSysCallResponse(Respond& ResponderRef, e_statusCode errorCode)
+{
+	ResponderRef.setStatusCode(errorCode);
+	ResponderRef.setBody(createServerErrorBody(ResponderRef, errorCode));
+	return ;
+}
+
 std::string		buildCgiExecPath(Respond& ResponderRef)
 {
 	Location current = ResponderRef.getLocation();
@@ -43,6 +58,8 @@ char**			createArgv(Respond& ResponderRef)
 	for (int i = 0; i < 2; i++)
 	{
 		argv[i] = strdup(static_cast<const char*>(argvString[i].data()));
+		if (!argv[i])
+			exit(BAD_GATEWAY_EXIT_CODE); //debatable
 	}
 	argv[2] = NULL;
 	return argv;
@@ -66,24 +83,30 @@ char**			createEnvp(Respond& ResponderRef)
 	for (int i = 0; i < 2; i++)
 	{
 		envp[i] = strdup(static_cast<const char*>(envpStrig[i].data()));
+		if (!envp[i])
+			exit(BAD_GATEWAY_EXIT_CODE); //debatable
+
 	}
 	envp[2] = NULL;
 	return envp;
 }
 
-
 void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 {
-	close(fds[0]);
-	close(STDIN_FILENO);
-	dup2(fds[1], STDOUT_FILENO);
+	if (close(fds[0]) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+	if (close(STDIN_FILENO) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+	if (dup2(fds[1], STDOUT_FILENO) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 
 	char**	argv = createArgv(ResponderRef);
 	char**	envp = createEnvp(ResponderRef);
 
 	if (access(argv[1], (X_OK | F_OK)) == 0)
 	{
-		execve(argv[0], argv, envp);
+		if (execve(argv[0], argv, envp) < 0)
+			exit(BAD_GATEWAY_EXIT_CODE);
 	}
 	else
 	{
@@ -92,20 +115,24 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 	}
 }
 
-
-void			Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
+void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 {
-	close(fds[1]);
-	dup2(fds[0], STDIN_FILENO);
-	waitpid(-1, &stat, 0);
+	if (close(fds[1]) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+	if (dup2(fds[0], STDIN_FILENO) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+	if (waitpid(-1, &stat, 0) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+
 	if (WIFEXITED(stat) == true)
 	{
 		static char buff[1024];
+		int exit_status = WEXITSTATUS(stat);
+		if (exit_status == BAD_GATEWAY_EXIT_CODE)
+			return (createFailedSysCallResponse(ResponderRef, e_BadGateway));
 		int ret = read(fds[0], buff, sizeof(buff));
-		if (ret == 0)
-		{
-			//std::cout << "EOF" << std::endl;
-		}
+		if (ret == -1)
+			return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 		std::string cgiBody(buff);
 		ResponderRef.setBody(cgiBody);
 	}
@@ -113,21 +140,23 @@ void			Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 	{
 		//maybe signaled quit? interruption ? 
 	}
-	close(fds[0]);
-	return ;
+	if (close(fds[0]) < 0)
+		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 }
-
 
 std::string			Cgi::executeScript(Respond& ResponderRef)
 {
 	int	fds[2];
 	int	stat;
 
-	pipe(fds);
+	if (pipe(fds) < 0)
+	{
+		return (createServerErrorBody(ResponderRef, e_InternalServerError));
+	}
 	pid_t	pid = fork();
 	if (pid == -1)
 	{
-		std::cout << "Forking process for CGI failed." << std::endl;
+		return (createServerErrorBody(ResponderRef, e_InternalServerError));
 	}
 	else if (pid == 0)
 	{	
