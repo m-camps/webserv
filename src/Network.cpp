@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 15:30:49 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 17:39:02 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include "Exchange/Request.hpp"
 #include <iostream>
 #include "../inc/Cgi.hpp"
+#include "Poller.hpp"
 
 #define BUFF 10000
 /* Default constructor */
@@ -51,7 +52,7 @@ void Network::setup(std::string file)
 void Network::run()
 {
     char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::map<int, std::string> requestStrings;
+	std::map<int, Poller> io;
     //check if both location is seen here
     while (true)
     {
@@ -67,7 +68,7 @@ void Network::run()
                 if (isSocketFd(cur.fd))
                 {
 					int client_fd = acceptConnection(cur.fd);
-					requestStrings.insert(std::pair<int, std::string>(client_fd, ""));
+					io.insert(std::pair<int, Poller>(client_fd, Poller()));
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << client_fd << std::endl;
                 }
@@ -82,22 +83,25 @@ void Network::run()
                             std::perror("In recv: ");
                         close(cur.fd);
 						_poll.erase(_poll.begin() + i);
-						requestStrings.erase(cur.fd);
+						io.erase(cur.fd);
 						break ;
                     }
                     else
                     {
-						requestStrings.find(cur.fd)->second.append(buff, ret);
-                    	std::size_t found = requestStrings.find(cur.fd)->second.find(SEPERATOR);
+						io.find(cur.fd)->second.readString.append(buff, ret);
+                    	std::size_t found = io.find(cur.fd)->second.readString.find(SEPERATOR);
                         if (ret != BUFF && found != std::string::npos) 
-						{
-                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestStrings.find(cur.fd)->second);
-							requestStrings.find(cur.fd)->second.clear();
-							std::cout << "Reponse on fd: " << cur.fd << std::endl;
-                        }
+							io.find(cur.fd)->second.readyToWrite = true;
                     }
                 }
             }
+			else if ((cur.events & POLLOUT) && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
+			{
+				Exchange exchange(getServersByFd(cur.fd), cur.fd, io.find(cur.fd)->second.readString);
+				io.find(cur.fd)->second.readString.clear();
+				std::cout << "Reponse on fd: " << cur.fd << std::endl;
+				io.find(cur.fd)->second.readyToWrite = false;
+			}
         }
     }
 }
@@ -225,7 +229,7 @@ struct pollfd 	Network::newPoll(int fd)
 	struct pollfd newFd;
 
 	newFd.fd = fd;
-	newFd.events = POLLIN;
+	newFd.events = POLLIN | POLLOUT;
 	newFd.revents = 0;
 	return(newFd);
 }
