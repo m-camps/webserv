@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:44:44 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 11:30:20 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ void		Parse::parseLocationName(Server& server, ServerBlock::iterator& it, Server
 		throw (ExceptionBuilder("duplicate location name in server"));
 	location = parseLocation(location_block, location);
 	if (name.length() != 1 && name.back() == '/')
-		throw (ExceptionBuilder("Incorrect end of locationblock. Please remove the trailing / after the name."));
+		throw (ExceptionBuilder("Incorrect name of locationblock. Please remove the trailing / after the name."));
 	location.setName(name);
 	server.addToLocations(name, location);
 }
@@ -489,9 +489,9 @@ void	Parse::validateLocation(Location& location, int block)
 	if (location.getName() == "")
 		throw(ValidateException("Location name not set in", block));
 	if (location.getRoot() == "")
-		location.setRoot("data/www");
+		location.setRoot(DEFAULT_ROOT);
 	if (location.getIndex() == "")
-		location.setIndex("index.html");
+		location.setIndex(DEFAULT_INDEX);
 	if (location.getAllowMethods().empty())
 	{ 
 		location.addToAllowMethod("POST");
