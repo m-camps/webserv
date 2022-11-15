@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/11/15 17:26:47 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 17:34:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 18:31:06 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@ class Poller {
 		Poller();
 		~Poller();
 
-		std::string	readString;
-		bool		readyToWrite;
-		HashMap		requestData;
+		std::string		readString;
+		bool			readyToWrite;
+		HashMap			requestData;
+		size_t			contentLength;
+		size_t			readLength;
 };
 

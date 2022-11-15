@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 17:46:33 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 18:31:41 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ void Network::setup(std::string file)
 /* do we need to use select with the bitflags? */
 void Network::run()
 {;
-    std::size_t found;
     char buff[BUFF]; //  test buffer (can change later or keep it here)
 	std::map<int, Poller> io;
     //check if both location is seen here
@@ -91,43 +90,41 @@ void Network::run()
                     {
 						Poller poller = io.find(cur.fd)->second;
 						
-						io.find(cur.fd)->second.readString.append(buff, ret);
-                    	std::size_t found = io.find(cur.fd)->second.readString.find(SEPERATOR);
-                        if (ret != BUFF && found != std::string::npos) 
-							io.find(cur.fd)->second.readyToWrite = true;
-
-                        // Make Header
-                        if (found != std::string::npos && io.find(cur.fd)->second.requestData.empty())
+						poller.readLength += ret;
+						poller.readString.append(buff, ret);
+						if (poller.requestData.empty())
+                    	{
+							std::size_t found = poller.readString.find(SEPERATOR);
+							if (found != std::string::npos)
+							{
+								Request request;
+								poller.requestData = request.parseRequest(poller.readString);
+								if (poller.requestData.find("Content-Length") != poller.requestData.end())
+									poller.contentLength = ft_strol(poller.requestData.find("Content-Length")->second);
+							}
+						}
+                        if (poller.requestData.empty() == false && poller.contentLength == 0)
                         {
-                            Request request;
-                            io.find(cur.fd)->second.requestData = request.parseRequest(io.find(cur.fd)->second.readString);
+							poller.readyToWrite = true;
                         }
-
-
-                        HashMap::iterator ContentLength = requestData.find("Content-Length");
-                        if (requestData.empty() == false && ContentLength == requestData.end())
+                        if (poller.requestData.empty() == false && poller.contentLength > 0 &&
+                            poller.contentLength <= poller.readLength)
                         {
-                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestData);
-                            requestStrings.find(cur.fd)->second.clear();
-                            std::cout << "Reponse on fd: " << cur.fd << std::endl;
+                            poller.readyToWrite = true;
                         }
-
-                        if (requestData.empty() == false && ContentLength != requestData.end() &&
-                            ft_strol(ContentLength->second) <= requestStrings.find(cur.fd)->second.length())
-                        {
-                            Exchange exchange(getServersByFd(cur.fd), cur.fd, requestData);
-                            requestStrings.find(cur.fd)->second.clear();
-                            std::cout << "Reponse on fd: " << cur.fd << std::endl;
-                        }
+						if (poller.readLength % 10000000 == 0)
+							std::cout << poller.contentLength << " " << poller.readString.size() << std::endl;
+						io.find(cur.fd)->second = poller;
                     }
                 }
             }
 			else if ((cur.events & POLLOUT) && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
 			{
-				Exchange exchange(getServersByFd(cur.fd), cur.fd, io.find(cur.fd)->second.readString);
-				io.find(cur.fd)->second.readString.clear();
+				Poller poller = io.find(cur.fd)->second;
+				Request	request;
+
+				Exchange exchange(getServersByFd(cur.fd), cur.fd, request.parseRequest(poller.readString));
 				std::cout << "Reponse on fd: " << cur.fd << std::endl;
-				io.find(cur.fd)->second.readyToWrite = false;
 				io.find(cur.fd)->second = Poller();
 			}
         }
