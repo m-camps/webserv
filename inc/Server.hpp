@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:56:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 14:26:17 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/15 11:36:13 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class Server
 		std::map<int, std::string>          getErrorPage(void) const;
 
 		/* Setters */
-		void	setClientBody(int& client_body_size);
+		void	setClientBody(int client_body_size);
 		void	setLocations(std::map<std::string, Location>& locations);
 
 		/* Adders */

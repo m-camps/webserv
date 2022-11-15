@@ -6,11 +6,12 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:41:50 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 12:45:10 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Location.hpp"
+#include "Constants.hpp"
 
 // Constructor with default values
 Location::Location()
@@ -25,8 +26,8 @@ Location::Location(bool isEmpty)
 	(void)isEmpty;
 	_autoindex = 0;
 	_return_status = -1;
-	_index = "index.html";
-	_root = "data/www/";
+	_index = DEFAULT_INDEX;
+	_root = DEFAULT_ROOT;
 	_name = "/";
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
@@ -71,5 +72,7 @@ std::ostream& operator<<(std::ostream& stream, Location& location)
 	stream << "]\n";
 	stream << "\tCgiName: [" <<  location.getCgiName() << "]\n";
 	stream << "\tCgiExtension: [" <<  location.getCgiFileExtension() << "]\n";
+	stream << "\tReturnStatus: [" <<  location.getReturnStatus() << "]\n";
+	stream << "\tReturnRedirUrl: [" <<  location.getReturnPath() << "]\n";
 	return (stream);
 }

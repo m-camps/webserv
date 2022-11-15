@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:42:33 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/15 15:30:49 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,22 +32,14 @@ Network::~Network() {}
 ***/
 void Network::setup(std::string file)
 {
-	Parse				parser;
+	Parse		parser;
+	Servers 	servers;
 	
-	try
-	{
-		Servers servers;
-		
-		_servers = parser.parseNetwork(file, servers);
-		std::cout << "----PARSING COMPLETE----" << std::endl;
-	}
-	catch(std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
-		std::exit(0);
-	}
+	_servers = parser.parseNetwork(file, servers);
+	std::cout << "----PARSING COMPLETE----" << std::endl;
 	setupSockets();
 	createPoll();
+	std::cout << "----SOCKET SETUP COMPLETE----" << std::endl;
 	for (size_t i = 0; i < _servers.size(); i++)
 	{
 		std::cout << _servers.at(i) << "\n";
@@ -66,7 +58,6 @@ void Network::run()
         if (poll(_poll.data(), _poll.size(), -1) == -1)
         {
             perror("In poll: ");
-            exit(ERROR);
         }
         for (size_t i = 0; i < _poll.size(); i++)
         {
@@ -147,7 +138,6 @@ int		Network::acceptConnection(int socket_fd)
 	if (client_fd == -1)
 	{
 		std::perror("In accept: ");
-		std::exit(EXIT_FAILURE);
 	}
 	addClientToFds(socket_fd, client_fd);
 	_poll.push_back(newPoll(client_fd));
@@ -181,7 +171,6 @@ void	Network::setupSockets(void)
 
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
-		fcntl(socket_fd, F_SETFL, O_NONBLOCK);
 		setupFds(port, socket_fd);
 		_socket_fds.push_back(socket_fd);
 	}
@@ -192,11 +181,11 @@ int		Network::createSocket(void)
 	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
 	
 	if (socket_fd < 0) {
-		std::exit(EXIT_FAILURE);
+		throw std::runtime_error("Socket failed");
 	}
 	int reuse = 1;
 	if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) < 0)
-   		std::perror("setsockopt(SO_REUSEADDR) failed");
+   		throw std::runtime_error("setsockopt(SO_REUSEADDR) failed");
 	return socket_fd;
 }
 
@@ -214,19 +203,15 @@ struct sockaddr_in *	Network::makeSocketAddr(int port)
 void	Network::bind(int socket_fd, struct sockaddr_in* address_in)
 {
 	if (::bind(socket_fd, (const struct sockaddr *)address_in, sizeof(*address_in)) < 0)
-	{
-		std::perror("In Bind: ");
-		std::exit(ERROR);
-	}
+		throw std::runtime_error("Bind failed");
 }
 
 void	Network::listen(int socket_fd)
 {
 	if (::listen(socket_fd, 5) < 0)
-	{
-		std::perror("In listen: ");
-		std::exit(ERROR);
-	}
+		throw std::runtime_error("Listen failed");
+	if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) < 0)
+		throw std::runtime_error("Fcntl failed");
 }
 
 void			Network::createPoll(void)
