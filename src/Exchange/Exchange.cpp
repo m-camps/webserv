@@ -93,14 +93,40 @@ int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 
 void	Exchange::sendToClient(Respond& response)
 {
+    sendNormal(response.getHeader());
+    sendNormal(CRLF);
+    if (response.IsChunked() == false)
+        sendNormal(response.getBody());
+    else
+        sendChunked(response.getBody());
+}
+
+inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
+{
+    ssize_t ret;
+
+    ret = write(_fd, buff.data(), _nbyte);
+    if (ret < 0 || ret != (ssize_t)buff.length())
+    {
+        std::string StrError = std::strerror(errno);
+        throw (std::runtime_error(StrError));
+    }
+    return (ret);
+}
+
+void	Exchange::sendChunked(std::string str) const
+{
     try
     {
-        sendNormal(response.getHeader());
-        sendNormal(CRLF);
-        if (response.IsChunked() == false)
-            sendNormal(response.getBody());
-        else
-            sendChunked(response.getBody());
+        std::string Body = Generator::generateChunk(str);
+
+        while (Body.length() > 7)
+        {
+            ft_write(_socketFd, Body, Body.length());
+            Body.clear();
+            Body = Generator::generateChunk(str);
+        }
+        ft_write(_socketFd, Body, Body.length());
     }
     catch (const std::exception& e)
     {
@@ -108,39 +134,15 @@ void	Exchange::sendToClient(Respond& response)
     }
 }
 
-void	Exchange::sendChunked(std::string str) const
-{
-    ssize_t ret;
-    std::string Body = Generator::generateChunk(str);
-
-    while (Body.length() > 7)
-    {
-        ret = write(_socketFd, Body.data(), Body.length());
-        if (ret < 0 || ret != (ssize_t) Body.length())
-        {
-            std::string StrError = std::strerror(errno);
-            throw (std::runtime_error(StrError));
-        }
-		Body.clear();
-        Body = Generator::generateChunk(str);
-    }
-    ret = write(_socketFd, Body.data(), Body.length());
-    if (ret < 0 || ret != (ssize_t)Body.length())
-    {
-        std::string StrError = std::strerror(errno);
-        throw (std::runtime_error(StrError));
-    }
-}
-
 void    Exchange::sendNormal(const std::string& str) const
 {
-	ssize_t ret;
-
-    ret = write(_socketFd, str.data(), str.length());
-    if (ret < 0 || ret != (ssize_t)str.length())
+    try
     {
-        std::string ErrorMsg = std::strerror(errno);
-        throw (std::runtime_error(ErrorMsg));
+        ft_write(_socketFd, str, str.length());
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
     }
 }
 
