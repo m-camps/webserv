@@ -46,27 +46,6 @@ Server		Exchange::matchServer(Servers servers, HashMap requestData)
 	return (server);
 }
 
-std::vector<std::string> 	splitLineWithStrtok(std::string& line, const std::string& delimit)
-{
-	char						*word;
-	std::vector<std::string> 	ret;
-	char						*c_line = strdup(line.c_str());
-
-    if (!c_line)
-    {
-        std::perror("In malloc: ");
-        throw (std::logic_error("Malloc error"));
-    }
-	word = strtok(c_line, delimit.c_str());
-	while (word != NULL)
-	{
-		ret.push_back(word);
-		word = strtok(NULL, delimit.c_str());
-	}
-	free(c_line);
-	return ret;
-}
-
 Location	Exchange::matchLocation(Server server, HashMap requestData)
 {
     int32_t longestMatch = 0;
@@ -74,31 +53,24 @@ Location	Exchange::matchLocation(Server server, HashMap requestData)
     std::string route = requestData.find("Path")->second;
     Locations locations = server.getLocations();
 
-    try
-    {
-        std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
+    std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
 
-        for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
+    for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
+    {
+        std::string name = it->first;
+        std::vector<std::string> splitName = splitLineWithStrtok(name, "/");
+        int match = 0;
+
+        for (size_t i = 0; i < splitRoute.size() && i < splitName.size(); i++)
         {
-            std::string name = it->first;
-            std::vector<std::string> splitName = splitLineWithStrtok(name, "/");
-            int match = 0;
-
-            for (size_t i = 0; i < splitRoute.size() && i < splitName.size(); i++)
-            {
-                if (splitRoute[i] == splitName[i])
-                    match++;
-            }
-            if (match > longestMatch)
-            {
-                longestMatch = match;
-                loc = name;
-            }
+            if (splitRoute[i] == splitName[i])
+                match++;
         }
-    }
-    catch (const std::exception& e)
-    {
-        // Internal Error;
+        if (match > longestMatch)
+        {
+            longestMatch = match;
+            loc = name;
+        }
     }
     return (server.getLocations().find(loc)->second);
 }

@@ -30,6 +30,8 @@ bool isDirectory(const std::string& FileName);
 
 size_t ft_strol(const std::string& line);
 
+std::vector<std::string> 	splitLineWithStrtok(std::string& line, const char* delimit);
+
 template <typename T>
 std::string ToString(T Number)
 {

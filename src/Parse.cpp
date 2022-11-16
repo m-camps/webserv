@@ -37,7 +37,7 @@ File		Parse::extractFile(std::string& file)
 
 	for (std::vector<std::string>::iterator it = splitFile.begin(); it != splitFile.end(); it++)
 	{
-		Line tokLine = splitLineWithStrtok(*it, std::string(" \t\r\n\v\f"));
+		Line tokLine = splitLineWithStrtok(*it, " \t\r\n\v\f");
 		if (tokLine.empty())
 		{
 			throw(ExceptionBuilder("Newlines not accepted"));
@@ -404,34 +404,6 @@ std::invalid_argument Parse::ExceptionBuilder(std::string error)
 	str.append("Parsing Error | Line: " + TOSTRING(g_line_count) + " | ");
 	str.append(error);
 	return std::invalid_argument(str);
-}
-
-Line 	Parse::splitLineWithStrtok(std::string& line, const std::string& delimit)
-{
-	char	*word;
-	Line 	ret;
-	char	*c_line = strdup(line.c_str());
-
-    if (!c_line)
-    {
-        std::perror("In malloc: ");
-        std::exit(EXIT_FAILURE);
-    }
-	word = strtok(c_line, delimit.c_str());
-	while (word != NULL)
-	{
-		ret.push_back(word);
-		word = strtok(NULL, delimit.c_str());
-	}
-	if (DEBUG)
-	{
-		for (size_t i = 0; i < ret.size(); i++)
-		{
-			std::cout  << "[word " << i << "]: " << ret[i] << std::endl;
-		}
-	}
-	free(c_line);
-	return ret;
 }
 
 bool Parse::isNumber(const std::string& s)

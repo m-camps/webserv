@@ -14,7 +14,9 @@
 #include <iostream>
 #include <stack>
 #include <vector>
+
 #include "Server.hpp"
+#include "Utilities.hpp"
 
 typedef std::vector<std::string>::iterator 	vecIt;
 
@@ -60,7 +62,6 @@ class Parse
 		void					parseLocationReturn(Location& location, Line& line);
 
 		/* File I/O */
-		void 					openFile(std::ifstream& configStream, std::string configName);
 		File					extractFile(std::string& file);
 
 		/* Validator */
@@ -71,7 +72,6 @@ class Parse
 		
 		/* Helper Functions */
 		std::invalid_argument 	ExceptionBuilder(std::string error);
-		Line 					splitLineWithStrtok(std::string& line, const std::string& delimit);
 		bool 					isNumber(const std::string& s);
 		bool					isServerDirective(std::string& currentWord);
 		bool					isLocationDirective(std::string& currentWord);
