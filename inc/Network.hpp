@@ -47,8 +47,8 @@ class Network
 		std::vector<int>		extractListens(void);
 		void					setupSockets(void);
 		int						createSocket(void);
-		struct sockaddr_in *	makeSocketAddr(int port);
-		void					bind(int socket_fd, struct sockaddr_in* address_in);
+		struct sockaddr_in  	makeSocketAddr(int port);
+		void					bind(int socket_fd, struct sockaddr_in address_in);
 		void					listen(int socket_fd);
 
 		/* Poll */

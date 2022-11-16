@@ -197,7 +197,7 @@ void	Network::setupSockets(void)
 	{
 		int 				port = *it;
 		int					socket_fd = createSocket();
-		struct sockaddr_in* addr_in = makeSocketAddr(port);
+		struct sockaddr_in  addr_in = makeSocketAddr(port);
 
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
@@ -221,20 +221,20 @@ int		Network::createSocket(void)
 	return socket_fd;
 }
 
-struct sockaddr_in *	Network::makeSocketAddr(int port)
+struct sockaddr_in	Network::makeSocketAddr(int port)
 {
-	struct sockaddr_in *address = new sockaddr_in();
+	struct sockaddr_in address = {};
 
-	address->sin_family = AF_INET;
-	address->sin_port = htons(port);
-	address->sin_addr.s_addr = INADDR_ANY;
-	memset(address->sin_zero, 0, sizeof(address->sin_zero));
+	address.sin_family = AF_INET;
+	address.sin_port = htons(port);
+	address.sin_addr.s_addr = htonl(INADDR_ANY);
+	memset(address.sin_zero, 0, sizeof(address.sin_zero));
 	return address;
 }
 
-void	Network::bind(int socket_fd, struct sockaddr_in* address_in)
+void	Network::bind(int socket_fd, struct sockaddr_in address_in)
 {
-	if (::bind(socket_fd, (const struct sockaddr *)address_in, sizeof(*address_in)) < 0)
+	if (::bind(socket_fd, (const struct sockaddr *) &address_in, sizeof(address_in)) < 0)
 		throw std::runtime_error("Bind failed");
 }
 
