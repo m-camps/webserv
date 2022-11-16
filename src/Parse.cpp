@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 13:11:04 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/16 16:11:20 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,7 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 			{"server_name", &Parse::parseServerName},
 			{"client_body_size", &Parse::parseClientBodySize},
 			{"error_page", &Parse::parseErrorPage},
-            {"", NULL}
+			{"", NULL}
 	};
 	
 	for (int i = 0; !dTable[i]._name.empty(); i++)
@@ -408,13 +408,13 @@ std::invalid_argument Parse::ExceptionBuilder(std::string error)
 
 bool Parse::isNumber(const std::string& s)
 {
-    std::string::const_iterator it = s.begin();
+	std::string::const_iterator it = s.begin();
 
-    while (it != s.end() && std::isdigit(*it))
+	while (it != s.end() && std::isdigit(*it))
 	{
 		it++;
 	}
-    return (!s.empty() && it == s.end());
+	return (!s.empty() && it == s.end());
 }
 
 bool    Parse::isServerDirective(std::string& directive)

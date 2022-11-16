@@ -77,6 +77,7 @@
         "regex": "cpp",
         "set": "cpp",
         "thread": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "filesystem": "cpp"
     }
 }

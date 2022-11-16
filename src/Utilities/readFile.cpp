@@ -7,12 +7,12 @@
 
 int64_t getLength(std::ifstream& File)
 {
-    int64_t len;
+	int64_t len;
 
-    File.seekg(0, File.end);
-    len = File.tellg();
-    File.seekg(0, File.beg);
-    return (len);
+	File.seekg(0, File.end);
+	len = File.tellg();
+	File.seekg(0, File.beg);
+	return (len);
 }
 
 /*
@@ -23,29 +23,32 @@ int64_t getLength(std::ifstream& File)
 */
 std::string readFile(const std::string& RespondedFile)
 {
-    int64_t len;
-    std::ifstream File;
-    std::string FileContentStr;
+	int64_t len;
+	std::ifstream File;
+	std::string FileContentStr;
 
-    File.open(RespondedFile);
-    if (!File.is_open())
-        throw (std::invalid_argument("File does not exist."));
+	File.open(RespondedFile);
+	if (!File.is_open()) //what happens if the permission is denied for file
+		throw (std::invalid_argument("File could not be opened."));
 
-    len = getLength(File);
-    char *FileContent = new char [len];
-
-    try
-    {
-        File.read(FileContent, len);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    File.close();
-
-    FileContentStr.append(FileContent, len);
-    delete [] FileContent;
-    return (FileContentStr);
+	len = getLength(File);
+	char *FileContent = new char [len];
+	try
+	{
+		File.read(FileContent, len);
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		std::exit(EXIT_FAILURE);
+	}
+	File.close();
+	bool closingFailed = true;//File.fail();
+	if (closingFailed == true)
+	{
+		std::cerr << "Closing a file failed." << std::endl;
+	}
+	FileContentStr.append(FileContent, len);
+	delete [] FileContent;
+	return (FileContentStr);
 }

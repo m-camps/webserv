@@ -20,6 +20,7 @@ Location        Respond::getLocation() const { return _location; }
 bool			Respond::IsChunked(void) const { return _isChunked; }
 
 void			Respond::setBody(std::string body) { _body = body; }
+void			Respond::setStatusCode(int statusCode) { _status_code = statusCode; }
 
 void 		    Respond::addToHeader(const std::string& NewLine)
 {
@@ -32,10 +33,10 @@ void 		    Respond::addToHeader(const std::string& NewLine)
 
 bool isForbiddenPath(const std::string& Path)
 {
-    std::size_t found = Path.find("../");
-    if (found == std::string::npos)
-        return (false);
-    return (true);
+	std::size_t found = Path.find("../");
+	if (found == std::string::npos)
+		return (false);
+	return (true);
 }
 
 /* //////////////////////////// */
@@ -92,18 +93,18 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string> Allowed
 
 bool MethodIsImplemented(const std::string& Method)
 {
-    std::string ImplementedMethods[] = {
-            "GET",
-            "POST",
-            "DELETE"
-    };
+	std::string ImplementedMethods[] = {
+			"GET",
+			"POST",
+			"DELETE"
+	};
 
-    for (int32_t i = 0; i < 3 ; i++)
-    {
-        if (Method == ImplementedMethods[i])
-            return (true);
-    }
-    return (false);
+	for (int32_t i = 0; i < 3 ; i++)
+	{
+		if (Method == ImplementedMethods[i])
+			return (true);
+	}
+	return (false);
 }
 
 /* //////////////////////////// */
@@ -156,9 +157,9 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 {
 	HashMap::iterator it = _requestData.find(entry);
 
-        if (it == _requestData.end())
-            throw (std::invalid_argument("Invalid string"));
-        return (it->second);
+		if (it == _requestData.end())
+			throw (std::invalid_argument("Invalid string"));
+		return (it->second);
 }
 
 /* //////////////////////////// */
@@ -166,9 +167,9 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
-    std::string LocationIndex = _location.getRoot() + "/" + _location.getIndex();
-    ErrorPageMap ErrorPages = _server.getErrorPage();
-    ErrorPageMap::iterator it = ErrorPages.find(_status_code);
+	std::string LocationIndex = _location.getRoot() + "/" + _location.getIndex();
+	ErrorPageMap ErrorPages = _server.getErrorPage();
+	ErrorPageMap::iterator it = ErrorPages.find(_status_code);
 
 	try
 	{
@@ -190,23 +191,23 @@ std::string Respond::getValidFile(const std::string& relativePath)
 				    FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
-                buildRedir();
-                break ;
-            case e_NotFound:
-                if (_location.getAutoIndex() == true && LocationIndex == relativePath)
-                    FileContent = Generator::generateAutoIndex(*this);
-                else
-                    FileContent = Generator::generateDefaulPage(_status_code);
-                break ;
-            default:
-                FileContent = Generator::generateDefaulPage(_status_code);
-                break ;
+				buildRedir();
+				break ;
+			case e_NotFound:
+				if (_location.getAutoIndex() == true && LocationIndex == relativePath)
+					FileContent = Generator::generateAutoIndex(*this);
+				else
+					FileContent = Generator::generateDefaulPage(_status_code);
+				break ;
+			default:
+				FileContent = Generator::generateDefaulPage(_status_code);
+				break ;
 		}
 	}
 	catch (const std::exception& e)
 	{
-        std::cerr << e.what() << std::endl;
-        _status_code = e_InternalServerError;
+		std::cerr << e.what() << std::endl;
+		_status_code = e_InternalServerError;
 		FileContent = Generator::generateDefaulPage(_status_code);
 	}
 	return (FileContent);

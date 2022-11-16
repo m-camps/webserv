@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 19:12:57 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/16 16:11:02 by xvoorvaa      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ void Network::run()
     {
         if (poll(_poll.data(), _poll.size(), -1) == -1)
         {
-            perror("In poll: ");
+            std::perror("Error In poll, system failure: ");
+			std::exit(EXIT_FAILURE);
         }
         for (size_t i = 0; i < _poll.size(); i++)
         {
@@ -69,6 +70,11 @@ void Network::run()
                 {
 					int client_fd = acceptConnection(cur.fd);
 					io.insert(std::pair<int, Poller>(client_fd, Poller()));
+					if (client_fd == -1) //if it could not accept connection (accept == -1)
+					{
+						std::cerr << "Could not accept connection." << std::endl;
+						break ; //break out from the poll for loop
+					}
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << client_fd << std::endl;
                 }
@@ -80,8 +86,9 @@ void Network::run()
                         if (ret == 0)
                             std::cout << "Client closed connection fd: " << cur.fd << "\n";
                         else
-                            std::perror("In recv: ");
-                        close(cur.fd);
+							std::cerr << "Error in recv" << std::endl;
+                        if (close(cur.fd) < 0)
+							std::cerr << "Closing a file descriptor failed." << std::endl;
 						_poll.erase(_poll.begin() + i);
 						io.erase(cur.fd);
 						break ;
@@ -167,7 +174,7 @@ int		Network::acceptConnection(int socket_fd)
 	int	client_fd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
 	if (client_fd == -1)
 	{
-		std::perror("In accept: ");
+		return (-1);
 	}
 	addClientToFds(socket_fd, client_fd);
 	_poll.push_back(newPoll(client_fd));
@@ -208,8 +215,7 @@ void	Network::setupSockets(void)
 
 int		Network::createSocket(void)
 {
-	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
-	
+	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd < 0) {
 		throw std::runtime_error("Socket failed");
 	}

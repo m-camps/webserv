@@ -2,6 +2,7 @@
 #define CGI_HPP
 #include <string>
 #define NR_OF_CGI_ENV_VARS 24
+#define BAD_GATEWAY_EXIT_CODE 254
 #include "Exchange.hpp"
 #include "Respond.hpp"
 
