@@ -10,7 +10,6 @@
 #include "Respond.hpp"
 
 typedef std::map<std::string, std::string>  HashMap;
-typedef std::map<std::string, Location>     LocationMap;
 
 class Respond ;
 
@@ -31,8 +30,8 @@ public:
 	void			sendNormal(const std::string& str) const;
 
 	/* Matching */
-	Server			matchServer(Servers servers, HashMap requestData);
-	Location		matchLocation(Server server, HashMap requestData);
+	const Server&	    matchServer(Servers servers, HashMap requestData);
+	const Location&		matchLocation(const Server& server, HashMap requestData);
 
 
 private:

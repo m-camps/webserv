@@ -6,9 +6,6 @@
 #include "Request.hpp"
 #include "Respond.hpp"
 
-#pragma region "ctor & dtor"
-
-Exchange::Exchange(void) : _socketFd(0) {}
 Exchange::~Exchange(void) {}
 
 Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestData)
@@ -34,7 +31,7 @@ Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestDat
 
 /* //////////////////////////// */
 
-Server		Exchange::matchServer(Servers servers, HashMap requestData)
+const Server&	Exchange::matchServer(Servers servers, HashMap requestData)
 {
 	Server		server = servers.front();
 	std::string host = requestData.find("Host")->second;
@@ -50,7 +47,7 @@ Server		Exchange::matchServer(Servers servers, HashMap requestData)
 
 /* //////////////////////////// */
 
-Location	Exchange::matchLocation(Server server, HashMap requestData)
+const Location&   Exchange::matchLocation(const Server& server, HashMap requestData)
 {
     int32_t longestMatch = 0;
     std::string loc = "/";
