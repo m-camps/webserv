@@ -43,7 +43,8 @@ std::string		buildCgiExecPath(Respond& ResponderRef)
 char**			createArgv(Respond& ResponderRef)
 {
 	std::string 				requestedFilePath = buildCgiExecPath(ResponderRef);
-	std::string					interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
+	std::string					interpreterPath = "/opt/homebrew/opt/python@3.10/bin/python3.10";
+	//std::string					interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
 	std::vector<std::string>	argvString;
 
 	argvString.push_back(interpreterPath);
@@ -106,12 +107,13 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 	if (access(argv[1], (X_OK | F_OK)) == 0)
 	{
 		if (execve(argv[0], argv, envp) < 0)
+		{
 			exit(BAD_GATEWAY_EXIT_CODE);
+		}
 	}
 	else
 	{
-		std::cout << "We could not execute the CGI script what you asked for. Exciting process." << std::endl;
-		exit(1);
+		exit(BAD_GATEWAY_EXIT_CODE);
 	}
 }
 

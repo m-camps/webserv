@@ -57,7 +57,8 @@ void Network::run()
     {
         if (poll(_poll.data(), _poll.size(), -1) == -1)
         {
-            perror("In poll: ");
+            std::perror("Error In poll, system failure: ");
+			std::exit(EXIT_FAILURE);
         }
         for (size_t i = 0; i < _poll.size(); i++)
         {
@@ -67,6 +68,11 @@ void Network::run()
                 if (isSocketFd(cur.fd))
                 {
 					int client_fd = acceptConnection(cur.fd);
+					if (client_fd == -1) //if it could not accept connection (accept == -1)
+					{
+						std::cerr << "Could not accept connection." << std::endl;
+						break ; //break out from the poll for loop
+					}
 					requestStrings.insert(std::pair<int, std::string>(client_fd, ""));
                     std::cout << "New connection" << "\n";
                     std::cout << "On FD " << client_fd << std::endl;
@@ -79,8 +85,9 @@ void Network::run()
                         if (ret == 0)
                             std::cout << "Client closed connection fd: " << cur.fd << "\n";
                         else
-                            std::perror("In recv: ");
-                        close(cur.fd);
+							std::cerr << "Error in recv" << std::endl;
+                        if (close(cur.fd) < 0)
+							std::cerr << "Closing a file descriptor failed." << std::endl;
 						_poll.erase(_poll.begin() + i);
 						requestStrings.erase(cur.fd);
 						break ;
@@ -137,7 +144,7 @@ int		Network::acceptConnection(int socket_fd)
 	int	client_fd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
 	if (client_fd == -1)
 	{
-		std::perror("In accept: ");
+		return (-1);
 	}
 	addClientToFds(socket_fd, client_fd);
 	_poll.push_back(newPoll(client_fd));
@@ -168,7 +175,7 @@ void	Network::setupSockets(void)
 		int 				port = *it;
 		int					socket_fd = createSocket();
 		struct sockaddr_in* addr_in = makeSocketAddr(port);
-
+		//std::cout << socket_fd << " is socket fd, " << addr_in << " is addr" << std::endl;
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
 		setupFds(port, socket_fd);
@@ -178,8 +185,7 @@ void	Network::setupSockets(void)
 
 int		Network::createSocket(void)
 {
-	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);\
-	
+	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd < 0) {
 		throw std::runtime_error("Socket failed");
 	}
@@ -192,7 +198,10 @@ int		Network::createSocket(void)
 struct sockaddr_in *	Network::makeSocketAddr(int port)
 {
 	struct sockaddr_in *address = new sockaddr_in();
-
+	if (!address)
+	{
+		throw std::runtime_error("Creating socket address failed");
+	}
 	address->sin_family = AF_INET;
 	address->sin_port = htons(port);
 	address->sin_addr.s_addr = INADDR_ANY;
@@ -202,6 +211,7 @@ struct sockaddr_in *	Network::makeSocketAddr(int port)
 
 void	Network::bind(int socket_fd, struct sockaddr_in* address_in)
 {
+	std::cout << socket_fd << " is socked fd in bind," << address_in << " is address" << std::endl;
 	if (::bind(socket_fd, (const struct sockaddr *)address_in, sizeof(*address_in)) < 0)
 		throw std::runtime_error("Bind failed");
 }

@@ -198,7 +198,7 @@ void    Parse::parseServerDirective(Line& line, Server& server)
 			{"server_name", &Parse::parseServerName},
 			{"client_body_size", &Parse::parseClientBodySize},
 			{"error_page", &Parse::parseErrorPage},
-            {"", NULL}
+			{"", NULL}
 	};
 	
 	for (int i = 0; !dTable[i]._name.empty(); i++)
@@ -412,11 +412,11 @@ Line 	Parse::splitLineWithStrtok(std::string& line, const std::string& delimit)
 	Line 	ret;
 	char	*c_line = strdup(line.c_str());
 
-    if (!c_line)
-    {
-        std::perror("In malloc: ");
-        std::exit(EXIT_FAILURE);
-    }
+	if (!c_line)
+	{
+		std::perror("In malloc: ");
+		std::exit(EXIT_FAILURE);
+	}
 	word = strtok(c_line, delimit.c_str());
 	while (word != NULL)
 	{
@@ -436,13 +436,13 @@ Line 	Parse::splitLineWithStrtok(std::string& line, const std::string& delimit)
 
 bool Parse::isNumber(const std::string& s)
 {
-    std::string::const_iterator it = s.begin();
+	std::string::const_iterator it = s.begin();
 
-    while (it != s.end() && std::isdigit(*it))
+	while (it != s.end() && std::isdigit(*it))
 	{
 		it++;
 	}
-    return (!s.empty() && it == s.end());
+	return (!s.empty() && it == s.end());
 }
 
 bool    Parse::isServerDirective(std::string& directive)
