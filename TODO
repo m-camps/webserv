@@ -17,15 +17,10 @@ TODO:
 - (Bence) Chaining together the correct path based on location name+root+rest_of_url
 - (Bence) Restructure file passed to CGI
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
-- (Xander) Limit the upload size to 100mb? (suggestions are welcome)
-- Add default file to parser
-- HTML landing page
-
-TOCHECKLAST:
-- Check all system calls, handle return of error (-1) anything in
-- (Xander) Set default file for a directory
+- (Max) Limit the upload size to 200mb
 - (Max) Add default file to parser
-- (Max) HTML landing page
+- HTML landing page
+- Check all system calls, handle return of error (-1) anything in
 - (Bence) Check relinking of Makefile
 - (Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) 
 
@@ -58,7 +53,4 @@ data/www/test
 
 
 Xander:
-Eerste line van Header anders parsen
-Header en Body los parsen
-Dubbel "/" wegwerken
 Error page goed handelen

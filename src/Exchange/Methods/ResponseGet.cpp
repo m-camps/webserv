@@ -8,11 +8,8 @@ void Respond::buildRedir(void)
 {
     std::string LocationName = _location.getName();
     std::string NewLocation;
-    if (LocationName == "/")
-        NewLocation = Generator::generateLocation(_location.getIndex());
-    else
-        NewLocation = Generator::generateLocation(LocationName + "/" + _location.getIndex());
 
+    NewLocation = Generator::generateLocation(_location.getReturnPath());
     createResponse("");
     addToHeader(NewLocation);
 }
@@ -49,18 +46,19 @@ void Respond::buildGet(void)
         std::string Root = _location.getRoot();
         std::string Path = getEntryFromMap("Path");
 
-        if (correctCgiRequestAllowed() == true)
+        parsePath(Path);
+        relativePath = Root + Path;
+        modifyStatuscode(Path, relativePath);
+        if (correctCgiRequestAllowed() == true && _status_code != e_Redir)
         {
             Cgi	cgi;
             FileContent = cgi.executeScript(*this);
             createResponse(FileContent);
             return ;
         }
-        parsePath(Path);
-        relativePath = Root + Path;
-        modifyStatuscode(Path, relativePath);
         FileContent = getValidFile(relativePath);
         createResponse(FileContent);
+        std::cout << _header << std::endl;
     }
     catch (const std::exception& e)
     {

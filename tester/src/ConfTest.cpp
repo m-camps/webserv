@@ -24,7 +24,7 @@ void	ASSERT_VALID_CONFIG(std::string file)
 
 void	ASSERT_INVALID_CONFIG(std::string file)
 {
-	std::string configFile = VALID_PATH + file;
+	std::string configFile = INVALID_PATH + file;
 	SECTION("--- " + file + " ---")
 	{
 		Parse parser;

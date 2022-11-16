@@ -46,19 +46,17 @@ void Respond::modifyStatuscode(const std::string& Path, const std::string& relat
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
-        return ;
     }
-//    if ("/" == Path || Path.empty() == true)
-//    {
-//        _status_code = e_Redir;
-//        return ;
-//    }
-    if (access(relativePath.c_str(), R_OK) != 0)
+    else if (("/" == Path || Path.empty() == true) && _location.getReturnPath().empty() == false)
+    {
+        _status_code = e_Redir;
+    }
+    else if (access(relativePath.c_str(), R_OK) != 0)
     {
         _status_code = e_NotFound;
-        return ;
     }
-    _status_code = e_OK;
+    else
+        _status_code = e_OK;
 }
 
 /* //////////////////////////// */
