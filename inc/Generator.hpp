@@ -5,14 +5,14 @@
 #pragma once
 
 
-#include "Utilities.hpp"
-#include "../src/Exchange/Respond.hpp"
+
 #include <iostream>
 #include <dirent.h> // DIR
 #include <sys/stat.h>
 
-#define MAXBYTES 20000
-#define CRLF "\r\n"
+#include "Respond.hpp"
+#include "Utilities.hpp"
+#include "Constants.hpp"
 
 class Respond; // Need to include this otherwise compile error
 
@@ -24,13 +24,14 @@ public:
 
     static std::string generateStatus(Respond&);
     static std::string generateContentLength(std::size_t);
-    static std::string generateLocation(const std::string);
-    static std::string generateContentType(Respond&);
     static std::string generateTransferEncoding(void);
     static std::string generateChunk(std::string&);
-    static std::string generateBoundry(Respond&);
+    static std::string generateDirectoryPage(const std::string&);
     static std::string generateDefaulPage(uint32_t);
+    static std::string generateBoundry(Respond&);
     static std::string generateAutoIndex(Respond&);
-    static std::string generateUploadSucces(void);
+    static std::string generateLocation(const std::string&);
+private:
+    Generator& operator=(const Generator&);
 };
 

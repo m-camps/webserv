@@ -47,11 +47,11 @@ void Respond::modifyStatuscode(const std::string& Path, const std::string& relat
         _status_code = e_Forbidden;
         return ;
     }
-    if ("/" == Path || Path.empty() == true || isDirectory(relativePath) == true)
-    {
-        _status_code = e_Redir;
-        return ;
-    }
+//    if ("/" == Path || Path.empty() == true)
+//    {
+//        _status_code = e_Redir;
+//        return ;
+//    }
     if (access(relativePath.c_str(), R_OK) != 0)
     {
         _status_code = e_NotFound;
@@ -110,7 +110,7 @@ bool MethodIsImplemented(const std::string& Method)
 
 void 	Respond::buildResponse(HashMap requestData)
 {
-	_requestData = std::move(requestData);
+	_requestData = requestData;
 
     try
     {
@@ -175,7 +175,6 @@ std::string Respond::getValidFile(const std::string& relativePath)
         // Needs to be fixed
         if (it != ErrorPages.end())
         {
-//            std::cout << relativePath << std::endl;
             if (access(it->second.c_str(), R_OK) == 0)
             {
                 FileContent = readFile(_location.getRoot() + it->second);
@@ -185,7 +184,10 @@ std::string Respond::getValidFile(const std::string& relativePath)
         switch (_status_code)
 		{
 			case e_OK:
-				FileContent = readFile(relativePath);
+                if (isDirectory(relativePath) == true)
+                    FileContent = Generator::generateDirectoryPage(relativePath);
+                else
+				    FileContent = readFile(relativePath);
 				break ;
 			case e_Redir:
                 buildRedir();

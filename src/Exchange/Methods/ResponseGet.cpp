@@ -32,7 +32,7 @@ bool	Respond::correctCgiRequestAllowed(void)
     std::string cgiExt = _location.getCgiFileExtension();
     std::string cgiName = _location.getCgiName();
 
-    if (cgiName != "" && cgiExt != "")
+    if (!cgiName.empty() && !cgiExt.empty())
     {
         return (true);
     }
@@ -58,7 +58,7 @@ void Respond::buildGet(void)
         }
         parsePath(Path);
         relativePath = Root + Path;
-        modifyStatuscode(Path, relativePath); // Change name
+        modifyStatuscode(Path, relativePath);
         FileContent = getValidFile(relativePath);
         createResponse(FileContent);
     }

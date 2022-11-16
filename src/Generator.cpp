@@ -76,28 +76,10 @@ std::string Generator::generateChunk(std::string& Body)
 
 /* //////////////////////////// */
 
-std::string Generator::generateLocation(const std::string NewLocation)
+std::string Generator::generateLocation(const std::string& NewLocation)
 {
-    std::string Location = "Location: " + NewLocation + "\r\n";
+    const std::string Location = "Location: " + NewLocation + "\r\n";
 	return (Location);
-}
-
-/* //////////////////////////// */
-
-std::string Generator::generateContentType(Respond& Responder)
-{
-    std::string line;
-    std::string RequestBody = Responder.getEntryFromMap("Body");
-    std::istringstream issBody(RequestBody);
-
-    while (std::getline(issBody, line))
-    {
-        if (line.compare(0, 13, "Content-Type:") == 0)
-        {
-            break ;
-        }
-    }
-	return (line);
 }
 
 /* //////////////////////////// */
@@ -110,7 +92,7 @@ std::string Generator::generateBoundry(Respond& Responder)
     if (found == std::string::npos)
         throw (std::logic_error("No boundry found"));
 
-    return (ContentType.substr(found + 1, ContentType.length() - found) + "\r\n");
+    return (ContentType.substr(found + 1, ContentType.length() - found) + CRLF);
 }
 
 /* //////////////////////////// */
@@ -180,4 +162,17 @@ std::string Generator::generateAutoIndex(Respond& Responder)
         throw (std::logic_error(StrError));
     }
     return (AutoIndex);
+}
+
+/* //////////////////////////// */
+
+std::string Generator::generateDirectoryPage(const std::string& Path)
+{
+    return (
+            "<!DOCTYPE html>\n"
+            "<body>\n"
+            "<h1>You are in directory: " + Path + "</h1>"
+            "</body>\n"
+            "</html>"
+            );
 }

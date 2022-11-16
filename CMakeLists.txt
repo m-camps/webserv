@@ -36,7 +36,6 @@ set(SOURCES
         src/Exchange/Methods/ResponseGet.cpp
         src/Exchange/Methods/ResponseDelete.cpp
         src/Utilities/deleteFile.cpp
-        src/Utilities/findCharLocation.cpp
         src/Utilities/readFile.cpp
         src/Utilities/isDirectory.cpp
         src/Utilities/ft_stoi.cpp

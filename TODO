@@ -14,16 +14,14 @@
 	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
-- (Xander) Make recv first parse only header then parse body based on content length
 - (Bence) Chaining together the correct path based on location name+root+rest_of_url
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
 - (Xander) Limit the upload size to 100mb? (suggestions are welcome)
-- Set default file for a directory
 - Add default file to parser
 - HTML landing page
 
 TOCHECKLAST:
-- Check all system calls, handle return of error (-1) anything in 
+- Check all system calls, handle return of error (-1) anything in
 - Check for forbidden functions (ex. std::stoi)
 - Check relinking of Makefile
 - Check for leaks
@@ -31,6 +29,8 @@ TOCHECKLAST:
 - Clean up the repo
 
 DONE:
+- (Xander) [DONE] Make recv first parse only header then parse body based on content length
+- Set default file for a directory [DONE]
 - (DONE)(XANDER) Method like HEAD should return (501 Not implemented)
 - (DONE)(Max) Location block return (redirection)
 - (DONE)(Bence) Invalid location if /php/

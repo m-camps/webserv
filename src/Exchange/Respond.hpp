@@ -12,12 +12,10 @@
 
 #include "Exchange.hpp" // Exchange Class
 #include "Server.hpp" // Server class
-#include "Utilities.hpp" // findCharLocation, readFile, deleteFile & defaultPage
+#include "Utilities.hpp" // readFile, deleteFile
 #include "Generator.hpp"
 #include "Cgi.hpp"
-
-#define CRLF "\r\n"
-#define SEPERATOR "\r\n\r\n"
+#include "Constants.hpp"
 
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
