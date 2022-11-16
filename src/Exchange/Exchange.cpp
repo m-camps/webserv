@@ -31,7 +31,7 @@ Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestDat
 
 /* //////////////////////////// */
 
-const Server&	Exchange::matchServer(Servers servers, HashMap requestData)
+Server	Exchange::matchServer(Servers servers, HashMap requestData)
 {
 	Server		server = servers.front();
 	std::string host = requestData.find("Host")->second;
@@ -47,7 +47,7 @@ const Server&	Exchange::matchServer(Servers servers, HashMap requestData)
 
 /* //////////////////////////// */
 
-const Location&   Exchange::matchLocation(const Server& server, HashMap requestData)
+Location   Exchange::matchLocation(const Server& server, HashMap requestData)
 {
     int32_t longestMatch = 0;
     std::string loc = "/";

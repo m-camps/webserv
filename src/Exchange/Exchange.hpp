@@ -30,8 +30,8 @@ public:
 	void			sendNormal(const std::string& str) const;
 
 	/* Matching */
-	const Server&	    matchServer(Servers servers, HashMap requestData);
-	const Location&		matchLocation(const Server& server, HashMap requestData);
+	Server	    matchServer(Servers servers, HashMap requestData);
+	Location	matchLocation(const Server& server, HashMap requestData);
 
 
 private:

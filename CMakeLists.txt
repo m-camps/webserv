@@ -38,6 +38,8 @@ set(SOURCES
         src/Utilities/deleteFile.cpp
         src/Utilities/findCharLocation.cpp
         src/Utilities/readFile.cpp
-        src/Utilities/isDirectory.cpp src/Utilities/ft_stoi.cpp src/Utilities/splitLineWithStrtok.cpp)
+        src/Utilities/isDirectory.cpp
+        src/Utilities/ft_stoi.cpp
+        src/Utilities/splitLineWithStrtok.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
