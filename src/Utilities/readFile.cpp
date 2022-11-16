@@ -28,7 +28,7 @@ std::string readFile(const std::string& RespondedFile)
 	std::string FileContentStr;
 
 	File.open(RespondedFile);
-	if (!File.is_open()) //what happens if the permission is denied for file
+	if (!File.is_open())
 		throw (std::invalid_argument("File could not be opened."));
 
 	len = getLength(File);
@@ -43,11 +43,6 @@ std::string readFile(const std::string& RespondedFile)
 		std::exit(EXIT_FAILURE);
 	}
 	File.close();
-	bool closingFailed = true;//File.fail();
-	if (closingFailed == true)
-	{
-		std::cerr << "Closing a file failed." << std::endl;
-	}
 	FileContentStr.append(FileContent, len);
 	delete [] FileContent;
 	return (FileContentStr);
