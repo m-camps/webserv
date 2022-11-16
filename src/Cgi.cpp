@@ -125,7 +125,6 @@ void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 	if (waitpid(-1, &stat, 0) < 0)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
-
 	if (WIFEXITED(stat) == true)
 	{
 		static char buff[1024];
