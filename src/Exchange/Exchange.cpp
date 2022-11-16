@@ -11,7 +11,7 @@
 Exchange::Exchange(void) : _socketFd(0) {}
 Exchange::~Exchange(void) {}
 
-Exchange::Exchange(Servers servers, int32_t socketFd, const HashMap& requestData)
+Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestData)
     : _socketFd(socketFd)
 {
 	try
@@ -32,6 +32,8 @@ Exchange::Exchange(Servers servers, int32_t socketFd, const HashMap& requestData
 	}
 }
 
+/* //////////////////////////// */
+
 Server		Exchange::matchServer(Servers servers, HashMap requestData)
 {
 	Server		server = servers.front();
@@ -45,6 +47,8 @@ Server		Exchange::matchServer(Servers servers, HashMap requestData)
 	}
 	return (server);
 }
+
+/* //////////////////////////// */
 
 Location	Exchange::matchLocation(Server server, HashMap requestData)
 {
@@ -75,21 +79,13 @@ Location	Exchange::matchLocation(Server server, HashMap requestData)
     return (server.getLocations().find(loc)->second);
 }
 
-#pragma endregion ctoranddtor
-
-#pragma region getter
-
-/* ////////// Getter //////////// */
+/* //////////////////////////// */
 
 Server 		Exchange::getServer(void) const { return (_server); }
 HashMap		Exchange::getRequestData(void) const { return (_requestData); }
 int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
 
-#pragma endregion getter
-
-#pragma region functions
-
-/* ////////// Functions //////////// */
+/* //////////////////////////// */
 
 void	Exchange::sendToClient(Respond& response)
 {
@@ -100,6 +96,8 @@ void	Exchange::sendToClient(Respond& response)
     else
         sendChunked(response.getBody());
 }
+
+/* //////////////////////////// */
 
 inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
 {
@@ -113,6 +111,8 @@ inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
     }
     return (ret);
 }
+
+/* //////////////////////////// */
 
 void	Exchange::sendChunked(std::string str) const
 {
@@ -134,6 +134,8 @@ void	Exchange::sendChunked(std::string str) const
     }
 }
 
+/* //////////////////////////// */
+
 void    Exchange::sendNormal(const std::string& str) const
 {
     try
@@ -145,5 +147,3 @@ void    Exchange::sendNormal(const std::string& str) const
         std::cerr << e.what() << std::endl;
     }
 }
-
-#pragma endregion adders

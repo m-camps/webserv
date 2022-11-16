@@ -17,7 +17,7 @@ class Respond ;
 class Exchange
 {
 public:
-    Exchange(Servers, int32_t, const HashMap&);
+    Exchange(Servers&, int32_t, const HashMap&);
     ~Exchange(void);
 
     /* Getters */

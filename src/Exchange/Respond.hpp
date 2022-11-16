@@ -27,7 +27,7 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string> Allowed
 class Respond
 {
 	public:
-		explicit Respond(Server& server, Location& location);
+		explicit Respond(const Server& server, const Location& location);
 		~Respond(void);
 
 		/* Getters */

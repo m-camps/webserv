@@ -3,19 +3,13 @@
 //
 
 #include "Respond.hpp"
-#include "../../inc/Cgi.hpp"
-#include "../../inc/Server.hpp"
 
-#pragma region "ctor & dtor"
-
-////////// Ctor & Dtor ///////////
-
-Respond::Respond(Server& server, Location& location)
+Respond::Respond(const Server& server, const Location& location)
     : _server(server), _location(location) ,_status_code(200), _isChunked(false) {}
 
 Respond::~Respond(void) {}
 
-#pragma endregion "ctor & dtor"
+/* //////////////////////////// */
 
 std::string		Respond::getHeader(void) const { return _header; }
 std::string		Respond::getBody(void) const { return _body; }
@@ -23,11 +17,9 @@ HashMap			Respond::getRequestData(void) const { return _requestData; }
 int				Respond::getStatusCode(void) const { return _status_code; }
 Server			Respond::getServer(void) const { return _server; }
 Location        Respond::getLocation() const { return _location; }
-
 bool			Respond::IsChunked(void) const { return _isChunked; }
 
 void			Respond::setBody(std::string body) { _body = body; }
-
 
 void 		    Respond::addToHeader(const std::string& NewLine)
 {
@@ -35,9 +27,8 @@ void 		    Respond::addToHeader(const std::string& NewLine)
 
 	_header = NewHeader;
 }
-//////////// Responder ////////////
 
-/* ///////// External Functions ////////// */
+/* //////////////////////////// */
 
 bool isForbiddenPath(const std::string& Path)
 {
@@ -96,6 +87,8 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string> Allowed
 	}
 	return (false);
 }
+
+/* //////////////////////////// */
 
 bool MethodIsImplemented(const std::string& Method)
 {
@@ -157,6 +150,8 @@ void 	Respond::buildResponse(HashMap requestData)
     }
 }
 
+/* //////////////////////////// */
+
 std::string Respond::getEntryFromMap(const std::string& entry)
 {
 	HashMap::iterator it = _requestData.find(entry);
@@ -165,6 +160,8 @@ std::string Respond::getEntryFromMap(const std::string& entry)
             throw (std::invalid_argument("Invalid string"));
         return (it->second);
 }
+
+/* //////////////////////////// */
 
 std::string Respond::getValidFile(const std::string& relativePath)
 {

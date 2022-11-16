@@ -120,10 +120,11 @@ void Network::run()
             }
 			else if ((cur.events & POLLOUT) && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
 			{
-				Poller poller = io.find(cur.fd)->second;
 				Request	request;
+				Poller poller = io.find(cur.fd)->second;
+                Servers servers = getServersByFd(cur.fd);
 
-				Exchange exchange(getServersByFd(cur.fd), cur.fd, request.parseRequest(poller.readString));
+				Exchange exchange(servers, cur.fd, request.parseRequest(poller.readString));
 				std::cout << "Reponse on fd: " << cur.fd << std::endl;
 				io.find(cur.fd)->second = Poller();
 			}
