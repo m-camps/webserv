@@ -14,7 +14,7 @@
 	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
-- (Bence) Chaining together the correct path based on location name+root+rest_of_url
+
 - (Bence) Restructure file passed to CGI
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
 - (Xander) Limit the upload size to 100mb? (suggestions are welcome)
@@ -22,7 +22,6 @@ TODO:
 - HTML landing page
 
 TOCHECKLAST:
-- Check all system calls, handle return of error (-1) anything in
 - (Xander) Set default file for a directory
 - (Max) Add default file to parser
 - (Max) HTML landing page
@@ -46,6 +45,7 @@ DONE:
 - (Done)(Max) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
 - (Done)(Max) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>
 - (DONE)(Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) - SOMEONE PLEASE DOUBLE CHECK
+- (DONE)(Bence) Chaining together the correct path based on location name+root+rest_of_url
 
 Something goes wrong when you try to GET or DELETE a file with a spacebar in between.
 Example: "GET /space\ test.html HTTP/1.1"
