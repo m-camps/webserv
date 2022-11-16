@@ -23,6 +23,7 @@ TODO:
 - Check all system calls, handle return of error (-1) anything in
 - (Bence) Check relinking of Makefile
 - (Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) 
+- (Max) return status code parser remove
 
 TOCHECKLAST:
 - Check for forbidden functions (ex. std::stoi)

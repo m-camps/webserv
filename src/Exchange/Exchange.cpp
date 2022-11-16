@@ -55,7 +55,6 @@ Location   Exchange::matchLocation(const Server& server, HashMap requestData)
     Locations locations = server.getLocations();
 
     std::vector<std::string> splitRoute = splitLineWithStrtok(route, "/");
-
     for (Locations::iterator it = locations.begin(); it != locations.end(); it++)
     {
         std::string name = it->first;
