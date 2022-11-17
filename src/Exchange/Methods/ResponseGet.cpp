@@ -41,6 +41,7 @@ void Respond::buildGet(void)
     std::cout << "GET" << std::endl;
     try
     {
+        Cgi	cgi;
         std::string FileContent;
         std::string relativePath;
         std::string Root = _location.getRoot();
@@ -50,20 +51,15 @@ void Respond::buildGet(void)
         relativePath = Root + Path;
         modifyStatuscode(Path, relativePath);
         if (correctCgiRequestAllowed() == true && _status_code != e_Redir)
-        {
-            Cgi	cgi;
             FileContent = cgi.executeScript(*this);
-            createResponse(FileContent);
-            return ;
-        }
-        FileContent = getValidFile(relativePath);
+        else
+            FileContent = getValidFile(relativePath);
         createResponse(FileContent);
-        std::cout << _header << std::endl;
     }
     catch (const std::exception& e)
     {
         std::cerr << "Internal Server Error: " << e.what() << std::endl;
         _status_code = e_InternalServerError;
-        createResponse(Generator::generateDefaulPage(_status_code));
+        createResponse(Generator::generateDefaulPage(*this));
     }
 }

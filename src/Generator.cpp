@@ -124,17 +124,25 @@ std::string StatusMessage(int32_t StatusCode)
     }
 }
 
-std::string Generator::generateDefaulPage(uint32_t StatusCode)
+std::string Generator::generateDefaulPage(const Respond& ResponderRef)
 {
-     return (
-            "<!DOCTYPE html>\n"
-            "<body>\n"
-            "<h1>ERROR " + ToString(StatusCode) +
-            "</h1>\n" +
-            StatusMessage(StatusCode) +
-            "</body>\n"
-            "</html>"
-    );
+    int32_t status_code = ResponderRef.getStatusCode();
+    ErrorPageMap ErrorPages = ResponderRef.getServer().getErrorPage();
+    ErrorPageMap::const_iterator it = ErrorPages.find(status_code);
+
+    if (it != ErrorPages.end())
+    {
+        return (readFile(ResponderRef.getLocation().getRoot() + it->second));
+    }
+    return (
+        "<!DOCTYPE html>\n"
+        "<body>\n"
+        "<h1>ERROR " + ToString(status_code) +
+        "</h1>\n" +
+        StatusMessage(status_code) +
+        "</body>\n"
+        "</html>"
+);
 }
 
 /* //////////////////////////// */

@@ -1,14 +1,18 @@
-#include "../inc/Cgi.hpp"
+//
+// Created by Xander Voorvaart on 11/1/22.
+//
+
+#include "Cgi.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <vector>
-#include <string.h>
+#include <cstring>
 
 std::string		Cgi::createServerErrorBody(Respond& ResponderRef, int errorCode)
 {
 	ResponderRef.setStatusCode(errorCode);
-	std::string defaultServerErrorBody = Generator::generateDefaulPage(ResponderRef.getStatusCode());
-	return	defaultServerErrorBody;
+	std::string defaultServerErrorBody = Generator::generateDefaulPage(ResponderRef);
+	return defaultServerErrorBody;
 }
 
 void		Cgi::createFailedSysCallResponse(Respond& ResponderRef, int errorCode)
@@ -182,10 +186,7 @@ std::string			Cgi::executeScript(Respond& ResponderRef)
 	return (ResponderRef.getBody());
 }
 
-Cgi::Cgi() 
-{
-	;
-}
+Cgi::Cgi() {}
 
 
 /*

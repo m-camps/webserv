@@ -23,14 +23,14 @@ void Respond::buildDelete(void)
         if (isDirectory(relativePath) == true)
         {
             _status_code = e_Forbidden;
-            createResponse(Generator::generateDefaulPage(_status_code));
+            createResponse(Generator::generateDefaulPage(*this));
             return ;
         }
 
         modifyStatuscode(Path, relativePath);
         if (_status_code != e_OK)
         {
-            createResponse(Generator::generateDefaulPage(_status_code));
+            createResponse(Generator::generateDefaulPage(*this));
             return;
         }
         deleteFile(relativePath);
@@ -40,6 +40,6 @@ void Respond::buildDelete(void)
     {
         std::cerr << "Internal Server Error: " << e.what() << std::endl;
         _status_code = e_InternalServerError;
-        createResponse(Generator::generateDefaulPage(_status_code));
+        createResponse(Generator::generateDefaulPage(*this));
     }
 }

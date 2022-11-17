@@ -47,7 +47,7 @@ void Respond::modifyStatuscode(const std::string& Path, const std::string& relat
     {
         _status_code = e_Forbidden;
     }
-    else if (("/" == Path || Path.empty() == true) && _location.getReturnPath().empty() == false)
+    else if (_location.getReturnPath().empty() == false)
     {
         _status_code = e_Redir;
     }
@@ -139,13 +139,13 @@ void 	Respond::buildResponse(HashMap requestData)
             _status_code = e_Badrequest;
         else
             _status_code = e_NotImplemented;
-        createResponse(Generator::generateDefaulPage(_status_code));
+        createResponse(Generator::generateDefaulPage(*this));
     }
     catch (const std::exception &e)
     {
         std::cerr << e.what() << std::endl;
         _status_code = e_InternalServerError;
-        createResponse(Generator::generateDefaulPage(_status_code));
+        createResponse(Generator::generateDefaulPage(*this));
     }
 }
 
@@ -166,20 +166,9 @@ std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
 	std::string LocationIndex = _location.getRoot() + "/" + _location.getIndex();
-	ErrorPageMap ErrorPages = _server.getErrorPage();
-	ErrorPageMap::iterator it = ErrorPages.find(_status_code);
 
 	try
 	{
-        // Needs to be fixed
-        if (it != ErrorPages.end())
-        {
-            if (access(it->second.c_str(), R_OK) == 0)
-            {
-                FileContent = readFile(_location.getRoot() + it->second);
-                return (FileContent);
-            }
-        }
         switch (_status_code)
 		{
 			case e_OK:
@@ -195,10 +184,10 @@ std::string Respond::getValidFile(const std::string& relativePath)
 				if (_location.getAutoIndex() == true && LocationIndex == relativePath)
 					FileContent = Generator::generateAutoIndex(*this);
 				else
-					FileContent = Generator::generateDefaulPage(_status_code);
+					FileContent = Generator::generateDefaulPage(*this);
 				break ;
 			default:
-				FileContent = Generator::generateDefaulPage(_status_code);
+				FileContent = Generator::generateDefaulPage(*this);
 				break ;
 		}
 	}
@@ -206,7 +195,7 @@ std::string Respond::getValidFile(const std::string& relativePath)
 	{
 		std::cerr << e.what() << std::endl;
 		_status_code = e_InternalServerError;
-		FileContent = Generator::generateDefaulPage(_status_code);
+		FileContent = Generator::generateDefaulPage(*this);
 	}
 	return (FileContent);
 }

@@ -69,7 +69,7 @@ std::string Respond::sendSuccesfulUpload(std::string MetaData)
 {
     std::string Root = _location.getRoot();
     std::string FileName = getFilename(MetaData);
-    std::string RelativePath = Root + "/" + FileName;
+    std::string RelativePath = Root + FileName;
 
     return ("Saved upload to file <a href=\"" + FileName + "\">" + RelativePath + "</a> on disk");
 }
@@ -85,13 +85,13 @@ bool Respond::isPostValid(void)
         if (found == std::string::npos)
         {
             _status_code = e_UnsupportedMediaType;
-            createResponse(Generator::generateDefaulPage(_status_code));
+            createResponse(Generator::generateDefaulPage(*this));
             return (false);
         }
         if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
         {
             _status_code = e_PayloadTooLarge;
-            createResponse(Generator::generateDefaulPage(_status_code));
+            createResponse(Generator::generateDefaulPage(*this));
             return (false);
         }
     }
@@ -125,6 +125,6 @@ void Respond::buildPost(void)
     {
         std::cerr << "Internal Server Error: " << e.what() << std::endl;
         _status_code = e_InternalServerError;
-        createResponse(Generator::generateDefaulPage(_status_code));
+        createResponse(Generator::generateDefaulPage(*this));
     }
 }

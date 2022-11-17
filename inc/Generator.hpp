@@ -27,10 +27,11 @@ public:
     static std::string generateTransferEncoding(void);
     static std::string generateChunk(std::string&);
     static std::string generateDirectoryPage(const std::string&);
-    static std::string generateDefaulPage(uint32_t);
+    static std::string generateDefaulPage(const Respond&);
     static std::string generateBoundry(Respond&);
     static std::string generateAutoIndex(Respond&);
     static std::string generateLocation(const std::string&);
+
 private:
     Generator& operator=(const Generator&);
 };
