@@ -4,89 +4,98 @@
 #include <vector>
 #include <string.h>
 
-
-std::string		createServerErrorBody(Respond& ResponderRef, e_statusCode errorCode)
+std::string		Cgi::createServerErrorBody(Respond& ResponderRef, int errorCode)
 {
 	ResponderRef.setStatusCode(errorCode);
 	std::string defaultServerErrorBody = Generator::generateDefaulPage(ResponderRef.getStatusCode());
 	return	defaultServerErrorBody;
 }
 
-void		createFailedSysCallResponse(Respond& ResponderRef, e_statusCode errorCode)
+void		Cgi::createFailedSysCallResponse(Respond& ResponderRef, int errorCode)
 {
 	ResponderRef.setStatusCode(errorCode);
 	ResponderRef.setBody(createServerErrorBody(ResponderRef, errorCode));
 	return ;
 }
 
-std::string		buildCgiExecPath(Respond& ResponderRef)
+std::string		Cgi::buildCgiExecPath(Respond& ResponderRef)
 {
-	Location current = ResponderRef.getLocation();
-	char absolutePath[300];
+	Location 	currentLoc = ResponderRef.getLocation();
+	std::string PATH = ResponderRef.getEntryFromMap("Path");
+	std::string locationRoot = currentLoc.getRoot();
+	std::string locationName = currentLoc.getName();
+	size_t		index = PATH.find(locationName);
+	char 		absolutePath[500]; //do we need this big container?
 
-	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL) //navigate to the directory of cgibin
+	PATH.replace(index, locationName.length(), locationRoot);
+
+	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL)
 	{
 		std::cout << "Could not enter to current working directory, closing program" << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	std::string relativePath = current.getRoot() + ResponderRef.getEntryFromMap("Path");
 	std::string executablePath(absolutePath);
-	executablePath += "/" + current.getRoot() + "/cgi-bin" + current.getName() + "/" + current.getCgiName();
-	if (current.getCgiFileExtension() != "" && current.getCgiName() != "")
-	{
-		executablePath += ".";
-		executablePath += current.getCgiFileExtension();
-	}
+	executablePath += '/' + PATH; //end of path should be the same as the cgi_name + ext
+
 	return executablePath;
 }
 
-char**			createArgv(Respond& ResponderRef)
+char**			Cgi::createArgv(Respond& ResponderRef)
 {
 	std::string 				requestedFilePath = buildCgiExecPath(ResponderRef);
-	std::string					interpreterPath = "/opt/homebrew/opt/python@3.10/bin/python3.10";
-	//std::string					interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
+	std::string					interpreterPath = "/opt/homebrew/opt/python@3.10/bin/python3.10"; //on m2
+	//std::string				interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
 	std::vector<std::string>	argvString;
+	char						**argv;
 
 	argvString.push_back(interpreterPath);
 	argvString.push_back(requestedFilePath);
 
-	char **argv = new (std::nothrow) char*[3];
-	if (argv == nullptr)
+	try
 	{
-		std::cerr << "New allocation failed for argv, returning" << std::endl;
-		exit(BAD_GATEWAY_EXIT_CODE); //debatable
+		argv = new char*[3];
+	}
+	catch(std::bad_alloc& e)
+	{
+		exit(INTERNAL_SERVER_ERROR_CODE);
 	}
 	for (int i = 0; i < 2; i++)
 	{
 		argv[i] = strdup(static_cast<const char*>(argvString[i].data()));
 		if (!argv[i])
-			exit(BAD_GATEWAY_EXIT_CODE); //debatable
+		{
+			exit(INTERNAL_SERVER_ERROR_CODE);
+		}
 	}
 	argv[2] = NULL;
 	return argv;
 }
 
-char**			createEnvp(Respond& ResponderRef)
+char**			Cgi::createEnvp(Respond& ResponderRef)
 {
 	std::vector<std::string>	envpStrig;
-	std::string					pathInfo = "PATH_INFO=" + ResponderRef.getLocation().getName(); //we could here add full path, donno why is it needed tho
+	std::string					pathInfo = "PATH_INFO=" + ResponderRef.getLocation().getName();
 	std::string					scriptName = "SCRIPT_NAME=/cgi-bin";
+	char**						envp;
 
 	envpStrig.push_back(pathInfo);
 	envpStrig.push_back(scriptName);
 
-	char **envp = new (std::nothrow) char*[3];
-	if (envp == nullptr)
+	try
 	{
-		std::cerr << "New allocation failed for envp, returning" << std::endl;
-		exit(BAD_GATEWAY_EXIT_CODE); //debatable
+		envp = new char*[3];
+	}
+	catch(std::bad_alloc& e)
+	{
+		exit(INTERNAL_SERVER_ERROR_CODE);
 	}
 	for (int i = 0; i < 2; i++)
 	{
 		envp[i] = strdup(static_cast<const char*>(envpStrig[i].data()));
 		if (!envp[i])
-			exit(BAD_GATEWAY_EXIT_CODE); //debatable
-
+		{
+			exit(INTERNAL_SERVER_ERROR_CODE);
+		}
 	}
 	envp[2] = NULL;
 	return envp;
@@ -94,6 +103,12 @@ char**			createEnvp(Respond& ResponderRef)
 
 void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 {
+	struct stat	s;
+	char**		argv = createArgv(ResponderRef);
+	char**		envp = createEnvp(ResponderRef);
+	Location 	currentLoc = ResponderRef.getLocation();
+	std::string requestedFileName = currentLoc.getCgiName() + "." + currentLoc.getCgiFileExtension();
+
 	if (close(fds[0]) < 0)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 	if (close(STDIN_FILENO) < 0)
@@ -101,20 +116,15 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 	if (dup2(fds[1], STDOUT_FILENO) < 0)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 
-	char**	argv = createArgv(ResponderRef);
-	char**	envp = createEnvp(ResponderRef);
-
-	if (access(argv[1], (X_OK | F_OK)) == 0)
+	if (stat(argv[1], &s) == 0)
 	{
-		if (execve(argv[0], argv, envp) < 0)
+		char* cgiFileFoundInPath = strstr(argv[1], requestedFileName.c_str());
+		if (s.st_mode & S_IFREG && access(argv[1], (X_OK)) == 0 && cgiFileFoundInPath != NULL) //small bug, it sees python// also an executable path
 		{
-			exit(BAD_GATEWAY_EXIT_CODE);
+			execve(argv[0], argv, envp); //no need to check if its < 0
 		}
 	}
-	else
-	{
-		exit(BAD_GATEWAY_EXIT_CODE);
-	}
+	exit(INTERNAL_SERVER_ERROR_CODE);
 }
 
 void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
@@ -130,19 +140,18 @@ void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
 	{
 		static char buff[1024];
 		int exit_status = WEXITSTATUS(stat);
-		if (exit_status == BAD_GATEWAY_EXIT_CODE)
+		if (exit_status == INTERNAL_SERVER_ERROR_CODE)
 		{	
-			return (createFailedSysCallResponse(ResponderRef, e_BadGateway));
+			close(fds[0]);
+			return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
 		}
 		int ret = read(fds[0], buff, sizeof(buff));
 		if (ret == -1)
+		{
 			return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
+		}
 		std::string cgiBody(buff);
 		ResponderRef.setBody(cgiBody);
-	}
-	else
-	{
-		//maybe signaled quit? interruption ? 
 	}
 	if (close(fds[0]) < 0)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));

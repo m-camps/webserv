@@ -1,8 +1,9 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 #include <string>
+#include "../src/Exchange/Respond.hpp"
 #define NR_OF_CGI_ENV_VARS 24
-#define BAD_GATEWAY_EXIT_CODE 254
+#define INTERNAL_SERVER_ERROR_CODE 254
 #include "Exchange.hpp"
 #include "Respond.hpp"
 
@@ -16,7 +17,12 @@ class Cgi
 		std::string		executeScript(Respond& Responder);
 		void			parentProcess(Respond& Responder, int* fds, int& stat);
 		void			childProcess(int* fds, Respond& Responder);
-		char**			createEnvVariables(Respond& Responder);
+		char**			createEnvp(Respond& ResponderRef);
+		char**			createArgv(Respond& ResponderRef);
+		std::string		buildCgiExecPath(Respond& ResponderRef);
+		void			createFailedSysCallResponse(Respond& ResponderRef, int errorCode);
+		std::string		createServerErrorBody(Respond& ResponderRef, int errorCode);
+
 		//i need to construct a header separate from the script
 			// VERSION & STATUSCODE FIRST
 			// ContentLength, if there is a body
