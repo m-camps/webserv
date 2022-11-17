@@ -90,7 +90,7 @@ test: all
 unit_tester:
 	cmake -S . -B cBuild/
 	make -C cBuild/
-	./cBuild/tester/catch2Tester 2> /dev/null
+	./cBuild/tester/catch2Tester
 
 # Colors
 RED=\x1b[1;31m

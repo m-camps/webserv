@@ -13,6 +13,8 @@
 #pragma once
 
 #include "Location.hpp"
+#include "Constants.hpp"
+
 #include <string>
 #include <map>
 #include <list>
@@ -22,8 +24,6 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <vector>
-
-#define ERROR 1
 
 typedef std::map<std::string, Location>::iterator locIt;
 

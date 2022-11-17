@@ -24,9 +24,8 @@ int32_t	main(int argc, char *argv[])
 		std::exit(EXIT_FAILURE);
 	}
 
-	
 	Network network;
-	
+
 	try
 	{	
 		network.setup(argv[1]);
@@ -34,8 +33,8 @@ int32_t	main(int argc, char *argv[])
 	catch(std::exception& e)
 	{
 		std::cout << e.what() << std::endl;
-		std::exit(ERROR);
+        return (ERROR);
 	}
 	network.run();
-	return (0);
+	return (SUCCES);
 }

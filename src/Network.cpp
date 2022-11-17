@@ -10,13 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/Network.hpp"
-#include "../inc/Server.hpp"
-#include "../inc/Constants.hpp"
-#include "Exchange/Exchange.hpp"
-#include "Exchange/Request.hpp"
-#include <iostream>
-#include "../inc/Cgi.hpp"
+#include "Network.hpp"
+#include "Request.hpp"
 #include "Poller.hpp"
 
 #define BUFF 10000

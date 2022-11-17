@@ -13,20 +13,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 
-#include "Server.hpp"
 #include "Network.hpp"
-#include "Exchange.hpp"
-#include "Respond.hpp"
-#include "Request.hpp"
-#include "Generator.hpp"
-
-TEST_CASE("Using a string that does not exist in getHashMapstring")
-{
-	Server server;
-	Exchange exchange(server, 0);
-
-	REQUIRE_THROWS(exchange.getHashMapString("StrDoesNotExists"));
-}
 
 TEST_CASE("Non-Existing File")
 {
@@ -61,21 +48,4 @@ TEST_CASE("deleteFile should Throw, if file does not exists")
 	std::string path = "APathThatWillNotExist";
 
 	REQUIRE_THROWS(deleteFile(path));
-}
-
-TEST_CASE("Generator Test")
-{
-    Server server;
-    Exchange exchanger(server, 0);
-
-    SECTION("Exchange has a Body")
-    {
-        exchanger.setBody("Hallo");
-        REQUIRE(Generator::generateChunk(exchanger) == "5\r\nHallo\r\n\r\n");
-    }
-    SECTION("Exchange has a no Body")
-    {
-        exchanger.setBody("");
-        REQUIRE(Generator::generateChunk(exchanger) == "0\r\n\r\n\r\n");
-    }
 }

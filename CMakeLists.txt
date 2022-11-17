@@ -19,6 +19,8 @@ set(SOURCES
         ${INC_HEADERS}/Server.hpp
         ${INC_HEADERS}/Utilities.hpp
         ${INC_HEADERS}/Generator.hpp
+        ${INC_HEADERS}/Cgi.hpp
+        ${INC_HEADERS}/Poller.hpp
         ${EXCHANGE_HEADERS}/Exchange.hpp
         ${EXCHANGE_HEADERS}/Respond.hpp
         ${EXCHANGE_HEADERS}/Request.hpp
@@ -35,6 +37,8 @@ set(SOURCES
         src/Exchange/Methods/ResponsePost.cpp
         src/Exchange/Methods/ResponseGet.cpp
         src/Exchange/Methods/ResponseDelete.cpp
+        src/Cgi.cpp
+        src/Poller.cpp
         src/Utilities/deleteFile.cpp
         src/Utilities/readFile.cpp
         src/Utilities/isDirectory.cpp

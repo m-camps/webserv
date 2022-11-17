@@ -97,13 +97,41 @@ std::string Generator::generateBoundry(Respond& Responder)
 
 /* //////////////////////////// */
 
+std::string StatusMessage(int32_t StatusCode)
+{
+    switch (StatusCode)
+    {
+        case e_Badrequest:
+            return ("invalid request");
+        case e_Forbidden:
+            return ("Forbidden");
+        case e_NotFound:
+            return ("Page not found");
+        case e_MethodNotFound:
+            return ("Method not found");
+        case e_PayloadTooLarge:
+            return ("Payload too large");
+        case e_UnsupportedMediaType:
+            return ("Unsupported Media Type");
+        case e_InternalServerError:
+            return ("Internal Server Error");
+        case e_NotImplemented:
+            return ("Method not implemented");
+        case e_BadGateway:
+            return ("Bad Gateway");
+        default:
+            return ("");
+    }
+}
+
 std::string Generator::generateDefaulPage(uint32_t StatusCode)
 {
      return (
             "<!DOCTYPE html>\n"
             "<body>\n"
             "<h1>ERROR " + ToString(StatusCode) +
-            "</h1>\n"
+            "</h1>\n" +
+            StatusMessage(StatusCode) +
             "</body>\n"
             "</html>"
     );

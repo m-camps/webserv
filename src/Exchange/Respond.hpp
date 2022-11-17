@@ -99,8 +99,6 @@ struct s_Methods
 enum e_statusCode
 {
     e_OK = 200,
-	e_Accepted = 202,
-	e_NoContent = 204,
     e_Redir = 301,
     e_Badrequest = 400,
     e_Unauthorized = 401,
