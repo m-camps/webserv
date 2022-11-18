@@ -9,7 +9,6 @@ void deleteFile(std::string& filePath)
     int32_t result = std::remove(filePath.c_str());
     if (result != 0)
     {
-        //std::perror("In remove: ");
         throw (std::out_of_range("filePath cannot be removed"));
     }
 }

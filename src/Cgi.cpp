@@ -36,7 +36,7 @@ std::string		Cgi::buildCgiExecPath(Respond& ResponderRef)
 	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL)
 	{
 		std::cout << "Could not enter to current working directory, closing program" << std::endl;
-		exit(EXIT_FAILURE);
+		std::exit(EXIT_FAILURE);
 	}
 	std::string executablePath(absolutePath);
 	executablePath += '/' + PATH; //end of path should be the same as the cgi_name + ext
@@ -61,14 +61,14 @@ char**			Cgi::createArgv(Respond& ResponderRef)
 	}
 	catch(std::bad_alloc& e)
 	{
-		exit(INTERNAL_SERVER_ERROR_CODE);
+		std::exit(INTERNAL_SERVER_ERROR_CODE);
 	}
 	for (int i = 0; i < 2; i++)
 	{
 		argv[i] = strdup(static_cast<const char*>(argvString[i].data()));
 		if (!argv[i])
 		{
-			exit(INTERNAL_SERVER_ERROR_CODE);
+			std::exit(INTERNAL_SERVER_ERROR_CODE);
 		}
 	}
 	argv[2] = NULL;
@@ -91,14 +91,14 @@ char**			Cgi::createEnvp(Respond& ResponderRef)
 	}
 	catch(std::bad_alloc& e)
 	{
-		exit(INTERNAL_SERVER_ERROR_CODE);
+		std::exit(INTERNAL_SERVER_ERROR_CODE);
 	}
 	for (int i = 0; i < 2; i++)
 	{
 		envp[i] = strdup(static_cast<const char*>(envpStrig[i].data()));
 		if (!envp[i])
 		{
-			exit(INTERNAL_SERVER_ERROR_CODE);
+			std::exit(INTERNAL_SERVER_ERROR_CODE);
 		}
 	}
 	envp[2] = NULL;
@@ -128,7 +128,7 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 			execve(argv[0], argv, envp); //no need to check if its < 0
 		}
 	}
-	exit(INTERNAL_SERVER_ERROR_CODE);
+	std::exit(INTERNAL_SERVER_ERROR_CODE);
 }
 
 void		Cgi::parentProcess(Respond& ResponderRef, int* fds, int& stat)
