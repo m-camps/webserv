@@ -24,16 +24,13 @@ void Respond::parsePath(std::string& Path)
     Path.erase(0, found + LocationName.size());
 }
 
-bool	Respond::correctCgiRequestAllowed(void)
+bool    Respond::isPyExtension(const std::string& Path)
 {
-    std::string cgiExt = _location.getCgiFileExtension();
-    std::string cgiName = _location.getCgiName();
+    size_t found = Path.find(".py");
 
-    if (!cgiName.empty() && !cgiExt.empty())
-    {
-        return (true);
-    }
-	return (false);
+    if (found == std::string::npos)
+        return (false);
+    return (true);
 }
 
 void Respond::buildGet(void)
@@ -50,7 +47,7 @@ void Respond::buildGet(void)
         parsePath(Path);
         relativePath = Root + Path;
         modifyStatuscode(Path, relativePath);
-        if (correctCgiRequestAllowed() == true && _status_code != e_Redir)
+        if (_status_code == e_OK && isPyExtension(Path) == true)
             FileContent = cgi.executeScript(*this);
         else
             FileContent = getValidFile(relativePath);

@@ -76,7 +76,7 @@ class Respond
         /* GET Functions */
 		void 			buildGet(void);
 		void 			buildRedir(void);
-		bool			correctCgiRequestAllowed(void);
+        bool            isPyExtension(const std::string&);
 		std::string 	getValidFile(const std::string&);
 
         /* DELETE Functions */
