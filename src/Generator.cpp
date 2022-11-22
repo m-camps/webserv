@@ -207,7 +207,6 @@ std::string Generator::generateDirectoryPage(Respond& Responder)
     std::string FileContent;
     std::string Path = Responder.getLocation().getRoot() + Responder.getLocation().getDefaultPage();
 
-    std::cout << Path << std::endl;
     try
     {
         FileContent = readFile(Path);
