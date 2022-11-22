@@ -27,6 +27,7 @@ class Location {
 		std::string					_cgi_ext;
 		int							_return_status;
 		std::string					_return_path;
+        std::string                 _default_page;
 
 		//if there is a cginame and cgi extension then its a cgi request
 	public:
@@ -44,6 +45,7 @@ class Location {
 		std::string					getCgiName(void) const;
 		int							getReturnStatus(void) const;
 		std::string					getReturnPath(void) const;
+        std::string                 getDefaultPage(void) const;
 
 		/* Setters */
 		void						setName(const std::string& name);

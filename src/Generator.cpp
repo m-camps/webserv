@@ -202,13 +202,20 @@ std::string Generator::generateAutoIndex(Respond& Responder)
 
 /* //////////////////////////// */
 
-std::string Generator::generateDirectoryPage(const std::string& Path)
+std::string Generator::generateDirectoryPage(Respond& Responder)
 {
-    return (
-            "<!DOCTYPE html>\n"
-            "<body>\n"
-            "<h1>You are in directory: " + Path + "</h1>"
-            "</body>\n"
-            "</html>"
-            );
+    std::string FileContent;
+    std::string Path = Responder.getLocation().getRoot() + Responder.getLocation().getDefaultPage();
+
+    std::cout << Path << std::endl;
+    try
+    {
+        FileContent = readFile(Path);
+    }
+    catch (const std::exception& e)
+    {
+        Responder.setStatusCode(e_NotFound);
+        FileContent = Generator::generateDefaulPage(Responder);
+    }
+    return (FileContent);
 }

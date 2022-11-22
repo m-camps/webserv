@@ -177,7 +177,7 @@ std::string Respond::getValidFile(const std::string& relativePath)
 		{
 			case e_OK:
                 if (isDirectory(relativePath) == true)
-                    FileContent = Generator::generateDirectoryPage(relativePath);
+                    FileContent = Generator::generateDirectoryPage(*this);
                 else
 				    FileContent = readFile(relativePath);
 				break ;

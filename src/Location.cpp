@@ -16,6 +16,7 @@
 // Constructor with default values
 Location::Location()
 {
+    _default_page = "DefaultPage.html";
 	_autoindex = -1;
 	_return_status = -1;
 }
@@ -32,6 +33,7 @@ Location::Location(bool isEmpty)
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
 	_methods.push_back("GET");
+    _default_page = "DefaultPage.html";
 }
 
 Location::~Location(){} 
@@ -46,6 +48,7 @@ std::string					Location::getCgiFileExtension(void) const { return _cgi_ext; }
 std::string					Location::getCgiName(void) const { return _cgi_name; }
 int							Location::getReturnStatus(void) const { return _return_status; }
 std::string					Location::getReturnPath(void) const { return _return_path; }
+std::string					Location::getDefaultPage(void) const { return _default_page; }
 
 /* Setters */
 void						Location::setName(const std::string& name) { _name = name; }
