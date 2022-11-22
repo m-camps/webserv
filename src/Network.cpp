@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/16 16:11:02 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/22 18:02:31 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,7 @@ void Network::run()
                     }
                 }
             }
-			else if ((cur.events & POLLOUT) && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
+			else if ((cur.events & POLLOUT) && io.find(cur.fd) != io.end() && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
 			{
 				Request	request;
 				Poller poller = io.find(cur.fd)->second;
