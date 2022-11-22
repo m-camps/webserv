@@ -19,8 +19,12 @@ Server			Respond::getServer(void) const { return _server; }
 Location        Respond::getLocation() const { return _location; }
 bool			Respond::IsChunked(void) const { return _isChunked; }
 
+/* //////////////////////////// */
+
 void			Respond::setBody(std::string body) { _body = body; }
 void			Respond::setStatusCode(int statusCode) { _status_code = statusCode; }
+
+/* //////////////////////////// */
 
 void 		    Respond::addToHeader(const std::string& NewLine)
 {
@@ -91,13 +95,13 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string> Allowed
 
 bool MethodIsImplemented(const std::string& Method)
 {
-	std::string ImplementedMethods[] = {
-			"GET",
-			"POST",
-			"DELETE"
-	};
+    const std::array<std::string, 3> ImplementedMethods = {
+            "GET",
+            "POST",
+            "DELETE"
+    };
 
-	for (int32_t i = 0; i < 3 ; i++)
+	for (uint64_t i = 0; i < ImplementedMethods.size() ; i++)
 	{
 		if (Method == ImplementedMethods[i])
 			return (true);
@@ -116,15 +120,15 @@ void 	Respond::buildResponse(HashMap requestData)
         void (Respond::*FuncPointer)(void) = NULL;
         std::string Method = getEntryFromMap("HTTPMethod");
 
-        const s_Methods CompareMethods[3] = {
+        const std::array<s_Methods, 3> CompareMethods = {{
                 {"GET",    &Respond::buildGet},
                 {"POST",   &Respond::buildPost},
                 {"DELETE", &Respond::buildDelete}
-        };
+        }};
 
         if (MethodIsAllowed(Method, _location.getAllowMethods()) == true)
         {
-            for (int32_t i = 0; i < 3; i++) {
+            for (uint64_t i = 0; i < CompareMethods.size(); i++) {
                 if (Method == CompareMethods[i].Method) {
                     FuncPointer = CompareMethods[i].FuncPointer;
                     (this->*FuncPointer)();
@@ -165,7 +169,7 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
-	std::string LocationIndex = _location.getRoot() + "/" + _location.getIndex();
+	std::string LocationIndex = _location.getRoot() + _location.getIndex();
 
 	try
 	{

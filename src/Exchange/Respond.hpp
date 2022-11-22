@@ -7,6 +7,7 @@
 #include <iostream> // std::
 #include <fstream> // std::istream
 #include <sstream> // std::istringstream
+#include <array>
 #include <map> // std::map<>
 #include <exception> // std::exceptions
 
