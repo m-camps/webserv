@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:41:43 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:26:43 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@ class Location {
 		std::string					_index; 
 		std::vector<std::string>	_methods; 
 		int							_autoindex;
-		std::string					_cgi_name;
-		std::string					_cgi_ext;
+		int							_cgi;
 		int							_return_status;
 		std::string					_return_path;
 
@@ -40,8 +39,7 @@ class Location {
 		std::string					getIndex(void) const;
 		int							getAutoIndex(void) const;
 		std::vector<std::string>	getAllowMethods(void) const;
-		std::string					getCgiFileExtension(void) const;
-		std::string					getCgiName(void) const;
+		int							getCgi(void) const;
 		int							getReturnStatus(void) const;
 		std::string					getReturnPath(void) const;
 
@@ -50,8 +48,7 @@ class Location {
 		void 						setRoot(const std::string& root);
 		void						setIndex(const std::string& index);
 		void						setAutoIndex(const int& autoindex);
-		void						setCgiName(const std::string& cgiName);
-		void						setCgiExt(const std::string& cgiExt);
+		void						setCgi(const int& cgi);
 		void						setReturnStatus(const int& status);
 		void						setReturnPath(const std::string& path);
 		

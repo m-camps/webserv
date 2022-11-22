@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:54:01 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:25:08 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,7 @@ class Parse
 		void					parseLocationIndex(Location& location, Line& line);
 		void					parseLocationAllowMethod(Location& location, Line& line);
 		void					parseLocationAutoIndex(Location& location, Line& line);
-		void					parseLocationCgiName(Location& location, Line& line);
-		void					parseLocationCgiExt(Location& location, Line& line);
+		void					parseLocationCgi(Location& location, Line& line);
 		void					parseLocationReturn(Location& location, Line& line);
 
 		/* File I/O */

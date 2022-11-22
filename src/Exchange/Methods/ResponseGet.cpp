@@ -24,18 +24,6 @@ void Respond::parsePath(std::string& Path)
     Path.erase(0, found + LocationName.size());
 }
 
-bool	Respond::correctCgiRequestAllowed(void)
-{
-    std::string cgiExt = _location.getCgiFileExtension();
-    std::string cgiName = _location.getCgiName();
-
-    if (!cgiName.empty() && !cgiExt.empty())
-    {
-        return (true);
-    }
-	return (false);
-}
-
 void Respond::buildGet(void)
 {
     std::cout << "GET" << std::endl;
@@ -50,7 +38,7 @@ void Respond::buildGet(void)
         parsePath(Path);
         relativePath = Root + Path;
         modifyStatuscode(Path, relativePath);
-        if (correctCgiRequestAllowed() == true && _status_code != e_Redir)
+        if (_location.getCgi() == 1 && _status_code != e_Redir)
             FileContent = cgi.executeScript(*this);
         else
             FileContent = getValidFile(relativePath);

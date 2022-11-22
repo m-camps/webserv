@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/16 16:11:20 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/22 16:31:54 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,8 +222,7 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 			{"index", &Parse::parseLocationIndex},
 			{"allow_methods", &Parse::parseLocationAllowMethod},
 			{"autoindex", &Parse::parseLocationAutoIndex},
-			{"cgi_name", &Parse::parseLocationCgiName},
-			{"cgi_ext", &Parse::parseLocationCgiExt},
+			{"cgi", &Parse::parseLocationCgi},
 			{"return", &Parse::parseLocationReturn}
 	};
 
@@ -363,22 +362,21 @@ void	Parse::parseLocationAutoIndex(Location& location, Line& line)
 	location.setAutoIndex(autoindex);
 }
 
-void	Parse::parseLocationCgiName(Location& location, Line& line)
+void	Parse::parseLocationCgi(Location& location, Line& line)
 {
+	int		cgi = 0;
+	
 	if (line.size() != 2)
-		throw (ExceptionBuilder("cgi_name location directive incorrect"));
-	else if(location.getCgiName() != "")
-		throw (ExceptionBuilder("duplicate cgi_name in location"));
-	location.setCgiName(line[1]);
-}
-
-void	Parse::parseLocationCgiExt(Location& location, Line& line)
-{
-	if (line.size() != 2)
-		throw (ExceptionBuilder("cgi_ext location directive incorrect"));
-	else if(location.getCgiFileExtension() != "")
-		throw (ExceptionBuilder("duplicate cgi_ext in location"));
-	location.setCgiExt(line[1]);
+		throw (ExceptionBuilder("cgi location directive incorrect"));
+	if(location.getAutoIndex() != -1)
+		throw (ExceptionBuilder("duplicate cgi in location"));
+	if (line[1] == "on")
+		cgi  = 1;
+	else if (line[1] == "off")
+		cgi = 0;
+	else
+		throw (ExceptionBuilder("autoindex value incorrect in location"));
+	location.setCgi(cgi);
 }
 
 void	Parse::parseLocationReturn(Location& location, Line& line)
@@ -490,4 +488,6 @@ void	Parse::validateLocation(Location& location, int block)
 	}
 	if (location.getAutoIndex() == -1)
 		location.setAutoIndex(0);
+	if (location.getCgi() == -1)
+		location.setCgi(0);
 }

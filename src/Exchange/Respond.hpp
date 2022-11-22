@@ -76,7 +76,6 @@ class Respond
         /* GET Functions */
 		void 			buildGet(void);
 		void 			buildRedir(void);
-		bool			correctCgiRequestAllowed(void);
 		std::string 	getValidFile(const std::string&);
 
         /* DELETE Functions */

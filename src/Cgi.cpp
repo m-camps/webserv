@@ -111,7 +111,8 @@ void			Cgi::childProcess(int *fds, Respond& ResponderRef)
 	char**		argv = createArgv(ResponderRef);
 	char**		envp = createEnvp(ResponderRef);
 	Location 	currentLoc = ResponderRef.getLocation();
-	std::string requestedFileName = currentLoc.getCgiName() + "." + currentLoc.getCgiFileExtension();
+	std::string requestedFileName = "test"; // Needs to be changed to requested file
+	// std::string requestedFileName = currentLoc.getCgiName() + "." + currentLoc.getCgiFileExtension();
 
 	if (close(fds[0]) < 0)
 		return (createFailedSysCallResponse(ResponderRef, e_InternalServerError));
