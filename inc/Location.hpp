@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:33:57 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:51:58 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ class Location {
 		int							_autoindex;
 		int							_cgi;
 		std::string					_return_path;
+		std::string					_default_file;
 
 		//if there is a cginame and cgi extension then its a cgi request
 	public:
@@ -40,6 +41,7 @@ class Location {
 		std::vector<std::string>	getAllowMethods(void) const;
 		int							getCgi(void) const;
 		std::string					getReturnPath(void) const;
+		std::string					getDefaultFile(void) const;
 
 		/* Setters */
 		void						setName(const std::string& name);
@@ -48,6 +50,7 @@ class Location {
 		void						setAutoIndex(const int& autoindex);
 		void						setCgi(const int& cgi);
 		void						setReturnPath(const std::string& path);
+		void						setDefaultFile(const std::string& default_file);
 		
 		/* Adders */
 		void						addToAllowMethod(const std::string& method);

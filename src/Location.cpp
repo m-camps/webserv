@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:36:18 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:54:29 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ int							Location::getAutoIndex(void) const { return _autoindex; }
 std::vector<std::string>	Location::getAllowMethods(void) const { return _methods; }
 int							Location::getCgi(void) const {return _cgi; }
 std::string					Location::getReturnPath(void) const { return _return_path; }
+std::string					Location::getDefaultFile(void) const { return _default_file; }
 
 /* Setters */
 void						Location::setName(const std::string& name) { _name = name; }
@@ -52,6 +53,7 @@ void						Location::setIndex(const std::string& index) { _index = index; }
 void						Location::setAutoIndex(const int& autoindex) { _autoindex = autoindex; }
 void						Location::setCgi(const int& cgi) {_cgi = cgi; }
 void						Location::setReturnPath(const std::string& path) { _return_path = path; }
+void						Location::setDefaultFile(const std::string& default_file) { _default_file = default_file; }
 
 /* Adders */
 void 						Location::addToAllowMethod(const std::string& method) { _methods.push_back(method); }
@@ -68,5 +70,6 @@ std::ostream& operator<<(std::ostream& stream, Location& location)
 	stream << "]\n";
 	stream << "\tCgi: [" <<  location.getCgi() << "]\n";
 	stream << "\tReturnRedirUrl: [" <<  location.getReturnPath() << "]\n";
+	stream << "\tDefaultFile: [" <<  location.getDefaultFile() << "]\n";
 	return (stream);
 }

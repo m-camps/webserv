@@ -13,6 +13,7 @@
 
 #define DEFAULT_ROOT "data/www/"
 #define DEFAULT_INDEX "index.html"
+#define DEFAULT_FILE "default_file.html"
 #define DEFAULT_CLIENT_BODY_SIZE 10
 
 #define SEPERATOR "\r\n\r\n"

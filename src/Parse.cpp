@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:43:34 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 17:01:41 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,8 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 			{"allow_methods", &Parse::parseLocationAllowMethod},
 			{"autoindex", &Parse::parseLocationAutoIndex},
 			{"cgi", &Parse::parseLocationCgi},
-			{"return", &Parse::parseLocationReturn}
+			{"return", &Parse::parseLocationReturn},
+			{"default_file", &Parse::parseLocationDefaultFile}
 	};
 
 	for (int i = 0; i < NR_OF_LOCATION_DIRECTIVES; i++)
@@ -385,8 +386,16 @@ void	Parse::parseLocationReturn(Location& location, Line& line)
 		throw (ExceptionBuilder("return location directive incorrect"));
 	else if (location.getReturnPath() != "")
 		throw (ExceptionBuilder("duplicate return in location"));
-	std::cout << line[1] << std::endl;
 	location.setReturnPath(line[1]);
+}
+
+void	Parse::parseLocationDefaultFile(Location &location, Line& line)
+{
+	if (line.size() != 2)
+		throw (ExceptionBuilder("default_file location directive incorrect"));
+	else if (location.getDefaultFile() != "")
+		throw (ExceptionBuilder("duplicate default_file in location"));
+	location.setDefaultFile(line[1]);
 }
 
 /* Helper Functions */
@@ -420,7 +429,7 @@ bool    Parse::isLocationDirective(std::string& directive)
 {
 	return (directive == "root" || directive == "index" ||
 			directive == "allow_methods" || directive == "autoindex" ||
-			directive == "cgi" || directive == "return");
+			directive == "cgi" || directive == "default_file" || directive == "return");
 }
 
 std::invalid_argument Parse::ValidateException(std::string error, int block)
@@ -473,6 +482,8 @@ void	Parse::validateLocation(Location& location, int block)
 		throw(ValidateException("Location name not set in", block));
 	if (location.getRoot() == "")
 		location.setRoot(DEFAULT_ROOT);
+	if (location.getDefaultFile() == "")
+		location.setDefaultFile(DEFAULT_FILE);
 	if (location.getIndex() == "")
 		location.setIndex(DEFAULT_INDEX);
 	if (location.getAllowMethods().empty())
