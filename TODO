@@ -17,11 +17,10 @@ TODO:
 
 - (Bence) Restructure file passed to CGI
 
-- (Max) If read/write fails close connection (still need to implement on write)
-- (Max) Add default file to parser
-- (Max) return status code parser remove (dont remember ask Xander)
-- (Max) Check for forbidden functions (ex. std::stoi)
-
+- (Max/Xander) If read/write fails close connection (still need to implement on write)
+- (Max) Add default_file to parser
+- (Max) (DONE) return status code parser remove (dont remember ask Xander)
+- (Max) (DONE) Change CGI to on and off
 - (Xander) Set default file for a directory
 - (Xander) HTML landing page
 - (Xander) Handle spacebars?

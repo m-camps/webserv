@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:26:43 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:33:57 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ class Location {
 		std::vector<std::string>	_methods; 
 		int							_autoindex;
 		int							_cgi;
-		int							_return_status;
 		std::string					_return_path;
 
 		//if there is a cginame and cgi extension then its a cgi request
@@ -40,7 +39,6 @@ class Location {
 		int							getAutoIndex(void) const;
 		std::vector<std::string>	getAllowMethods(void) const;
 		int							getCgi(void) const;
-		int							getReturnStatus(void) const;
 		std::string					getReturnPath(void) const;
 
 		/* Setters */
@@ -49,7 +47,6 @@ class Location {
 		void						setIndex(const std::string& index);
 		void						setAutoIndex(const int& autoindex);
 		void						setCgi(const int& cgi);
-		void						setReturnStatus(const int& status);
 		void						setReturnPath(const std::string& path);
 		
 		/* Adders */

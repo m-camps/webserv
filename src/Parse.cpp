@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:31:54 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:43:34 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -368,30 +368,25 @@ void	Parse::parseLocationCgi(Location& location, Line& line)
 	
 	if (line.size() != 2)
 		throw (ExceptionBuilder("cgi location directive incorrect"));
-	if(location.getAutoIndex() != -1)
+	if(location.getCgi() != -1)
 		throw (ExceptionBuilder("duplicate cgi in location"));
 	if (line[1] == "on")
 		cgi  = 1;
 	else if (line[1] == "off")
 		cgi = 0;
 	else
-		throw (ExceptionBuilder("autoindex value incorrect in location"));
+		throw (ExceptionBuilder("cgi value incorrect in location"));
 	location.setCgi(cgi);
 }
 
 void	Parse::parseLocationReturn(Location& location, Line& line)
 {
-	if (line.size() != 2 && line.size() != 3)
+	if (line.size() != 2)
 		throw (ExceptionBuilder("return location directive incorrect"));
-	else if (location.getReturnPath() != "" || location.getReturnStatus() != -1)
+	else if (location.getReturnPath() != "")
 		throw (ExceptionBuilder("duplicate return in location"));
-	else if (!isNumber(line[1])) 
-		throw (ExceptionBuilder("return status code directive not a number"));
-	int status_code;
-	std::istringstream(line[1]) >> status_code;
-	location.setReturnStatus(status_code);
-	if (line.size() == 3)
-		location.setReturnPath(line[2]);
+	std::cout << line[1] << std::endl;
+	location.setReturnPath(line[1]);
 }
 
 /* Helper Functions */
@@ -425,7 +420,7 @@ bool    Parse::isLocationDirective(std::string& directive)
 {
 	return (directive == "root" || directive == "index" ||
 			directive == "allow_methods" || directive == "autoindex" ||
-			directive == "cgi_name" || directive == "cgi_ext" || directive == "return");
+			directive == "cgi" || directive == "return");
 }
 
 std::invalid_argument Parse::ValidateException(std::string error, int block)
