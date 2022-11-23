@@ -6,13 +6,16 @@
 
 void Respond::buildRedir(void)
 {
-    std::string LocationName = _location.getName();
     std::string NewLocation;
+    std::string LocationName = _location.getName();
 
     if (_location.getReturnPath().empty() == false)
         NewLocation = Generator::generateLocation(_location.getReturnPath());
-    else
+    else if (LocationName == "/")
         NewLocation = Generator::generateLocation(_location.getIndex());
+    else
+        NewLocation = Generator::generateLocation(_location.getName() + "/" + _location.getIndex());
+
     createResponse("");
     addToHeader(NewLocation);
 }
