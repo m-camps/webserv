@@ -33,6 +33,11 @@ public:
 	Server	    matchServer(Servers servers, HashMap requestData);
 	Location	matchLocation(const Server& server, HashMap requestData);
 
+    class WriteException : public std::exception
+    {
+    public:
+        const char* what() const throw();
+    };
 
 private:
     Exchange(void);

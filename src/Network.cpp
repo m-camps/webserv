@@ -132,6 +132,14 @@ void Network::run()
                     std::cout << "Reponse on fd: " << cur.fd << std::endl;
                     io.find(cur.fd)->second = Poller();
                 }
+                catch (const Exchange::WriteException& e)
+                {
+                    std::cerr << e.what() << std::endl;
+                    if (close(cur.fd) < 0)
+                        std::cerr << "Closing a file descriptor failed." << std::endl;
+                    _poll.erase(_poll.begin() + i);
+                    io.erase(cur.fd);
+                }
                 catch (const std::exception& e)
                 {
                     std::cerr << e.what() << std::endl;

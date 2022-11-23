@@ -94,10 +94,7 @@ inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
 
     ret = write(_fd, buff.data(), _nbyte);
     if (ret < 0 || ret != (ssize_t)buff.length())
-    {
-        std::string StrError = std::strerror(errno);
-        throw (std::runtime_error(StrError));
-    }
+        throw (Exchange::WriteException());
     return (ret);
 }
 
@@ -121,4 +118,11 @@ void	Exchange::sendChunked(std::string str) const
 void    Exchange::sendNormal(const std::string& str) const
 {
     ft_write(_socketFd, str, str.length());
+}
+
+/* //////////////////////////// */
+
+const char* Exchange::WriteException::what() const throw()
+{
+    return ("An error in write. Closing client socket");
 }
