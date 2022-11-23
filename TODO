@@ -17,6 +17,7 @@ TODO:
 
 - (Bence) Restructure file passed to CGI
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
+
 - (Xander) Set default file for a directory
 - (Xander) HTML landing page
 - (Xander) Handle spacebars?
@@ -28,6 +29,7 @@ BEFOREHANDIN:
 - Clean up repo
 
 DONE:
+- (DONE) (Max) Limit client_body_size in parser
 - (Max) (DONE) Add default_file to parser
 - (Max) (DONE) return status code parser remove (dont remember ask Xander)
 - (Max) (DONE) Change CGI to on and off
