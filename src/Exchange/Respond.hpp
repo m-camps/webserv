@@ -104,9 +104,10 @@ enum e_statusCode
     e_Unauthorized = 401,
     e_Forbidden = 403,
     e_NotFound = 404,
-    e_MethodNotFound = 405,
+    e_MethodNotAllowed = 405,
     e_PayloadTooLarge = 413,
     e_UnsupportedMediaType = 415,
+    e_ImATeapot = 418,
 	e_InternalServerError = 500,
     e_NotImplemented = 501,
 	e_BadGateway = 502

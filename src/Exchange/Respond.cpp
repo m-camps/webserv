@@ -45,6 +45,8 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
+// -- / moet redirecten nar "index.html"
+// localhost/python does not work
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
     if (isForbiddenPath(Path) == true)
@@ -55,9 +57,13 @@ void Respond::modifyStatuscode(const std::string& Path, const std::string& relat
     {
         _status_code = e_Redir;
     }
-    else if (access(relativePath.c_str(), R_OK) != 0)
+    else if (access(relativePath.c_str(), F_OK) != 0)
     {
         _status_code = e_NotFound;
+    }
+    else if (access(relativePath.c_str(), R_OK) != 0)
+    {
+        _status_code = e_Unauthorized;
     }
     else
         _status_code = e_OK;
@@ -138,7 +144,7 @@ void 	Respond::buildResponse(HashMap requestData)
         }
 
         if (MethodIsImplemented(Method) == true)
-            _status_code = e_MethodNotFound;
+            _status_code = e_MethodNotAllowed;
         else if (Method == "ERROR")
             _status_code = e_Badrequest;
         else
@@ -166,6 +172,8 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 
 /* //////////////////////////// */
 
+// getIndex() moet nog gefixt worden
+//
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;

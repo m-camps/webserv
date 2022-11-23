@@ -102,13 +102,13 @@ std::string StatusMessage(int32_t StatusCode)
     switch (StatusCode)
     {
         case e_Badrequest:
-            return ("invalid request");
+            return ("Invalid request");
         case e_Forbidden:
             return ("Forbidden");
         case e_NotFound:
             return ("Page not found");
-        case e_MethodNotFound:
-            return ("Method not found");
+        case e_MethodNotAllowed:
+            return ("Method not allowed");
         case e_PayloadTooLarge:
             return ("Payload too large");
         case e_UnsupportedMediaType:
@@ -119,6 +119,8 @@ std::string StatusMessage(int32_t StatusCode)
             return ("Method not implemented");
         case e_BadGateway:
             return ("Bad Gateway");
+        case e_Unauthorized:
+            return ("Unauthorized");
         default:
             return ("");
     }
