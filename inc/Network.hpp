@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/11 14:39:26 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 14:36:30 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "Server.hpp"
 #include "Parse.hpp"
 #include "../src/Exchange/Exchange.hpp"
+#include "Client.hpp"
 #include <poll.h>
 #include <iostream>
 #include <fstream>
@@ -32,6 +33,7 @@ class Network
 		std::vector<int>						_socket_fds;				
 		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
 		std::map<int, Servers>					_fds; // <fd,std::vector<Server>> all servers corrosponding with that fd
+		std::map<int, Client>					_io;
 		
 		/* Orthodox canonical class BS */
 		Network(const Network &obj);
@@ -43,7 +45,8 @@ class Network
 		void					delClientFromFds(int client_fd);
 
 		/* Setup Sockets*/
-		int						acceptConnection(int socket_fd);
+		void					acceptConnection(int socket_fd);
+		void					closeConnection(int fd, int i);
 		std::vector<int>		extractListens(void);
 		void					setupSockets(void);
 		int						createSocket(void);
