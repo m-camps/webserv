@@ -11,22 +11,15 @@ Exchange::~Exchange(void) {}
 Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestData)
     : _socketFd(socketFd)
 {
-	try
-	{
-        Server server;
-        Location location;
+    Server server;
+    Location location;
 
-		server = matchServer(servers, requestData);
-		location = matchLocation(server, requestData);
+    server = matchServer(servers, requestData);
+    location = matchLocation(server, requestData);
 
-		Respond	response(server, location);
-		response.buildResponse(requestData);
-		sendToClient(response);
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
+    Respond	response(server, location);
+    response.buildResponse(requestData);
+    sendToClient(response);
 }
 
 /* //////////////////////////// */
@@ -101,10 +94,7 @@ inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
 
     ret = write(_fd, buff.data(), _nbyte);
     if (ret < 0 || ret != (ssize_t)buff.length())
-    {
-        std::string StrError = std::strerror(errno);
-        throw (std::runtime_error(StrError));
-    }
+        throw (Exchange::WriteException());
     return (ret);
 }
 
@@ -112,34 +102,27 @@ inline ssize_t ft_write(int32_t _fd, const std::string& buff, size_t _nbyte)
 
 void	Exchange::sendChunked(std::string str) const
 {
-    try
-    {
-        std::string Body = Generator::generateChunk(str);
+    std::string Body = Generator::generateChunk(str);
 
-        while (Body.length() > 7)
-        {
-            ft_write(_socketFd, Body, Body.length());
-            Body.clear();
-            Body = Generator::generateChunk(str);
-        }
-        ft_write(_socketFd, Body, Body.length());
-    }
-    catch (const std::exception& e)
+    while (Body.length() > 7)
     {
-        std::cerr << e.what() << std::endl;
+        ft_write(_socketFd, Body, Body.length());
+        Body.clear();
+        Body = Generator::generateChunk(str);
     }
+    ft_write(_socketFd, Body, Body.length());
 }
 
 /* //////////////////////////// */
 
 void    Exchange::sendNormal(const std::string& str) const
 {
-    try
-    {
-        ft_write(_socketFd, str, str.length());
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+    ft_write(_socketFd, str, str.length());
+}
+
+/* //////////////////////////// */
+
+const char* Exchange::WriteException::what() const throw()
+{
+    return ("An error in write. Closing client socket");
 }

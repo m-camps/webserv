@@ -2,6 +2,9 @@
     /* The image used */
     background-image: url("background.jpg");
 
+    filter: blur(3px);
+    -webkit-filter: blur(3px);
+
     /* Full height */
     height: 100%;
 
@@ -11,19 +14,37 @@
     background-size: cover;
 }
 
+.button-text {
+    background-color: rgb(0,100,0); /* Fallback color */
+    background-color: rgba(0,100,0, 0.4); /* Black w/opacity/see-through */
+    color: white;
+    font-weight: bold;
+    border: 3px solid #ffffff;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 20%;
+    padding: 10px;
+    text-align: center;
+}
+
+ul#redbutton li.newbutton {
+    /*background: url("../images/blank_button.png") no-repeat;*/
+    width: 140px;
+
+
+    color: #FFFFFF;
+    font-weight:bold;
+    text-decoration: none;
+    text-transform:uppercase;
+    text-align:center;
+    font-size:12px;
+    line-height:30px;
+}
+
 body, html {
     height: 100%;
     margin: 0;
-}
-
-h1 {
-    margin-left: 20px;
-}
-
-.first-txt {
-    position: absolute;
-}
-
-.second-txt {
-    position: absolute;
 }

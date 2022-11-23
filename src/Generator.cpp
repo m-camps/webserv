@@ -102,13 +102,13 @@ std::string StatusMessage(int32_t StatusCode)
     switch (StatusCode)
     {
         case e_Badrequest:
-            return ("invalid request");
+            return ("Invalid request");
         case e_Forbidden:
             return ("Forbidden");
         case e_NotFound:
             return ("Page not found");
-        case e_MethodNotFound:
-            return ("Method not found");
+        case e_MethodNotAllowed:
+            return ("Method not allowed");
         case e_PayloadTooLarge:
             return ("Payload too large");
         case e_UnsupportedMediaType:
@@ -119,6 +119,8 @@ std::string StatusMessage(int32_t StatusCode)
             return ("Method not implemented");
         case e_BadGateway:
             return ("Bad Gateway");
+        case e_Unauthorized:
+            return ("Unauthorized");
         default:
             return ("");
     }
@@ -202,13 +204,19 @@ std::string Generator::generateAutoIndex(Respond& Responder)
 
 /* //////////////////////////// */
 
-std::string Generator::generateDirectoryPage(const std::string& Path)
+std::string Generator::generateDirectoryPage(Respond& Responder)
 {
-    return (
-            "<!DOCTYPE html>\n"
-            "<body>\n"
-            "<h1>You are in directory: " + Path + "</h1>"
-            "</body>\n"
-            "</html>"
-            );
+    std::string FileContent;
+    std::string Path = Responder.getLocation().getRoot() + Responder.getLocation().getDefaultPage();
+
+    try
+    {
+        FileContent = readFile(Path);
+    }
+    catch (const std::exception& e)
+    {
+        Responder.setStatusCode(e_NotFound);
+        FileContent = Generator::generateDefaulPage(Responder);
+    }
+    return (FileContent);
 }

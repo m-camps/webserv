@@ -25,67 +25,67 @@ bool MethodIsAllowed(const std::string& Method, std::vector<std::string> Allowed
 
 class Respond
 {
-	public:
-		explicit Respond(const Server& server, const Location& location);
-		~Respond(void);
+public:
+    explicit Respond(const Server& server, const Location& location);
+    ~Respond(void);
 
-		/* Getters */
-		std::string		getHeader(void) const;
-		std::string		getBody(void) const;
-		HashMap			getRequestData(void) const;
-		int				getStatusCode(void) const;
-		Server			getServer(void) const;
-        Location        getLocation(void) const;
+    /* Getters */
+    std::string		getHeader(void) const;
+    std::string		getBody(void) const;
+    HashMap			getRequestData(void) const;
+    int				getStatusCode(void) const;
+    Server			getServer(void) const;
+    Location        getLocation(void) const;
 
-		/* Flags */
-		bool			IsChunked(void) const;
+    /* Flags */
+    bool			IsChunked(void) const;
 
-		/* Setters */
-		void			setBody(std::string body);
-		void			setStatusCode(int statusCode);
-		/* Adders */
-		void			addToHeader(const std::string& NewLine);
+    /* Setters */
+    void			setBody(std::string body);
+    void			setStatusCode(int statusCode);
+    /* Adders */
+    void			addToHeader(const std::string& NewLine);
 
-		/* Public build function*/
-		void 			buildResponse(HashMap	requestData);
+    /* Public build function*/
+    void 			buildResponse(HashMap	requestData);
 
-		/* Interface */
-		std::string 	getEntryFromMap(const std::string&	entry);
+    /* Interface */
+    std::string 	getEntryFromMap(const std::string&	entry);
 
-	private:
-		Respond(void);
-		Respond(const Respond&);
-		Respond& operator=(const Respond&);
+private:
+    Respond(void);
+    Respond(const Respond&);
+    Respond& operator=(const Respond&);
 
-		const Server	_server;
-        const Location  _location;
-		HashMap			_requestData;
-		std::string 	_header;
-		std::string 	_body;
-		int32_t			_status_code;
-		bool			_isChunked;
+    const Server	_server;
+    const Location  _location;
+    HashMap			_requestData;
+    std::string 	_header;
+    std::string 	_body;
+    int32_t			_status_code;
+    bool			_isChunked;
 
-        /* POST Functions */
-		void 			buildPost(void);
-		void 			putBodyInFile(std::string&, std::string&);
-        bool            isPostValid(void);
-		std::string		sendSuccesfulUpload(std::string);
-        std::string     removeBoundry();
-        std::string     parseMetadata(std::string&);
+    /* POST Functions */
+    void 			buildPost(void);
+    void 			putBodyInFile(std::string&, std::string&);
+    bool            isPostValid(void);
+    std::string		sendSuccesfulUpload(std::string);
+    std::string     removeBoundry();
+    std::string     parseMetadata(std::string&);
 
-        /* GET Functions */
-		void 			buildGet(void);
-		void 			buildRedir(void);
-		std::string 	getValidFile(const std::string&);
+    /* GET Functions */
+    void 			buildGet(void);
+    void 			buildRedir(void);
+    bool            isPyExtension(const std::string&);
+    std::string 	getValidFile(const std::string&);
 
-        /* DELETE Functions */
-		void 			buildDelete(void);
+    /* DELETE Functions */
+    void 			buildDelete(void);
 
-		/* Helper functions */
-		void			createResponse(const std::string&);
-        void            parsePath(std::string&);
-        void            modifyStatuscode(const std::string&, const std::string&);
-
+    /* Helper functions */
+    void			createResponse(const std::string&);
+    void            parsePath(std::string&);
+    void            modifyStatuscode(const std::string&, const std::string&);
 };
 
 /* --- Structs --- */
@@ -104,9 +104,10 @@ enum e_statusCode
     e_Unauthorized = 401,
     e_Forbidden = 403,
     e_NotFound = 404,
-    e_MethodNotFound = 405,
+    e_MethodNotAllowed = 405,
     e_PayloadTooLarge = 413,
     e_UnsupportedMediaType = 415,
+    e_ImATeapot = 418,
 	e_InternalServerError = 500,
     e_NotImplemented = 501,
 	e_BadGateway = 502

@@ -26,7 +26,7 @@ public:
     static std::string generateContentLength(std::size_t);
     static std::string generateTransferEncoding(void);
     static std::string generateChunk(std::string&);
-    static std::string generateDirectoryPage(const std::string&);
+    static std::string generateDirectoryPage(Respond&);
     static std::string generateDefaulPage(const Respond&);
     static std::string generateBoundry(Respond&);
     static std::string generateAutoIndex(Respond&);

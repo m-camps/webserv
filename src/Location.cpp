@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 16:54:29 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 14:08:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 // Constructor with default values
 Location::Location()
 {
+    _default_page = "DefaultPage.html";
 	_autoindex = -1;
 	_cgi = -1;
 }
@@ -32,6 +33,7 @@ Location::Location(bool isEmpty)
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
 	_methods.push_back("GET");
+    _default_page = "DefaultPage.html";
 }
 
 Location::~Location(){} 
