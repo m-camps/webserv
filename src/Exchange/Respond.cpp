@@ -118,6 +118,7 @@ bool MethodIsImplemented(const std::string& Method)
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
+	std::cout << YELLOW_COLOR << getEntryFromMap("HTTPMethod") << " " << getEntryFromMap("Path") << RESET_COLOR << std::endl;
 
     try
     {

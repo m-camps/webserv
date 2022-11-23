@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 14:08:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:40:07 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Location::Location(bool isEmpty)
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
 	_methods.push_back("GET");
-    _default_file = DEFAULT_FILE;
+	_default_file = DEFAULT_FILE;
 }
 
 Location::~Location(){} 

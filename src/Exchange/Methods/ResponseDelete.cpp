@@ -11,7 +11,6 @@ std::string sendSuccesfulDelete(const std::string& relativePath)
 
 void Respond::buildDelete(void)
 {
-	std::cout << "DELETE" << std::endl;
     try
     {
 		std::string relativePath;
@@ -35,6 +34,7 @@ void Respond::buildDelete(void)
         }
         deleteFile(relativePath);
         createResponse(sendSuccesfulDelete(relativePath));
+		std::cout << RED_COLOR << "File deleted" << RESET_COLOR << std::endl;
     }
     catch (const std::exception& e)
     {
@@ -42,4 +42,5 @@ void Respond::buildDelete(void)
         _status_code = e_InternalServerError;
         createResponse(Generator::generateDefaulPage(*this));
     }
+	
 }

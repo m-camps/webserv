@@ -56,7 +56,6 @@ bool    Respond::isPyExtension(const std::string& Path)
 
 void Respond::buildGet(void)
 {
-    std::cout << "GET" << std::endl;
     try
     {
         std::string FileContent;
@@ -75,6 +74,7 @@ void Respond::buildGet(void)
         else
             FileContent = getValidFile(relativePath);
         createResponse(FileContent);
+			std::cout << CYAN_COLOR << "GET response: " << _requestData.find("Path")->second << RESET_COLOR << std::endl;
     }
     catch (const std::exception& e)
     {
