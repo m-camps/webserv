@@ -58,7 +58,7 @@ private:
     Respond& operator=(const Respond&);
 
     const Server	_server;
-    const Location  _location;
+    Location        _location;
     HashMap			_requestData;
     std::string 	_header;
     std::string 	_body;
@@ -85,6 +85,7 @@ private:
     /* Helper functions */
     void			createResponse(const std::string&);
     void            parsePath(std::string&);
+    std::string     parseRelativePath(std::string&, std::string&);
     void            modifyStatuscode(const std::string&, const std::string&);
 };
 

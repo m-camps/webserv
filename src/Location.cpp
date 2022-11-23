@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 14:10:26 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:40:07 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ Location::Location()
 
 Location::Location(bool isEmpty)
 {
-	//isEmpty = true;
-	(void)isEmpty;
+	(void) isEmpty;
+
 	_autoindex = 0;
 	_cgi = 0;
 	_index = DEFAULT_INDEX;
