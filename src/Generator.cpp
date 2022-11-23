@@ -207,7 +207,7 @@ std::string Generator::generateAutoIndex(Respond& Responder)
 std::string Generator::generateDirectoryPage(Respond& Responder)
 {
     std::string FileContent;
-    std::string Path = Responder.getLocation().getRoot() + Responder.getLocation().getDefaultPage();
+    std::string Path = Responder.getLocation().getRoot() + Responder.getLocation().getDefaultFile();
 
     try
     {

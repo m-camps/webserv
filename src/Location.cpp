@@ -16,15 +16,14 @@
 // Constructor with default values
 Location::Location()
 {
-    _default_page = "DefaultPage.html";
 	_autoindex = -1;
 	_cgi = -1;
 }
 
 Location::Location(bool isEmpty)
 {
-	//isEmpty = true;
-	(void)isEmpty;
+	(void) isEmpty;
+
 	_autoindex = 0;
 	_cgi = 0;
 	_index = DEFAULT_INDEX;
@@ -33,7 +32,7 @@ Location::Location(bool isEmpty)
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
 	_methods.push_back("GET");
-    _default_page = "DefaultPage.html";
+    _default_file = DEFAULT_FILE;
 }
 
 Location::~Location(){} 
