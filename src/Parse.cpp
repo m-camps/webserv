@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 17:01:41 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 13:14:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -288,6 +288,8 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 	std::istringstream(line[1]) >> clientBodySize;
 	if (clientBodySize == 0)
 		throw (ExceptionBuilder("client_body_size can't be 0"));
+	else if (clientBodySize > 100)
+		throw (ExceptionBuilder("client_body_size must be in range (1-100)"));
 	server.setClientBody(clientBodySize);
 }
 
