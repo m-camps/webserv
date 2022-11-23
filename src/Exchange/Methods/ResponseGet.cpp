@@ -37,9 +37,14 @@ std::string Respond::parseRelativePath(std::string& Path, std::string& Root)
         Root.append("/");
     _location.setRoot(Root);
 
+    std::string relativePath = Root + Path;
+    found = relativePath.find("//");
+    if (found != std::string::npos)
+        relativePath.erase(found, 1);
+
     if (Path == "/")
         return (Root);
-    return (Root + Path);
+    return (relativePath);
 }
 
 bool    Respond::isPyExtension(const std::string& Path)

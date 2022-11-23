@@ -1,12 +1,9 @@
 .bg {
     /* The image used */
-    background-image: url("background.jpg");
-
-    filter: blur(3px);
-    -webkit-filter: blur(3px);
+    background-image: url(https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif);
 
     /* Full height */
-    height: 100%;
+    height: 110%;
 
     /* Center and scale the image nicely */
     background-position: center;
@@ -14,14 +11,13 @@
     background-size: cover;
 }
 
-.button-text {
-    background-color: rgb(0,100,0); /* Fallback color */
-    background-color: rgba(0,100,0, 0.4); /* Black w/opacity/see-through */
+.text-container {
+    background-color: darkblue;
     color: white;
     font-weight: bold;
-    border: 3px solid #ffffff;
+    border: 1px solid darkblue;
     position: absolute;
-    top: 20%;
+    top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
@@ -30,21 +26,40 @@
     text-align: center;
 }
 
-ul#redbutton li.newbutton {
-    /*background: url("../images/blank_button.png") no-repeat;*/
-    width: 140px;
+.center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
 
+.btn-group button {
+    background-color: #054d95; /* Green background */
+    border: 1px solid darkblue; /* Green border */
+    color: white; /* White text */
+    padding: 15px 54px; /* Some padding */
+    cursor: pointer; /* Pointer/hand icon */
+    width: 100%; /* Set a width if needed */
+    display: block; /* Make the buttons appear below each other */
+}
 
-    color: #FFFFFF;
-    font-weight:bold;
-    text-decoration: none;
-    text-transform:uppercase;
-    text-align:center;
-    font-size:12px;
-    line-height:30px;
+.btn-group button:not(:last-child) {
+    border-bottom: none; /* Prevent double borders */
+}
+
+/* Add a background color on hover */
+.btn-group button:hover {
+    background-color: #02294f;
 }
 
 body, html {
     height: 100%;
     margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color: white;
 }

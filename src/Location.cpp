@@ -43,7 +43,7 @@ std::string					Location::getRoot(void) const { return _root; }
 std::string					Location::getIndex(void) const { return _index; }
 int							Location::getAutoIndex(void) const { return _autoindex; }
 std::vector<std::string>	Location::getAllowMethods(void) const { return _methods; }
-int							Location::getCgi(void) const {return _cgi; }
+int							Location::getCgi(void) const { return _cgi; }
 std::string					Location::getReturnPath(void) const { return _return_path; }
 std::string					Location::getDefaultFile(void) const { return _default_file; }
 
