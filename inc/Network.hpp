@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 14:36:30 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:12:03 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ class Network
 		std::vector<struct pollfd>				_poll;				// Vector containing all poll structs
 		std::vector<int>						_socket_fds;				
 		std::map<int, std::string>				_buffer;			// All incoming messages in a buffer
-		std::map<int, Servers>					_fds; // <fd,std::vector<Server>> all servers corrosponding with that fd
 		std::map<int, Client>					_io;
 		
 		/* Orthodox canonical class BS */
@@ -40,9 +39,7 @@ class Network
 		Network &operator=(const Network &obj);
 		
 		/* Fds */
-		void					setupFds(int port, int socket_fd);
-		void					addClientToFds(int socket_fd, int client_fd);
-		void					delClientFromFds(int client_fd);
+		void					setupIO(int port, int socket_fd);
 
 		/* Setup Sockets*/
 		void					acceptConnection(int socket_fd);

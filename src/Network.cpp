@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 15:09:39 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:12:37 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,7 @@ Network::Network() {}
 /* Default deconstructor */
 Network::~Network() {}
 
-/***
- * Setup for the network
- * (right now just starting a basic server with default constructor)
- * @param file the file to be parsed
-***/
+
 void Network::setup(std::string file)
 {
 	Parse		parser;
@@ -152,7 +148,7 @@ void	Network::closeConnection(int fd, int i)
 		std::cerr << "Closing a file descriptor failed." << std::endl;
 }
 
-void	Network::setupFds(int port, int socket_fd)
+void	Network::setupIO(int port, int socket_fd)
 {
 	Servers servers;
 
@@ -207,7 +203,7 @@ void	Network::setupSockets(void)
 
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
-		setupFds(port, socket_fd);
+		setupIO(port, socket_fd);
 		_socket_fds.push_back(socket_fd);
 	}
 }
