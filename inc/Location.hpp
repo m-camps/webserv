@@ -33,7 +33,7 @@ class Location {
 	public:
 		Location();
 		~Location();
-		Location(bool);
+		explicit Location(bool);
 
 		/* Getters */
 		std::string					getName(void) const;

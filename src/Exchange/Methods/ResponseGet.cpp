@@ -9,7 +9,10 @@ void Respond::buildRedir(void)
     std::string LocationName = _location.getName();
     std::string NewLocation;
 
-    NewLocation = Generator::generateLocation(_location.getReturnPath());
+    if (_location.getReturnPath().empty() == false)
+        NewLocation = Generator::generateLocation(_location.getReturnPath());
+    else
+        NewLocation = Generator::generateLocation(_location.getIndex());
     createResponse("");
     addToHeader(NewLocation);
 }
@@ -24,13 +27,23 @@ void Respond::parsePath(std::string& Path)
     Path.erase(0, found + LocationName.size());
 }
 
+std::string Respond::parseRelativePath(std::string& Path, std::string& Root)
+{
+    size_t found = Root.find_last_of('/');
+    if (found == std::string::npos || Root.size() - 1 > found)
+        Root.append("/");
+    _location.setRoot(Root);
+
+    if (Path == "/")
+        return (Root);
+    return (Root + Path);
+}
+
 bool    Respond::isPyExtension(const std::string& Path)
 {
     size_t found = Path.find(".py");
 
-    if (found == std::string::npos)
-        return (false);
-    return (true);
+    return (found != std::string::npos);
 }
 
 void Respond::buildGet(void)
@@ -38,17 +51,19 @@ void Respond::buildGet(void)
     std::cout << "GET" << std::endl;
     try
     {
-        Cgi	cgi;
         std::string FileContent;
         std::string relativePath;
         std::string Root = _location.getRoot();
         std::string Path = getEntryFromMap("Path");
 
         parsePath(Path);
-        relativePath = Root + Path;
+        relativePath = parseRelativePath(Path, Root);
         modifyStatuscode(Path, relativePath);
         if (_status_code == e_OK && isPyExtension(Path) == true)
+        {
+            Cgi cgi;
             FileContent = cgi.executeScript(*this);
+        }
         else
             FileContent = getValidFile(relativePath);
         createResponse(FileContent);

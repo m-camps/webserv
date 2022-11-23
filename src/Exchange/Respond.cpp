@@ -45,15 +45,15 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
-// -- / moet redirecten nar "index.html"
 // localhost/python does not work
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
+    std::cout << relativePath << std::endl;
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
     }
-    else if (_location.getReturnPath().empty() == false)
+    else if (_location.getReturnPath().empty() == false || relativePath == _location.getRoot())
     {
         _status_code = e_Redir;
     }
@@ -173,41 +173,31 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 /* //////////////////////////// */
 
 // getIndex() moet nog gefixt worden
-//
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
 	std::string LocationIndex = _location.getRoot() + _location.getIndex();
 
-	try
-	{
-        switch (_status_code)
-		{
-			case e_OK:
-                if (isDirectory(relativePath) == true)
-                    FileContent = Generator::generateDirectoryPage(*this);
-                else
-				    FileContent = readFile(relativePath);
-				break ;
-			case e_Redir:
-				buildRedir();
-				break ;
-			case e_NotFound:
-				if (_location.getAutoIndex() == true && LocationIndex == relativePath)
-					FileContent = Generator::generateAutoIndex(*this);
-				else
-					FileContent = Generator::generateDefaulPage(*this);
-				break ;
-			default:
-				FileContent = Generator::generateDefaulPage(*this);
-				break ;
-		}
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-		_status_code = e_InternalServerError;
-		FileContent = Generator::generateDefaulPage(*this);
-	}
+    switch (_status_code)
+    {
+        case e_OK:
+            if (isDirectory(relativePath) == true)
+                FileContent = Generator::generateDirectoryPage(*this);
+            else
+                FileContent = readFile(relativePath);
+            break ;
+        case e_Redir:
+            buildRedir();
+            break ;
+        case e_NotFound:
+            if (_location.getAutoIndex() == true && LocationIndex == relativePath)
+                FileContent = Generator::generateAutoIndex(*this);
+            else
+                FileContent = Generator::generateDefaulPage(*this);
+            break ;
+        default:
+            FileContent = Generator::generateDefaulPage(*this);
+            break ;
+    }
 	return (FileContent);
 }
