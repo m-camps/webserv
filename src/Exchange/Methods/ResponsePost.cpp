@@ -104,7 +104,6 @@ bool Respond::isPostValid(void)
 
 void Respond::buildPost(void)
 {
-    std::cout << "POST" << std::endl;
     try
     {
         std::string MetaData;
@@ -120,6 +119,7 @@ void Respond::buildPost(void)
         Body.clear();
         Body = sendSuccesfulUpload(MetaData);
         createResponse(Body);
+		std::cout << BLUE_COLOR << "POST file uploaded: " << getFilename(MetaData) << RESET_COLOR << std::endl;
     }
     catch (const std::exception& e)
     {

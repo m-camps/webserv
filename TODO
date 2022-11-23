@@ -15,8 +15,8 @@
 	
 TODO:
 - (Bence) Restructure file passed to CGI
-- (Xander) Set default file for a directory
 - (Xander) HTML landing page
+- (Max) add color code to cout
 
 BEFOREHANDIN:
 - (Bence) Check relinking of Makefile
@@ -25,6 +25,7 @@ BEFOREHANDIN:
 - Clean up repo
 
 DONE:
+- (DONE) (Xander) Set default file for a directory
 - (DONE) (Max/Xander) If read/write fails close connection (still need to implement on write)
 - (DONE) (Max) Limit client_body_size in parser
 - (Max) (DONE) Add default_file to parser

@@ -6,13 +6,14 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 15:32:42 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 16:41:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Network.hpp"
 #include "Request.hpp"
 #include "Client.hpp"
+#include "Constants.hpp"
 
 #define BUFF 10000
 /* Default constructor */
@@ -109,7 +110,6 @@ void	Network::sendResponse(int fd)
 	Servers servers = getServersByFd(fd);
 
 	Exchange exchange(servers, fd, request.parseRequest(client.readString));
-	std::cout << "Reponse on fd: " << fd << std::endl;
 	_io.find(fd)->second = Client(_io.find(fd)->second.servers);
 }
 
@@ -120,9 +120,9 @@ void 	Network::receiveData(int fd)
 	if (ret <= 0)
 	{
 		if (ret == 0)
-			std::cout << "Client closed connection fd: " << fd << std::endl;
+			std::cout << MAGENTA_COLOR << "Client closed connection fd: " << fd << RESET_COLOR <<std::endl;
 		else
-			std::cerr << "Errror in recv" << std::endl;
+			std::cerr << "Client connection closed fd: " << fd <<  ": [Error in recv]" << std::endl;
 		throw(std::logic_error("Connection closed"));
 	}
 	else
@@ -179,7 +179,7 @@ void	Network::acceptConnection(int socket_fd)
 		throw(std::runtime_error("Could not accept connection"));
 	_poll.push_back(newPoll(client_fd));
 	_io.insert(std::pair<int, Client>(client_fd, Client(_io.find(socket_fd)->second.servers)));
-    std::cout << "New connection on FD: " << client_fd << std::endl;
+    std::cout << GREEN_COLOR <<"New connection on FD: " << client_fd << RESET_COLOR <<std::endl;
 }
 
 void	Network::closeConnection(int fd, int i)

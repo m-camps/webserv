@@ -48,7 +48,6 @@ bool isForbiddenPath(const std::string& Path)
 // localhost/python does not work
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
-    std::cout << relativePath << std::endl;
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
@@ -120,6 +119,7 @@ bool MethodIsImplemented(const std::string& Method)
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
+	std::cout << YELLOW_COLOR << getEntryFromMap("HTTPMethod") << " " << getEntryFromMap("Path") << RESET_COLOR << std::endl;
 
     try
     {
