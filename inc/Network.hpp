@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:04 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 15:12:03 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:33:09 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,15 @@ class Network
 		Network(const Network &obj);
 		Network &operator=(const Network &obj);
 		
-		/* Fds */
+		/* IO */
+		void 					receiveData(int fd);
+		void					sendResponse(int fd);
 		void					setupIO(int port, int socket_fd);
 
 		/* Setup Sockets*/
 		void					acceptConnection(int socket_fd);
 		void					closeConnection(int fd, int i);
+
 		std::vector<int>		extractListens(void);
 		void					setupSockets(void);
 		int						createSocket(void);

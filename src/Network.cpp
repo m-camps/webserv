@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 15:12:37 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:32:42 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,7 @@ void Network::setup(std::string file)
 /* Poll() loop of the network */
 /* do we need to use select with the bitflags? */
 void Network::run()
-{;
-    char buff[BUFF]; //  test buffer (can change later or keep it here)
-	// std::map<int, Client> io;
-    //check if both location is seen here
+{
     while (true)
     {
         if (poll(_poll.data(), _poll.size(), -1) == -1)
@@ -71,59 +68,22 @@ void Network::run()
                 }
                 else
                 {
-                    ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
-                    if (ret <= 0)
-                    {
-                        if (ret == 0)
-                            std::cout << "Client closed connection fd: " << cur.fd << "\n";
-                        else
-							std::cerr << "Error in recv" << std::endl;
+					try
+					{
+						receiveData(cur.fd);
+					}
+					catch(const std::exception& e)
+					{
 						closeConnection(cur.fd, i);
 						break ;
-                    }
-                    else
-                    {
-						Client client = _io.find(cur.fd)->second;
-						
-						client.readLength += ret;
-						client.readString.append(buff, ret);
-						if (client.requestData.empty())
-                    	{
-							std::size_t found = client.readString.find(SEPERATOR);
-							if (found != std::string::npos)
-							{
-								Request request;
-								client.requestData = request.parseRequest(client.readString);
-								if (client.requestData.find("Content-Length") != client.requestData.end())
-									client.contentLength = ft_strol(client.requestData.find("Content-Length")->second);
-							}
-						}
-                        if (client.requestData.empty() == false && client.contentLength == 0)
-                        {
-							client.readyToWrite = true;
-                        }
-                        if (client.requestData.empty() == false && client.contentLength > 0 &&
-                            client.contentLength <= client.readLength)
-                        {
-                            client.readyToWrite = true;
-                        }
-						if (client.readLength % 10000000 == 0)
-							std::cout << client.contentLength << " " << client.readString.size() << std::endl;
-						_io.find(cur.fd)->second = client;
-                    }
+					}
                 }
             }
-			else if ((cur.events & POLLOUT) && isSocketFd(cur.fd) == false && _io.find(cur.fd)->second.readyToWrite == true)
+			else if ((cur.events & POLLOUT))
 			{
                 try
                 {
-                    Request request;
-                    Client client = _io.find(cur.fd)->second;
-                    Servers servers = getServersByFd(cur.fd);
-
-                    Exchange exchange(servers, cur.fd, request.parseRequest(client.readString));
-                    std::cout << "Reponse on fd: " << cur.fd << std::endl;
-                    _io.find(cur.fd)->second = Client(_io.find(cur.fd)->second.servers);
+					sendResponse(cur.fd);
                 }
                 catch (const Exchange::WriteException& e)
                 {
@@ -140,12 +100,58 @@ void Network::run()
     }
 }
 
-void	Network::closeConnection(int fd, int i)
+void	Network::sendResponse(int fd)
 {
-	_poll.erase(_poll.begin() + i);
-	_io.erase(fd);
-	if (close(fd) < 0)
-		std::cerr << "Closing a file descriptor failed." << std::endl;
+	if (isSocketFd(fd) == true || _io.find(fd)->second.readyToWrite == false)
+		return ;
+	Request request;
+    Client client = _io.find(fd)->second;
+	Servers servers = getServersByFd(fd);
+
+	Exchange exchange(servers, fd, request.parseRequest(client.readString));
+	std::cout << "Reponse on fd: " << fd << std::endl;
+	_io.find(fd)->second = Client(_io.find(fd)->second.servers);
+}
+
+void 	Network::receiveData(int fd)
+{
+	char buff[BUFF];
+	ssize_t ret = recv(fd, buff, sizeof(buff), 0);
+	if (ret <= 0)
+	{
+		if (ret == 0)
+			std::cout << "Client closed connection fd: " << fd << std::endl;
+		else
+			std::cerr << "Errror in recv" << std::endl;
+		throw(std::logic_error("Connection closed"));
+	}
+	else
+	{
+		Client client = _io.find(fd)->second;
+		client.readLength += ret;
+		client.readString.append(buff, ret);
+		if (client.requestData.empty())
+		{
+			std::size_t found = client.readString.find(SEPERATOR);
+			if (found != std::string::npos)
+			{
+				Request request;
+				client.requestData = request.parseRequest(client.readString);
+				if (client.requestData.find("Content-Length") != client.requestData.end())
+					client.contentLength = ft_strol(client.requestData.find("Content-Length")->second);
+			}
+		}
+		if (client.requestData.empty() == false && client.contentLength == 0)
+		{
+			client.readyToWrite = true;
+		}
+		if (client.requestData.empty() == false && client.contentLength > 0 &&
+			client.contentLength <= client.readLength)
+		{
+			client.readyToWrite = true;
+		}
+		_io.find(fd)->second = client;
+	}
 }
 
 void	Network::setupIO(int port, int socket_fd)
@@ -174,6 +180,14 @@ void	Network::acceptConnection(int socket_fd)
 	_poll.push_back(newPoll(client_fd));
 	_io.insert(std::pair<int, Client>(client_fd, Client(_io.find(socket_fd)->second.servers)));
     std::cout << "New connection on FD: " << client_fd << std::endl;
+}
+
+void	Network::closeConnection(int fd, int i)
+{
+	_poll.erase(_poll.begin() + i);
+	_io.erase(fd);
+	if (close(fd) < 0)
+		std::cerr << "Closing a file descriptor failed." << std::endl;
 }
 
 std::vector<int> Network::extractListens(void)
