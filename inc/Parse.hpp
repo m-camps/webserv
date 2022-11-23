@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/28 16:53:31 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/15 11:54:01 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/22 16:55:06 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ typedef std::vector<Line>					ServerBlock;
 typedef std::vector<Line>					Block;
 typedef std::vector<Line>					File;
 
-#define NR_OF_SERVER_DIRECTIVES 6 //will be more later
-#define NR_OF_LOCATION_DIRECTIVES 7 //will be more later
+#define NR_OF_SERVER_DIRECTIVES 5 //will be more later
+#define NR_OF_LOCATION_DIRECTIVES 8 //will be more later
 
 class Parse
 {
@@ -57,9 +57,9 @@ class Parse
 		void					parseLocationIndex(Location& location, Line& line);
 		void					parseLocationAllowMethod(Location& location, Line& line);
 		void					parseLocationAutoIndex(Location& location, Line& line);
-		void					parseLocationCgiName(Location& location, Line& line);
-		void					parseLocationCgiExt(Location& location, Line& line);
+		void					parseLocationCgi(Location& location, Line& line);
 		void					parseLocationReturn(Location& location, Line& line);
+		void					parseLocationDefaultFile(Location& location, Line& line);
 
 		/* File I/O */
 		File					extractFile(std::string& file);

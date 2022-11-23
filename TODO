@@ -17,29 +17,29 @@ TODO:
 
 - (Bence) Restructure file passed to CGI
 - (Max/Xander) If read/write fails close connection (still need to implement on write)
-- (Max) Limit the upload size to 200mb
-- (Max) Add default file to parser
-- HTML landing page
-- Check all system calls, handle return of error (-1) anything in
-- (Bence) Check relinking of Makefile
-- (Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) 
-- (Max) return status code parser remove
+
+- (Xander) Set default file for a directory
+- (Xander) HTML landing page
 - (Xander) Handle spacebars?
 
-TOCHECKLAST:
-- Check for forbidden functions (ex. std::stoi)
-- (Max) Check for leaks
-- (Xander) Check all respond codes
-- Clean up the repo
+BEFOREHANDIN:
+- (Bence) Check relinking of Makefile
+- Check for leaks
+- Check respond codes
+- Clean up repo
 
 DONE:
+- (DONE) (Max) Limit client_body_size in parser
+- (Max) (DONE) Add default_file to parser
+- (Max) (DONE) return status code parser remove (dont remember ask Xander)
+- (Max) (DONE) Change CGI to on and off
 - (Xander) [DONE] Make recv first parse only header then parse body based on content length
-- Set default file for a directory [DONE]
 - (DONE)(XANDER) Method like HEAD should return (501 Not implemented)
 - (DONE)(Max) Location block return (redirection)
 - (DONE)(Bence) Invalid location if /php/
 - (DONE)(Bence) Denied permisson of the script 
 - (DONE)(Bence) Check allow_methods for cgi
+- (DONE)(Bence) Check all system calls, handle return of error (-1) inside run loop -> correct status code should be send back (500) 
 - (Done)(Max) Rewrite Poll struct to use std::vector<pollfd*> for readability and to remove malloc (std::vector.data() for beginning of struct) 
 - (Done)(Max) make std::map<int, std::vector<Server>> to easily send Exchange matching filedescriptors
 - (Done)(Max) rewrite acceptConnection to be based on fd instead of Server, then add it to the std::map<int, std::vector<Server&>>

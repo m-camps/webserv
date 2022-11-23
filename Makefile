@@ -6,7 +6,7 @@
 #    By: mcamps <mcamps@student.codam.nl>             +#+                      #
 #                                                    +#+                       #
 #    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/11/04 13:44:36 by mcamps        ########   odam.nl          #
+#    Updated: 2022/11/23 12:33:53 by mcamps        ########   odam.nl          #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ SRC := $(shell find $(SRCDIR) -type f -name "*.cpp")
 OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
 CONFIG := data/conf/basic.conf
+DEFAULT := data/conf/default.conf
 
 INC := -Iinc -Isrc/Exchange
 CFLAGS :=  -pedantic -Wall -Werror -Wextra $(INC)
@@ -76,6 +77,10 @@ resan: fclean
 run: all
 	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
 	./$(NAME) $(CONFIG)
+
+default: all
+	@printf "$(YELLOW)Running Default || $(DEFAULT) $(COL_END)"
+	./$(NAME) $(DEFAULT)
 
 rerun: fclean all
 	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"

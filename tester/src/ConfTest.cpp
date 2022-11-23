@@ -35,6 +35,7 @@ void	ASSERT_INVALID_CONFIG(std::string file)
 
 TEST_CASE("Valid Configs")
 {
+	ASSERT_VALID_CONFIG("Minimal.conf");
 	ASSERT_VALID_CONFIG("basic_no_location.conf");
 	ASSERT_VALID_CONFIG("basic_location.conf");
 	ASSERT_VALID_CONFIG("MultipleListen.conf");
@@ -49,14 +50,16 @@ TEST_CASE("Valid Configs")
 TEST_CASE("Invalid Configs")
 {
 	ASSERT_INVALID_CONFIG("ClientBodySizeWithoutDigit.conf");
+	ASSERT_INVALID_CONFIG("DuplicateServerName.conf");
 	ASSERT_INVALID_CONFIG("DuplicateListen.conf");
 	ASSERT_INVALID_CONFIG("NoBracketLocation.conf");
 	ASSERT_INVALID_CONFIG("NoBracketServer.conf");
-	ASSERT_INVALID_CONFIG("NoIndex.conf");
-	ASSERT_INVALID_CONFIG("NoListen.conf");
+	ASSERT_INVALID_CONFIG("NoListenValue.conf");
+	ASSERT_INVALID_CONFIG("EmptyServer.conf");
 	ASSERT_INVALID_CONFIG("NoLocationAutoIndex.conf");
 	ASSERT_INVALID_CONFIG("NoLocationCgiExt.conf");
 	ASSERT_INVALID_CONFIG("NoLocationCgiName.conf");
+	ASSERT_INVALID_CONFIG("NoNameLocation.conf");
 	ASSERT_INVALID_CONFIG("NotImplementedMethod.conf");
 	ASSERT_INVALID_CONFIG("ConfThatDoesNotExists");
 }

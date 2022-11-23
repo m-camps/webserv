@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:10:52 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/14 17:41:43 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 14:05:57 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,9 @@ class Location {
 		std::string					_index; 
 		std::vector<std::string>	_methods; 
 		int							_autoindex;
-		std::string					_cgi_name;
-		std::string					_cgi_ext;
-		int							_return_status;
+		int							_cgi;
 		std::string					_return_path;
-        std::string                 _default_page;
+		std::string					_default_file;
 
 		//if there is a cginame and cgi extension then its a cgi request
 	public:
@@ -41,21 +39,18 @@ class Location {
 		std::string					getIndex(void) const;
 		int							getAutoIndex(void) const;
 		std::vector<std::string>	getAllowMethods(void) const;
-		std::string					getCgiFileExtension(void) const;
-		std::string					getCgiName(void) const;
-		int							getReturnStatus(void) const;
+		int							getCgi(void) const;
 		std::string					getReturnPath(void) const;
-        std::string                 getDefaultPage(void) const;
+		std::string					getDefaultFile(void) const;
 
 		/* Setters */
 		void						setName(const std::string& name);
 		void 						setRoot(const std::string& root);
 		void						setIndex(const std::string& index);
 		void						setAutoIndex(const int& autoindex);
-		void						setCgiName(const std::string& cgiName);
-		void						setCgiExt(const std::string& cgiExt);
-		void						setReturnStatus(const int& status);
+		void						setCgi(const int& cgi);
 		void						setReturnPath(const std::string& path);
+		void						setDefaultFile(const std::string& default_file);
 		
 		/* Adders */
 		void						addToAllowMethod(const std::string& method);

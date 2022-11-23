@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/31 13:00:05 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/16 16:11:20 by xvoorvaa      ########   odam.nl         */
+/*   Updated: 2022/11/23 13:14:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,9 +222,9 @@ void    Parse::parseLocationDirective(Line& line, Location& location)
 			{"index", &Parse::parseLocationIndex},
 			{"allow_methods", &Parse::parseLocationAllowMethod},
 			{"autoindex", &Parse::parseLocationAutoIndex},
-			{"cgi_name", &Parse::parseLocationCgiName},
-			{"cgi_ext", &Parse::parseLocationCgiExt},
-			{"return", &Parse::parseLocationReturn}
+			{"cgi", &Parse::parseLocationCgi},
+			{"return", &Parse::parseLocationReturn},
+			{"default_file", &Parse::parseLocationDefaultFile}
 	};
 
 	for (int i = 0; i < NR_OF_LOCATION_DIRECTIVES; i++)
@@ -288,6 +288,8 @@ void    Parse::parseClientBodySize(Server& server, Line& line)
 	std::istringstream(line[1]) >> clientBodySize;
 	if (clientBodySize == 0)
 		throw (ExceptionBuilder("client_body_size can't be 0"));
+	else if (clientBodySize > 100)
+		throw (ExceptionBuilder("client_body_size must be in range (1-100)"));
 	server.setClientBody(clientBodySize);
 }
 
@@ -363,37 +365,39 @@ void	Parse::parseLocationAutoIndex(Location& location, Line& line)
 	location.setAutoIndex(autoindex);
 }
 
-void	Parse::parseLocationCgiName(Location& location, Line& line)
+void	Parse::parseLocationCgi(Location& location, Line& line)
 {
+	int		cgi = 0;
+	
 	if (line.size() != 2)
-		throw (ExceptionBuilder("cgi_name location directive incorrect"));
-	else if(location.getCgiName() != "")
-		throw (ExceptionBuilder("duplicate cgi_name in location"));
-	location.setCgiName(line[1]);
-}
-
-void	Parse::parseLocationCgiExt(Location& location, Line& line)
-{
-	if (line.size() != 2)
-		throw (ExceptionBuilder("cgi_ext location directive incorrect"));
-	else if(location.getCgiFileExtension() != "")
-		throw (ExceptionBuilder("duplicate cgi_ext in location"));
-	location.setCgiExt(line[1]);
+		throw (ExceptionBuilder("cgi location directive incorrect"));
+	if(location.getCgi() != -1)
+		throw (ExceptionBuilder("duplicate cgi in location"));
+	if (line[1] == "on")
+		cgi  = 1;
+	else if (line[1] == "off")
+		cgi = 0;
+	else
+		throw (ExceptionBuilder("cgi value incorrect in location"));
+	location.setCgi(cgi);
 }
 
 void	Parse::parseLocationReturn(Location& location, Line& line)
 {
-	if (line.size() != 2 && line.size() != 3)
+	if (line.size() != 2)
 		throw (ExceptionBuilder("return location directive incorrect"));
-	else if (location.getReturnPath() != "" || location.getReturnStatus() != -1)
+	else if (location.getReturnPath() != "")
 		throw (ExceptionBuilder("duplicate return in location"));
-	else if (!isNumber(line[1])) 
-		throw (ExceptionBuilder("return status code directive not a number"));
-	int status_code;
-	std::istringstream(line[1]) >> status_code;
-	location.setReturnStatus(status_code);
-	if (line.size() == 3)
-		location.setReturnPath(line[2]);
+	location.setReturnPath(line[1]);
+}
+
+void	Parse::parseLocationDefaultFile(Location &location, Line& line)
+{
+	if (line.size() != 2)
+		throw (ExceptionBuilder("default_file location directive incorrect"));
+	else if (location.getDefaultFile() != "")
+		throw (ExceptionBuilder("duplicate default_file in location"));
+	location.setDefaultFile(line[1]);
 }
 
 /* Helper Functions */
@@ -427,7 +431,7 @@ bool    Parse::isLocationDirective(std::string& directive)
 {
 	return (directive == "root" || directive == "index" ||
 			directive == "allow_methods" || directive == "autoindex" ||
-			directive == "cgi_name" || directive == "cgi_ext" || directive == "return");
+			directive == "cgi" || directive == "default_file" || directive == "return");
 }
 
 std::invalid_argument Parse::ValidateException(std::string error, int block)
@@ -480,6 +484,8 @@ void	Parse::validateLocation(Location& location, int block)
 		throw(ValidateException("Location name not set in", block));
 	if (location.getRoot() == "")
 		location.setRoot(DEFAULT_ROOT);
+	if (location.getDefaultFile() == "")
+		location.setDefaultFile(DEFAULT_FILE);
 	if (location.getIndex() == "")
 		location.setIndex(DEFAULT_INDEX);
 	if (location.getAllowMethods().empty())
@@ -490,4 +496,6 @@ void	Parse::validateLocation(Location& location, int block)
 	}
 	if (location.getAutoIndex() == -1)
 		location.setAutoIndex(0);
+	if (location.getCgi() == -1)
+		location.setCgi(0);
 }

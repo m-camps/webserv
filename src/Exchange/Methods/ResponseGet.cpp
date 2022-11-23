@@ -59,7 +59,7 @@ void Respond::buildGet(void)
         parsePath(Path);
         relativePath = parseRelativePath(Path, Root);
         modifyStatuscode(Path, relativePath);
-        if (_status_code == e_OK && isPyExtension(Path) == true)
+        if (_location.getCgi() == 1 && _status_code == e_OK && isPyExtension(Path) == true)
         {
             Cgi cgi;
             FileContent = cgi.executeScript(*this);
