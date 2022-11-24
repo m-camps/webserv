@@ -5,7 +5,7 @@ OBJD = objs/
 SRCD = src/
 INCD = inc/
 
-SRCS := Cgi.cpp Client.cpp Generator.cpp Location.cpp main.cpp Network.cpp Parse.cpp Server.cpp Exchange.cpp Request.cpp Respond.cpp ResponseDelete.cpp ResponseGet.cpp ResponsePost.cpp deleteFile.cpp ft_stoi.cpp isDirectory.cpp readFile.cpp splitLineWithStrtok.cpp
+SRCS = Cgi.cpp Client.cpp Generator.cpp Location.cpp main.cpp Network.cpp Parse.cpp Server.cpp Exchange.cpp Request.cpp Respond.cpp ResponseDelete.cpp ResponseGet.cpp ResponsePost.cpp deleteFile.cpp ft_stoi.cpp isDirectory.cpp readFile.cpp splitLineWithStrtok.cpp
 OBJS = $(SRCS:%.cpp=$(OBJD)%.o)
 DEPS = $(SRCS:%.cpp=$(DEPD)%.d)
 
