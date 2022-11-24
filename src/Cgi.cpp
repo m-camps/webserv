@@ -45,8 +45,8 @@ std::string     Cgi::buildCgiExecPath(Respond& ResponderRef)
 char**          Cgi::createArgv(Respond& ResponderRef)
 {
 	std::string                 requestedFilePath = buildCgiExecPath(ResponderRef);
-	std::string                 interpreterPath = "/opt/homebrew/opt/python@3.10/bin/python3.10"; //on m2
-	//std::string               interpreterPath = "/usr/local/bin/python3"; //could we make this less error prone? in case it changes
+	//std::string                 interpreterPath = "/opt/homebrew/opt/python@3.10/bin/python3.10"; //on m2
+	std::string               interpreterPath = "/usr/local/bin/python3";
 	std::vector<std::string>    argvString;
 	char                        **argv;
 
