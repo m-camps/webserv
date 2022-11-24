@@ -6,13 +6,14 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/22 18:02:31 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 16:41:48 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Network.hpp"
 #include "Request.hpp"
-#include "Poller.hpp"
+#include "Client.hpp"
+#include "Constants.hpp"
 
 #define BUFF 10000
 /* Default constructor */
@@ -21,11 +22,7 @@ Network::Network() {}
 /* Default deconstructor */
 Network::~Network() {}
 
-/***
- * Setup for the network
- * (right now just starting a basic server with default constructor)
- * @param file the file to be parsed
-***/
+
 void Network::setup(std::string file)
 {
 	Parse		parser;
@@ -45,10 +42,7 @@ void Network::setup(std::string file)
 /* Poll() loop of the network */
 /* do we need to use select with the bitflags? */
 void Network::run()
-{;
-    char buff[BUFF]; //  test buffer (can change later or keep it here)
-	std::map<int, Poller> io;
-    //check if both location is seen here
+{
     while (true)
     {
         if (poll(_poll.data(), _poll.size(), -1) == -1)
@@ -63,82 +57,40 @@ void Network::run()
             {
                 if (isSocketFd(cur.fd))
                 {
-					int client_fd = acceptConnection(cur.fd);
-					io.insert(std::pair<int, Poller>(client_fd, Poller()));
-					if (client_fd == -1) //if it could not accept connection (accept == -1)
+					try
 					{
-						std::cerr << "Could not accept connection." << std::endl;
-						break ; //break out from the poll for loop
+						acceptConnection(cur.fd);
 					}
-                    std::cout << "New connection" << "\n";
-                    std::cout << "On FD " << client_fd << std::endl;
+					catch(const std::exception& e)
+					{
+						std::cerr << e.what() << std::endl;
+						break ;
+					}
                 }
                 else
                 {
-                    ssize_t ret = recv(cur.fd, buff, sizeof(buff), 0);
-                    if (ret <= 0)
-                    {
-                        if (ret == 0)
-                            std::cout << "Client closed connection fd: " << cur.fd << "\n";
-                        else
-							std::cerr << "Error in recv" << std::endl;
-                        if (close(cur.fd) < 0)
-							std::cerr << "Closing a file descriptor failed." << std::endl;
-						_poll.erase(_poll.begin() + i);
-						io.erase(cur.fd);
+					try
+					{
+						receiveData(cur.fd);
+					}
+					catch(const std::exception& e)
+					{
+						closeConnection(cur.fd, i);
 						break ;
-                    }
-                    else
-                    {
-						Poller poller = io.find(cur.fd)->second;
-						
-						poller.readLength += ret;
-						poller.readString.append(buff, ret);
-						if (poller.requestData.empty())
-                    	{
-							std::size_t found = poller.readString.find(SEPERATOR);
-							if (found != std::string::npos)
-							{
-								Request request;
-								poller.requestData = request.parseRequest(poller.readString);
-								if (poller.requestData.find("Content-Length") != poller.requestData.end())
-									poller.contentLength = ft_strol(poller.requestData.find("Content-Length")->second);
-							}
-						}
-                        if (poller.requestData.empty() == false && poller.contentLength == 0)
-                        {
-							poller.readyToWrite = true;
-                        }
-                        if (poller.requestData.empty() == false && poller.contentLength > 0 &&
-                            poller.contentLength <= poller.readLength)
-                        {
-                            poller.readyToWrite = true;
-                        }
-						if (poller.readLength % 10000000 == 0)
-							std::cout << poller.contentLength << " " << poller.readString.size() << std::endl;
-						io.find(cur.fd)->second = poller;
-                    }
+					}
                 }
             }
-			else if ((cur.events & POLLOUT) && io.find(cur.fd) != io.end() && io.find(cur.fd)->second.readyToWrite == true && isSocketFd(cur.fd) == false)
+			else if ((cur.events & POLLOUT))
 			{
                 try
                 {
-                    Request request;
-                    Poller poller = io.find(cur.fd)->second;
-                    Servers servers = getServersByFd(cur.fd);
-
-                    Exchange exchange(servers, cur.fd, request.parseRequest(poller.readString));
-                    std::cout << "Reponse on fd: " << cur.fd << std::endl;
-                    io.find(cur.fd)->second = Poller();
+					sendResponse(cur.fd);
                 }
                 catch (const Exchange::WriteException& e)
                 {
                     std::cerr << e.what() << std::endl;
-                    if (close(cur.fd) < 0)
-                        std::cerr << "Closing a file descriptor failed." << std::endl;
-                    _poll.erase(_poll.begin() + i);
-                    io.erase(cur.fd);
+					closeConnection(cur.fd, i);
+					break ;
                 }
                 catch (const std::exception& e)
                 {
@@ -149,7 +101,60 @@ void Network::run()
     }
 }
 
-void	Network::setupFds(int port, int socket_fd)
+void	Network::sendResponse(int fd)
+{
+	if (isSocketFd(fd) == true || _io.find(fd)->second.readyToWrite == false)
+		return ;
+	Request request;
+    Client client = _io.find(fd)->second;
+	Servers servers = getServersByFd(fd);
+
+	Exchange exchange(servers, fd, request.parseRequest(client.readString));
+	_io.find(fd)->second = Client(_io.find(fd)->second.servers);
+}
+
+void 	Network::receiveData(int fd)
+{
+	char buff[BUFF];
+	ssize_t ret = recv(fd, buff, sizeof(buff), 0);
+	if (ret <= 0)
+	{
+		if (ret == 0)
+			std::cout << MAGENTA_COLOR << "Client closed connection fd: " << fd << RESET_COLOR <<std::endl;
+		else
+			std::cerr << "Client connection closed fd: " << fd <<  ": [Error in recv]" << std::endl;
+		throw(std::logic_error("Connection closed"));
+	}
+	else
+	{
+		Client client = _io.find(fd)->second;
+		client.readLength += ret;
+		client.readString.append(buff, ret);
+		if (client.requestData.empty())
+		{
+			std::size_t found = client.readString.find(SEPERATOR);
+			if (found != std::string::npos)
+			{
+				Request request;
+				client.requestData = request.parseRequest(client.readString);
+				if (client.requestData.find("Content-Length") != client.requestData.end())
+					client.contentLength = ft_strol(client.requestData.find("Content-Length")->second);
+			}
+		}
+		if (client.requestData.empty() == false && client.contentLength == 0)
+		{
+			client.readyToWrite = true;
+		}
+		if (client.requestData.empty() == false && client.contentLength > 0 &&
+			client.contentLength <= client.readLength)
+		{
+			client.readyToWrite = true;
+		}
+		_io.find(fd)->second = client;
+	}
+}
+
+void	Network::setupIO(int port, int socket_fd)
 {
 	Servers servers;
 
@@ -161,34 +166,28 @@ void	Network::setupFds(int port, int socket_fd)
 			servers.push_back(*it);
 		}
 	}
-	_fds.insert(std::pair<int, Servers >(socket_fd, servers));
+	_io.insert(std::pair<int, Client >(socket_fd, Client(servers)));
 }
 
-void	Network::addClientToFds(int socket_fd, int client_fd)
-{
-	Servers servers = _fds.find(socket_fd)->second;
-
-	_fds.insert(std::pair<int, Servers >(client_fd, servers));
-}
-
-void	Network::delClientFromFds(int client_fd)
-{
-	_fds.erase(client_fd);
-}
-
-int		Network::acceptConnection(int socket_fd)
+void	Network::acceptConnection(int socket_fd)
 {
 	struct  sockaddr_in			client_addr;
 	socklen_t					client_addrlen = sizeof(client_addr);
 	
 	int	client_fd = accept(socket_fd, (struct sockaddr*)(&client_addr), &client_addrlen);
 	if (client_fd == -1)
-	{
-		return (-1);
-	}
-	addClientToFds(socket_fd, client_fd);
+		throw(std::runtime_error("Could not accept connection"));
 	_poll.push_back(newPoll(client_fd));
-	return (client_fd);
+	_io.insert(std::pair<int, Client>(client_fd, Client(_io.find(socket_fd)->second.servers)));
+    std::cout << GREEN_COLOR <<"New connection on FD: " << client_fd << RESET_COLOR <<std::endl;
+}
+
+void	Network::closeConnection(int fd, int i)
+{
+	_poll.erase(_poll.begin() + i);
+	_io.erase(fd);
+	if (close(fd) < 0)
+		std::cerr << "Closing a file descriptor failed." << std::endl;
 }
 
 std::vector<int> Network::extractListens(void)
@@ -218,7 +217,7 @@ void	Network::setupSockets(void)
 
 		bind(socket_fd, addr_in);
 		listen(socket_fd);
-		setupFds(port, socket_fd);
+		setupIO(port, socket_fd);
 		_socket_fds.push_back(socket_fd);
 	}
 }
@@ -264,7 +263,7 @@ void	Network::listen(int socket_fd)
 
 void			Network::createPoll(void)
 {
-	for (std::map<int, Servers>::iterator it = _fds.begin(); it != _fds.end(); it++)
+	for (std::map<int, Client>::iterator it = _io.begin(); it != _io.end(); it++)
 		_poll.push_back(newPoll(it->first));
 }
 
@@ -291,5 +290,5 @@ bool	Network::isSocketFd(int fd)
 
 Servers	Network::getServersByFd(int fd)
 {
-	return (_fds.find(fd)->second);
+	return (_io.find(fd)->second.servers);
 }

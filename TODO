@@ -14,15 +14,9 @@
 	- Response(requestData(mp<std::string, std::string>), _server(Server), _location(Location))
 	
 TODO:
-
 - (Bence) Restructure file passed to CGI
-- (Bence) README
-- (Max/Xander) If read/write fails close connection (still need to implement on write)
-
-- (Xander) Set default file for a directory
 - (Xander) HTML landing page
-- (Xander) Handle spacebars?
-- (Bence) check cgi should be run in the correct dir for relative path file access
+- (Max) add color code to cout
 
 BEFOREHANDIN:
 - (Bence) Check relinking of Makefile
@@ -31,6 +25,8 @@ BEFOREHANDIN:
 - Clean up repo
 
 DONE:
+- (DONE) (Xander) Set default file for a directory
+- (DONE) (Max/Xander) If read/write fails close connection (still need to implement on write)
 - (DONE) (Max) Limit client_body_size in parser
 - (Max) (DONE) Add default_file to parser
 - (Max) (DONE) return status code parser remove (dont remember ask Xander)

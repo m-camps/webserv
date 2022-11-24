@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/10/10 13:16:03 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 14:08:09 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/23 15:40:07 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Location::Location(bool isEmpty)
 	_methods.push_back("POST");
 	_methods.push_back("DELETE");
 	_methods.push_back("GET");
-    _default_file = DEFAULT_FILE;
+	_default_file = DEFAULT_FILE;
 }
 
 Location::~Location(){} 
@@ -43,7 +43,7 @@ std::string					Location::getRoot(void) const { return _root; }
 std::string					Location::getIndex(void) const { return _index; }
 int							Location::getAutoIndex(void) const { return _autoindex; }
 std::vector<std::string>	Location::getAllowMethods(void) const { return _methods; }
-int							Location::getCgi(void) const {return _cgi; }
+int							Location::getCgi(void) const { return _cgi; }
 std::string					Location::getReturnPath(void) const { return _return_path; }
 std::string					Location::getDefaultFile(void) const { return _default_file; }
 

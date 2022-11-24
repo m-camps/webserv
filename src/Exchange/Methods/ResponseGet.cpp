@@ -6,13 +6,16 @@
 
 void Respond::buildRedir(void)
 {
-    std::string LocationName = _location.getName();
     std::string NewLocation;
+    std::string LocationName = _location.getName();
 
     if (_location.getReturnPath().empty() == false)
         NewLocation = Generator::generateLocation(_location.getReturnPath());
-    else
+    else if (LocationName == "/")
         NewLocation = Generator::generateLocation(_location.getIndex());
+    else
+        NewLocation = Generator::generateLocation(_location.getName() + "/" + _location.getIndex());
+
     createResponse("");
     addToHeader(NewLocation);
 }
@@ -34,9 +37,14 @@ std::string Respond::parseRelativePath(std::string& Path, std::string& Root)
         Root.append("/");
     _location.setRoot(Root);
 
+    std::string relativePath = Root + Path;
+    found = relativePath.find("//");
+    if (found != std::string::npos)
+        relativePath.erase(found, 1);
+
     if (Path == "/")
         return (Root);
-    return (Root + Path);
+    return (relativePath);
 }
 
 bool    Respond::isPyExtension(const std::string& Path)
@@ -48,7 +56,6 @@ bool    Respond::isPyExtension(const std::string& Path)
 
 void Respond::buildGet(void)
 {
-    std::cout << "GET" << std::endl;
     try
     {
         std::string FileContent;
@@ -67,6 +74,7 @@ void Respond::buildGet(void)
         else
             FileContent = getValidFile(relativePath);
         createResponse(FileContent);
+			std::cout << CYAN_COLOR << "GET response: " << _requestData.find("Path")->second << RESET_COLOR << std::endl;
     }
     catch (const std::exception& e)
     {

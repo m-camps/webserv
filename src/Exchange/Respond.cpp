@@ -45,10 +45,8 @@ bool isForbiddenPath(const std::string& Path)
 
 /* //////////////////////////// */
 
-// localhost/python does not work
 void Respond::modifyStatuscode(const std::string& Path, const std::string& relativePath)
 {
-    std::cout << relativePath << std::endl;
     if (isForbiddenPath(Path) == true)
     {
         _status_code = e_Forbidden;
@@ -120,6 +118,7 @@ bool MethodIsImplemented(const std::string& Method)
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
+	std::cout << YELLOW_COLOR << getEntryFromMap("HTTPMethod") << " " << getEntryFromMap("Path") << RESET_COLOR << std::endl;
 
     try
     {
@@ -172,7 +171,6 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 
 /* //////////////////////////// */
 
-// getIndex() moet nog gefixt worden
 std::string Respond::getValidFile(const std::string& relativePath)
 {
 	std::string FileContent;
@@ -182,7 +180,12 @@ std::string Respond::getValidFile(const std::string& relativePath)
     {
         case e_OK:
             if (isDirectory(relativePath) == true)
-                FileContent = Generator::generateDirectoryPage(*this);
+            {
+                if (_location.getAutoIndex() == true)
+                    FileContent = Generator::generateAutoIndex(*this);
+                else
+                    FileContent = Generator::generateDirectoryPage(*this);
+            }
             else
                 FileContent = readFile(relativePath);
             break ;
