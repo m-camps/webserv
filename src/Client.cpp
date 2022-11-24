@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Client.hpp"
+#include "../inc/Client.hpp"
 
 Client::Client(Servers servers) : servers(servers)
 {

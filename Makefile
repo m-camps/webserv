@@ -1,110 +1,52 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         ::::::::             #
-#    Makefile                                           :+:    :+:             #
-#                                                      +:+                     #
-#    By: mcamps <mcamps@student.codam.nl>             +#+                      #
-#                                                    +#+                       #
-#    Created: 2022/09/13 17:00:28 by mcamps        #+#    #+#                  #
-#    Updated: 2022/11/23 12:33:53 by mcamps        ########   odam.nl          #
-#                                                                              #
-# **************************************************************************** #
+TARGET = webserv
 
-NAME := webserv
+DEPD = deps/
+OBJD = objs/
+SRCD = src/
+INCD = inc/
 
-SRCDIR := src
-BUILDDIR := build
+SRCS := Cgi.cpp Client.cpp Generator.cpp Location.cpp main.cpp Network.cpp Parse.cpp Server.cpp Exchange.cpp Request.cpp Respond.cpp ResponseDelete.cpp ResponseGet.cpp ResponsePost.cpp deleteFile.cpp ft_stoi.cpp isDirectory.cpp readFile.cpp splitLineWithStrtok.cpp
+OBJS = $(SRCS:%.cpp=$(OBJD)%.o)
+DEPS = $(SRCS:%.cpp=$(DEPD)%.d)
 
-SRC := $(shell find $(SRCDIR) -type f -name "*.cpp")
-OBJ := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
+vpath %.hpp $(INCD) $(SRCD)/Exchange $(SRCD)/Exchange
+vpath %.cpp $(SRCD) $(SRCD)/Exchange $(SRCD)/Exchange/Methods $(SRCD)/Utilities
+vpath %.o $(OBJD)
 
-CONFIG := data/conf/basic.conf
-DEFAULT := data/conf/default.conf
+HFLAGS 		=	$(addprefix -I, $(INCD))
+DEPFLAGS 	=	-MT $@ -MMD -MP -MF $(DEPD)$*.d
+HEADER		=	inc
+CC			=	c++ 
+CFLAGS		=	-pedantic -Wall -Werror -Wextra -std=c++98
+RM			=	rm -rf
 
-INC := -Iinc -Isrc/Exchange
-CFLAGS :=  -pedantic -Wall -Werror -Wextra $(INC)
-CC	:= c++
-EXTRA := -std=c++98
-SHELL := /bin/bash
+all: $(OBJD) $(DEPD) $(TARGET) 
 
-ifdef DEBUG
-	CFLAGS += -g3
-else ifdef FSAN
-	CFLAGS += -fsanitize=address
-else
-	CFLAGS += -Ofast
-endif
+$(OBJD):
+	@mkdir -p $(OBJD)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(DEPD):
+	@mkdir -p $(DEPD)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $(NAME)
+$(OBJD)%.o: %.cpp $(DEPD)%.d
+	$(CC) $(CFLAGS) $(HFLAGS) $(DEPFLAGS) -c $< -o $@
 
-all: $(NAME)
-	@printf "$(GREEN)Compilation Complete$(COL_END)\n"
+$(TARGET) : $(OBJS)
+	$(CC) $(CFLAGS) -I $(HEADER) $^ -o $@
 
-# For LLDB or any other debugger
-debug:
-	make DEBUG=1
-	@printf "$(GREEN)Debug Compilation Complete $(COL_END)"
-	@printf "$(PURPLE)Running Debug Mode || $(CONFIG)$(COL_END)"
-
-rebug: fclean
-	make debug
-
-client:
-	$(GCC) client/main.cpp -o not_server $(FLAGS) $(EXTRA)
-	./not_server
-	
 clean:
-	rm -rf $(BUILDDIR)
+	$(RM) $(OBJD)
+	$(RM) $(DEPD)
 
 fclean: clean
-	rm -rf $(NAME)
+	$(RM) $(TARGET)
 
-re: fclean all
+re: fclean all	
 
-#For segfaults
-fsan:
-	make FSAN=1
+.PHONY : all clean fclean re
 
-resan: fclean
-	make fsan
-
-#Make & run executable
-run: all
-	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
-	./$(NAME) $(CONFIG)
-
-default: all
-	@printf "$(YELLOW)Running Default || $(DEFAULT) $(COL_END)"
-	./$(NAME) $(DEFAULT)
-
-rerun: fclean all
-	@printf "$(YELLOW)Running Default || $(CONFIG) $(COL_END)"
-	./$(NAME) $(CONFIG)
-
-
-# My test function (max)
-test: all
-	@printf "$(YELLOW)Running Test || conf/basic.conf $(COL_END)\n"
-	@./$(NAME) conf/basic.conf
-
-unit_tester:
-	cmake -S . -B cBuild/
-	make -C cBuild/
-	./cBuild/tester/catch2Tester
-
-# Colors
-RED=\x1b[1;31m
-GREEN=\x1b[32;01m
-PURPLE=\033[1;35m
-YELLOW=\033[1;33m
-COL_END=\x1b[0m
-
-.PHONY:	all clean fclean re
+$(DEPS) :
+include $(wildcard $(DEPS))
 
 
 

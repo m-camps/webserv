@@ -2,7 +2,7 @@
 // Created by Xander Voorvaart on 11/1/22.
 //
 
-#include "Generator.hpp"
+#include "../inc/Generator.hpp"
 
 Generator::Generator(void)
 {

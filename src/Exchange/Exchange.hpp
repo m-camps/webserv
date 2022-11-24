@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "Server.hpp"
+#include "../../inc/Server.hpp"
 #include "Respond.hpp"
 
 typedef std::map<std::string, std::string>  HashMap;

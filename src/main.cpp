@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #define DEBUG false
 
-#include "Network.hpp"
+#include "../inc/Network.hpp"
 
 int32_t	main(int argc, char *argv[])
 {

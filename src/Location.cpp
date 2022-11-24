@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Location.hpp"
-#include "Constants.hpp"
+#include "../inc/Location.hpp"
+#include "../inc/Constants.hpp"
 
 // Constructor with default values
 Location::Location()

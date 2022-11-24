@@ -4,8 +4,8 @@
 #include "../src/Exchange/Respond.hpp"
 #define NR_OF_CGI_ENV_VARS 24
 #define INTERNAL_SERVER_ERROR_CODE 254
-#include "Exchange.hpp"
-#include "Respond.hpp"
+#include "../src/Exchange/Exchange.hpp"
+#include "../src/Exchange/Respond.hpp"
 
 class Cgi
 {

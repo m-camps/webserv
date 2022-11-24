@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Network.hpp"
-#include "Request.hpp"
-#include "Client.hpp"
-#include "Constants.hpp"
+#include "../inc/Network.hpp"
+#include "Exchange/Request.hpp"
+#include "../inc/Client.hpp"
+#include "../inc/Constants.hpp"
 
 #define BUFF 10000
 /* Default constructor */

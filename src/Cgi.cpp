@@ -2,7 +2,7 @@
 // Created by Xander Voorvaart on 11/1/22.
 //
 
-#include "Cgi.hpp"
+#include "../inc/Cgi.hpp"
 #include <iostream>
 #include <unistd.h>
 #include <vector>

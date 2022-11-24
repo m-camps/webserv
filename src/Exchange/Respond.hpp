@@ -12,11 +12,11 @@
 #include <exception> // std::exceptions
 
 #include "Exchange.hpp" // Exchange Class
-#include "Server.hpp" // Server class
-#include "Utilities.hpp" // readFile, deleteFile
-#include "Generator.hpp"
-#include "Cgi.hpp"
-#include "Constants.hpp"
+#include "../../inc/Server.hpp"
+#include "../../inc/Utilities.hpp"
+#include "../../inc/Generator.hpp"
+#include "../../inc/Cgi.hpp"
+#include "../../inc/Constants.hpp"
 
 typedef std::map<std::string, std::string> 	HashMap;
 typedef std::map<int, std::string> 			ErrorPageMap;
