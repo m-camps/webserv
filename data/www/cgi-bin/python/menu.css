@@ -4,7 +4,7 @@
     box-sizing: border-box;
   }
   body {
-    background-image: linear-gradient(to right, rgba(200, 8,207, 0.75), rgba(28, 70, 184, 0.8)), url(https://www.hmablogs.com/wp-content/uploads/2022/06/background-1-scaled.jpg);
+    background-image: url(https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif);
     background-size: cover;
     background-attachment: fixed;
     color: white;
@@ -67,7 +67,6 @@
     background: rgba(216, 214, 214, 0);
   }
 
-
   #centered-paragraph
   {
     position: absolute;
@@ -81,7 +80,7 @@
 
   h1.displayedBody
   {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   p.padded

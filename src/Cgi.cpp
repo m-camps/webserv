@@ -80,7 +80,6 @@ char**          Cgi::createEnvp(Respond& ResponderRef)
 	std::string                	serverName = "SERVER_NAME=" + ResponderRef.getServer().getNames().front();
 	char**                      envp;
 
-	(void)ResponderRef;
 	envpStrig.push_back(pathInfo);
 	envpStrig.push_back(scriptName);
 	envpStrig.push_back(serverName);
