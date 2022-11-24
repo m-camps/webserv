@@ -29,10 +29,10 @@ $(DEPD):
 	@mkdir -p $(DEPD)
 
 $(OBJD)%.o: %.cpp $(DEPD)%.d
-	$(CC) $(CFLAGS) $(HFLAGS) $(DEPFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) $(HFLAGS) $(DEPFLAGS) -c $< -o $@
 
 $(TARGET) : $(OBJS)
-	$(CC) $(CFLAGS) -I $(HEADER) $^ -o $@
+	@$(CC) $(CFLAGS) -I $(HEADER) $^ -o $@
 
 clean:
 	$(RM) $(OBJD)

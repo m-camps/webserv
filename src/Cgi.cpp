@@ -29,17 +29,17 @@ std::string     Cgi::buildCgiExecPath(Respond& ResponderRef)
 	std::string locationRoot = currentLoc.getRoot();
 	std::string locationName = currentLoc.getName();
 	size_t      index = PATH.find(locationName);
-	char        absolutePath[500];
+	char        currentWorkingDir[500];
 
 	PATH.replace(index, locationName.length() + 1, locationRoot);
-	if (getcwd(absolutePath, sizeof(absolutePath)) == NULL)
+	if (getcwd(currentWorkingDir, sizeof(currentWorkingDir)) == NULL)
 	{
 		std::cout << "Could not enter to current working directory, closing program" << std::endl;
 		std::exit(EXIT_FAILURE);
 	}
-	std::string executablePath(absolutePath);
-	executablePath += '/' + PATH;
-	return executablePath;
+	std::string relativePath(currentWorkingDir);
+	relativePath += '/' + PATH;
+	return relativePath;
 }
 
 char**          Cgi::createArgv(Respond& ResponderRef)
@@ -76,12 +76,12 @@ char**          Cgi::createEnvp(Respond& ResponderRef)
 {
 	std::vector<std::string>    envpStrig;
 	std::string                 pathInfo = "PATH_INFO=/usr/local/bin/python3";
-	std::string                 scriptName = "SCRIPT_NAME=/cgi-bin";
+	std::string                 serverProtocol = "SERVER_PROTOCOL=HTTP/1.1";
 	std::string                	serverName = "SERVER_NAME=" + ResponderRef.getServer().getNames().front();
 	char**                      envp;
 
 	envpStrig.push_back(pathInfo);
-	envpStrig.push_back(scriptName);
+	envpStrig.push_back(serverProtocol);
 	envpStrig.push_back(serverName);
 
 	try
