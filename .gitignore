@@ -1,4 +1,6 @@
 .DS_Store
+deps/
+objs/
 webserv
 build/
 tester/build/

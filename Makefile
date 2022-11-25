@@ -29,7 +29,7 @@ $(DEPD):
 	@mkdir -p $(DEPD)
 
 $(OBJD)%.o: %.cpp $(DEPD)%.d
-	@$(CC) $(CFLAGS) $(HFLAGS) $(DEPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(HFLAGS) $(DEPFLAGS) -c $< -o $@
 
 $(TARGET) : $(OBJS)
 	@$(CC) $(CFLAGS) -I $(HEADER) $^ -o $@
@@ -43,10 +43,12 @@ fclean: clean
 
 re: fclean all	
 
+unit_tester:
+	cmake -S . -B cBuild/
+	make -C cBuild/
+	./cBuild/tester/catch2Tester
+
 .PHONY : all clean fclean re
 
 $(DEPS) :
 include $(wildcard $(DEPS))
-
-
-

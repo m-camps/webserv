@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED(true))
 
 set(INC_HEADERS ../inc)
-set(EXCHANGE_HEADERS ../src/Exchange)
 
 include_directories(${INC_HEADERS})
 include_directories(${EXCHANGE_HEADERS})
@@ -20,10 +19,10 @@ set(SOURCES
         ${INC_HEADERS}/Utilities.hpp
         ${INC_HEADERS}/Generator.hpp
         ${INC_HEADERS}/Cgi.hpp
-        ${INC_HEADERS}/Poller.hpp
-        ${EXCHANGE_HEADERS}/Exchange.hpp
-        ${EXCHANGE_HEADERS}/Respond.hpp
-        ${EXCHANGE_HEADERS}/Request.hpp
+        ${INC_HEADERS}/Client.hpp
+        ${INC_HEADERS}/Exchange.hpp
+        ${INC_HEADERS}/Respond.hpp
+        ${INC_HEADERS}/Request.hpp
 
         ../src/Location.cpp
         ../src/Network.cpp
@@ -37,13 +36,12 @@ set(SOURCES
         ../src/Exchange/Methods/ResponseGet.cpp
         ../src/Exchange/Methods/ResponseDelete.cpp
         ../src/Cgi.cpp
-        ../src/Poller.cpp
+        ../src/Client.cpp
         ../src/Utilities/deleteFile.cpp
         ../src/Utilities/readFile.cpp
         ../src/Utilities/isDirectory.cpp
         ../src/Utilities/ft_stoi.cpp
         ../src/Utilities/splitLineWithStrtok.cpp
-        src/ResponderTests.cpp
         src/ThrowTests.cpp
         src/ConfTest.cpp)
 
