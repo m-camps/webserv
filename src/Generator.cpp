@@ -20,11 +20,21 @@ Generator::~Generator(void)
  */
 std::string Generator::generateStatus(Respond& Responder)
 {
-    HashMap tempHash = Responder.getRequestData();
-    uint32_t StatusCode = Responder.getStatusCode();
-    std::string StatusLine = tempHash.find("HTTPVersion")->second;
+	std::string StatusLine;
+	uint32_t StatusCode = Responder.getStatusCode();
 
-    StatusLine +=  " " + ToString(StatusCode) + " \r\n";
+	try{
+    	StatusLine = Responder.getEntryFromMap("HTTPVersion");
+
+		StatusLine +=  " " + ToString(StatusCode) + " \r\n";
+	}
+	catch(std::exception &e)
+	{
+		Responder.setStatusCode(e_Badrequest);
+		StatusCode = e_Badrequest;
+		StatusLine = "HTTP/1.1";
+		StatusLine +=  " " + ToString(StatusCode) + " \r\n";
+	}
 	return (StatusLine);
 }
 

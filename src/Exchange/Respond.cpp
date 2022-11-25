@@ -118,12 +118,12 @@ bool MethodIsImplemented(const std::string& Method)
 void 	Respond::buildResponse(HashMap requestData)
 {
 	_requestData = requestData;
-	std::cout << YELLOW_COLOR << getEntryFromMap("HTTPMethod") << " " << getEntryFromMap("Path") << RESET_COLOR << std::endl;
 
     try
     {
         void (Respond::*FuncPointer)(void) = NULL;
         std::string Method = getEntryFromMap("HTTPMethod");
+		std::cout << YELLOW_COLOR << Method << " " << getEntryFromMap("Path") << RESET_COLOR << std::endl;
 
         const std::array<s_Methods, 3> CompareMethods = {{
                 {"GET",    &Respond::buildGet},
@@ -150,6 +150,12 @@ void 	Respond::buildResponse(HashMap requestData)
             _status_code = e_NotImplemented;
         createResponse(Generator::generateDefaulPage(*this));
     }
+	catch (const Respond::BadRequest &e)
+	{
+		std::cerr << e.what() << std::endl;
+		_status_code = e_Badrequest;
+		createResponse(Generator::generateDefaulPage(*this));
+	}
     catch (const std::exception &e)
     {
         std::cerr << e.what() << std::endl;
@@ -165,7 +171,7 @@ std::string Respond::getEntryFromMap(const std::string& entry)
 	HashMap::iterator it = _requestData.find(entry);
 
 		if (it == _requestData.end())
-			throw (std::invalid_argument("Invalid string"));
+			throw (Respond::BadRequest());
 		return (it->second);
 }
 
@@ -204,3 +210,9 @@ std::string Respond::getValidFile(const std::string& relativePath)
     }
 	return (FileContent);
 }
+
+const char* Respond::BadRequest::what() const throw()
+{
+	return ("Bad Request");
+}
+
