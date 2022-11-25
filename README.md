@@ -12,7 +12,7 @@
 
 
 ## General Information
-- The primary role of the web server is to store, process, and deliver requested information to the end users.
+- The primary role of the web server is to store, process and deliver requested information to the end users.
 - By building a web server, we could gain a deep understanding of the HTTP protocol, websockets and the Common Gateway Interface (CGI).
 
 
