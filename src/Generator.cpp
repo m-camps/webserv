@@ -131,6 +131,8 @@ std::string StatusMessage(int32_t StatusCode)
             return ("Bad Gateway");
         case e_Unauthorized:
             return ("Unauthorized");
+        case e_HTTPVersion:
+            return ("HTTP Version Not Supported");
         default:
             return ("");
     }

@@ -45,6 +45,17 @@ std::string Request::AppendRequest(const std::string& Request)
 	return (Header);
 }
 
+void removeNonAlnum(std::string& str)
+{
+    for (int32_t i = 0; str[i]; i++)
+    {
+        if (std::isalnum(str[i]) == false && str[i] != '.' && str[i] != '/')
+        {
+            str.erase(i, 1);
+        }
+    }
+}
+
 /**
  * splitMethod splits the HTTPMethod to the following std::map
  *
@@ -74,7 +85,8 @@ void Request::splitMethod(std::string line)
 		throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
 	}
 
-	temp = line.substr(found + 1, line.length() - found - 2);
+	temp = line.substr(found + 1, line.length() - found);
+    removeNonAlnum(temp);
 	addHashMapNode("HTTPVersion", temp);
 	line.erase(found);
 	temp.clear();

@@ -131,23 +131,33 @@ void 	Respond::buildResponse(HashMap requestData)
                 {"DELETE", &Respond::buildDelete}
         }};
 
-        if (MethodIsAllowed(Method, _location.getAllowMethods()) == true)
+
+        if (getEntryFromMap("HTTPVersion") == "HTTP/1.1")
         {
-            for (uint64_t i = 0; i < CompareMethods.size(); i++) {
-                if (Method == CompareMethods[i].Method) {
-                    FuncPointer = CompareMethods[i].FuncPointer;
-                    (this->*FuncPointer)();
-                    return;
+            if (MethodIsAllowed(Method, _location.getAllowMethods()) == true)
+            {
+                for (uint64_t i = 0; i < CompareMethods.size(); i++) {
+                    if (Method == CompareMethods[i].Method) {
+                        FuncPointer = CompareMethods[i].FuncPointer;
+                        (this->*FuncPointer)();
+                        return;
+                    }
                 }
             }
+        }
+        else
+        {
+            _status_code = e_HTTPVersion;
+            createResponse(Generator::generateDefaulPage(*this));
+            return ;
         }
 
         if (MethodIsImplemented(Method) == true)
             _status_code = e_MethodNotAllowed;
-        else if (Method == "ERROR")
-            _status_code = e_Badrequest;
         else
             _status_code = e_NotImplemented;
+
+
         createResponse(Generator::generateDefaulPage(*this));
     }
 	catch (const Respond::BadRequest &e)

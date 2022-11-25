@@ -117,5 +117,6 @@ enum e_statusCode
     e_ImATeapot = 418,
 	e_InternalServerError = 500,
     e_NotImplemented = 501,
-	e_BadGateway = 502
+	e_BadGateway = 502,
+    e_HTTPVersion = 505
 };
