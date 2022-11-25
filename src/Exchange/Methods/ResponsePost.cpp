@@ -35,19 +35,12 @@ void Respond::putBodyInFile(std::string& MetaData, std::string& Body)
 
 std::string Respond::removeBoundry(void)
 {
-    try
-    {
-        std::string RequestBody = getEntryFromMap("Body");
-        std::string Boundry = Generator::generateBoundry(*this);
+    std::string RequestBody = getEntryFromMap("Body");
+    std::string Boundry = Generator::generateBoundry(*this);
 
-        RequestBody.erase(0, Boundry.length() + 5);
-        RequestBody.erase(RequestBody.length() - Boundry.length() - 6, Boundry.length() + 6);
-        return (RequestBody);
-    }
-    catch (const std::exception& e)
-    {
-        throw (std::runtime_error("Could not find boundry"));
-    }
+    RequestBody.erase(0, Boundry.length() + 5);
+    RequestBody.erase(RequestBody.length() - Boundry.length() - 6, Boundry.length() + 6);
+    return (RequestBody);
 }
 
 std::string Respond::parseMetadata(std::string& RequestBody)
@@ -76,28 +69,21 @@ std::string Respond::sendSuccesfulUpload(std::string MetaData)
 
 bool Respond::isPostValid(void)
 {
-    try
-    {
-        std::string BodySize = getEntryFromMap("Content-Length");
-        std::string ContentType = getEntryFromMap("Content-Type");
-        std::size_t found = ContentType.find(';');
+    std::string BodySize = getEntryFromMap("Content-Length");
+    std::string ContentType = getEntryFromMap("Content-Type");
+    std::size_t found = ContentType.find(';');
 
-        if (found == std::string::npos)
-        {
-            _status_code = e_UnsupportedMediaType;
-            createResponse(Generator::generateDefaulPage(*this));
-            return (false);
-        }
-        if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
-        {
-            _status_code = e_PayloadTooLarge;
-            createResponse(Generator::generateDefaulPage(*this));
-            return (false);
-        }
-    }
-    catch (const std::exception& e)
+    if (found == std::string::npos)
     {
-        throw (std::runtime_error("error in isPostValid()"));
+        _status_code = e_UnsupportedMediaType;
+        createResponse(Generator::generateDefaulPage(*this));
+        return (false);
+    }
+    if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
+    {
+        _status_code = e_PayloadTooLarge;
+        createResponse(Generator::generateDefaulPage(*this));
+        return (false);
     }
     return (true);
 }
