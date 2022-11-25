@@ -79,7 +79,7 @@ bool Respond::isPostValid(void)
         createResponse(Generator::generateDefaulPage(*this));
         return (false);
     }
-    if (ToString(_server.getClientBodySize() * 1000000) < BodySize)
+    if (static_cast<size_t>(_server.getClientBodySize() * 1000000) < ft_strol(BodySize))
     {
         _status_code = e_PayloadTooLarge;
         createResponse(Generator::generateDefaulPage(*this));
