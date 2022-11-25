@@ -127,11 +127,3 @@ void Request::addHashMapNode(const std::string& NameNode, const std::string& Con
 {
     _requestData[NameNode] = ContentNode;
 }
-
-bool isPrintable(const char* str)
-{
-    for (int32_t i = 0; str[i]; i++)
-        if (std::isprint(str[i]) == false)
-            return (false);
-    return (true);
-}

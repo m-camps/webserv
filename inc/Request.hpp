@@ -14,19 +14,16 @@
 
 typedef std::map<std::string, std::string> HashMap;
 
-bool isPrintable(const char* str);
-
 class Request
 {
 public:
  	Request(void);
-    Request(const Request&);
     ~Request(void);
 
 	HashMap		parseRequest(const std::string& requestStr);
 
 private:
-   
+    Request(const Request&);
     Request& operator=(const Request& ref);
 
 	HashMap		_requestData;

@@ -19,11 +19,6 @@ public:
     Exchange(Servers&, int32_t, const HashMap&);
     ~Exchange(void);
 
-    /* Getters */
-	Server 			getServer(void) const;
-    HashMap 		getRequestData(void) const;
-    int32_t 		getSocketFd(void) const;
-
 	/* Send */
 	void			sendToClient(Respond& response);
 	void			sendChunked(std::string str) const;

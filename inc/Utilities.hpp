@@ -16,11 +16,7 @@
 #include <string>
 #include <sstream>
 
-std::vector<int> findCharLocation(std::string& line, int32_t c);
-
 std::string readFile(const std::string&);
-
-std::string readFile(const std::istringstream& Body);
 
 void deleteFile(std::string& filePath);
 

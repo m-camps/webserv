@@ -15,7 +15,6 @@
 #include "../inc/Location.hpp"
 #include "../inc/Constants.hpp"
 #include "../inc/Utilities.hpp"
-#include "../inc/Macros.hpp"
 #include <fstream>
 #include <sstream>
 #include <string.h>
@@ -405,7 +404,7 @@ std::invalid_argument Parse::ExceptionBuilder(std::string error)
 {
 	std::string str;
 	
-	str.append("Parsing Error | Line: " + TOSTRING(g_line_count) + " | ");
+	str.append("Parsing Error | Line: " + ToString(g_line_count) + " | ");
 	str.append(error);
 	return std::invalid_argument(str);
 }
@@ -438,7 +437,7 @@ std::invalid_argument Parse::ValidateException(std::string error, int block)
 {
 	std::string str;
 	
-	str.append("Incomplete Error | ServerBlock " + TOSTRING(block) + " | ");
+	str.append("Incomplete Error | ServerBlock " + ToString(block) + " | ");
 	str.append(error);
 	return std::invalid_argument(str);
 }

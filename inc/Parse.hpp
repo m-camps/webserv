@@ -18,16 +18,13 @@
 #include "Server.hpp"
 #include "Utilities.hpp"
 
-typedef std::vector<std::string>::iterator 	vecIt;
-
 typedef std::vector<std::string>			Line;
 typedef std::vector<Line>					LocationBlock;
 typedef std::vector<Line>					ServerBlock;
 typedef std::vector<Line>					Block;
 typedef std::vector<Line>					File;
 
-#define NR_OF_SERVER_DIRECTIVES 5 //will be more later
-#define NR_OF_LOCATION_DIRECTIVES 8 //will be more later
+#define NR_OF_LOCATION_DIRECTIVES 8
 
 class Parse
 {

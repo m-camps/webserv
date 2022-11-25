@@ -70,12 +70,6 @@ Location   Exchange::matchLocation(const Server& server, HashMap requestData)
 
 /* //////////////////////////// */
 
-Server 		Exchange::getServer(void) const { return (_server); }
-HashMap		Exchange::getRequestData(void) const { return (_requestData); }
-int32_t 	Exchange::getSocketFd(void) const { return (_socketFd); }
-
-/* //////////////////////////// */
-
 void	Exchange::sendToClient(Respond& response)
 {
     sendNormal(response.getHeader());
