@@ -208,11 +208,11 @@ std::string Generator::generateAutoIndex(Respond& Responder, const std::string& 
             {
                 if (isDirectory(*it) == true)
                     *it += "/";
-                *it = Path + "/" + *it;
-                size_t found = it->find("//");
+                std::string FullPath = Path + "/" + *it;
+                size_t found = FullPath.find("//");
                 if (found != std::string::npos)
-                    it->erase(found, 1);
-                AutoIndex += "<a href=\"" + *it  + "\">" + *it + "</a><br>\n";
+                    FullPath.erase(found, 1);
+                AutoIndex += "<a href=\"" + FullPath  + "\">" + *it + "</a><br>\n";
             }
         }
 
