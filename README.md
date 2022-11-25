@@ -19,7 +19,8 @@
 ## Technologies Used
 - C++98
 - Python3
-
+- HTML5
+- CSS
 
 ## Features
 - HTTP requests: GET, POST, DELETE 
