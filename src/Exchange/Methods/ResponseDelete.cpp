@@ -2,7 +2,7 @@
 // Created by Xander Voorvaart on 11/7/22.
 //
 
-#include "../Respond.hpp"
+#include "../../../inc/Respond.hpp"
 
 std::string sendSuccesfulDelete(const std::string& relativePath)
 {

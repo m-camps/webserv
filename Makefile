@@ -9,15 +9,15 @@ SRCS = Cgi.cpp Client.cpp Generator.cpp Location.cpp main.cpp Network.cpp Parse.
 OBJS = $(SRCS:%.cpp=$(OBJD)%.o)
 DEPS = $(SRCS:%.cpp=$(DEPD)%.d)
 
-vpath %.hpp $(INCD) $(SRCD)/Exchange $(SRCD)/Exchange
+vpath %.hpp $(INCD)
 vpath %.cpp $(SRCD) $(SRCD)/Exchange $(SRCD)/Exchange/Methods $(SRCD)/Utilities
 vpath %.o $(OBJD)
 
+CFLAGS		=	-pedantic -Wall -Werror -Wextra -std=c++98
 HFLAGS 		=	$(addprefix -I, $(INCD))
 DEPFLAGS 	=	-MT $@ -MMD -MP -MF $(DEPD)$*.d
 HEADER		=	inc
 CC			=	c++ 
-CFLAGS		=	-pedantic -Wall -Werror -Wextra -std=c++98
 RM			=	rm -rf
 
 all: $(OBJD) $(DEPD) $(TARGET) 

@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #pragma once
-#include "../src/Exchange/Request.hpp"
+#include "Request.hpp"
 
 class Client {
 	private:

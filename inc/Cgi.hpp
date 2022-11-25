@@ -1,11 +1,10 @@
 #ifndef CGI_HPP
 #define CGI_HPP
 #include <string>
-#include "../src/Exchange/Respond.hpp"
+#include "Respond.hpp"
 #define NR_OF_CGI_ENV_VARS 24
 #define INTERNAL_SERVER_ERROR_CODE 254
-#include "../src/Exchange/Exchange.hpp"
-#include "../src/Exchange/Respond.hpp"
+#include "Exchange.hpp"
 
 class Cgi
 {

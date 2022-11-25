@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../inc/Network.hpp"
-#include "Exchange/Request.hpp"
+#include "../inc/Request.hpp"
 #include "../inc/Client.hpp"
 #include "../inc/Constants.hpp"
 

@@ -13,7 +13,7 @@
 #pragma once
 #include "Server.hpp"
 #include "Parse.hpp"
-#include "../src/Exchange/Exchange.hpp"
+#include "Exchange.hpp"
 #include "Client.hpp"
 #include <poll.h>
 #include <iostream>

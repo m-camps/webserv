@@ -10,7 +10,7 @@
 #include <sstream> // issstringstream()
 
 #include "Respond.hpp"
-#include "../../inc/Server.hpp"
+#include "Server.hpp"
 
 typedef std::map<std::string, std::string> HashMap;
 

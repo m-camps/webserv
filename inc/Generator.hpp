@@ -10,7 +10,7 @@
 #include <dirent.h> // DIR
 #include <sys/stat.h>
 
-#include "../src/Exchange/Respond.hpp"
+#include "Respond.hpp"
 #include "Utilities.hpp"
 #include "Constants.hpp"
 
