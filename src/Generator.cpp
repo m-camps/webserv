@@ -168,12 +168,21 @@ std::vector<std::string> ListDir(DIR **dir, std::string Root)
     return (DirectoryList);
 }
 
-std::string Generator::generateAutoIndex(Respond& Responder)
+std::string Generator::generateAutoIndex(Respond& Responder, const std::string& relativePath)
 {
     DIR *dir;
+    bool isRoot = false;
     std::string AutoIndex;
-    std::string Root = Responder.getLocation().getRoot();
-    std::vector<std::string> DirectoryList = ListDir(&dir, Root);
+    std::string Path = Responder.getEntryFromMap("Path");
+    std::vector<std::string> DirectoryList;
+
+    if (isDirectory(relativePath) == true)
+        DirectoryList = ListDir(&dir, relativePath);
+    else
+    {
+        isRoot = true;
+        DirectoryList = ListDir(&dir, Responder.getLocation().getRoot());
+    }
     std::vector<std::string>::iterator it = DirectoryList.begin();
 
     AutoIndex =
@@ -181,16 +190,32 @@ std::string Generator::generateAutoIndex(Respond& Responder)
         "<html lang=\"en\">\n"
         "<head>\n"
         "<meta charset=\"UTF-8\">\n"
-        "<title>Auto Index of " + Root + "</title>\n"
+        "<title>Auto Index of " + relativePath + "</title>\n"
         "</head>\n"
         "<body>\n"
-        "<h1>Auto Index of " + Root + "</h1>";
-        for (; it != DirectoryList.end(); it++)
+        "<h1>Auto Index of " + relativePath + "</h1>\n";
+        if (isRoot == true)
         {
-            if (isDirectory(*it) == true)
-                *it += "/";
-             AutoIndex += "<a href=\"" + *it + "\">" + *it + "</a><br>\n";
+            for (; it != DirectoryList.end(); it++) {
+                if (isDirectory(*it) == true)
+                    *it += "/";
+                AutoIndex += "<a href=\"" + *it + "\">" + *it + "</a><br>\n";
+            }
         }
+        else
+        {
+            for (; it != DirectoryList.end(); it++)
+            {
+                if (isDirectory(*it) == true)
+                    *it += "/";
+                *it = Path + "/" + *it;
+                size_t found = it->find("//");
+                if (found != std::string::npos)
+                    it->erase(found, 1);
+                AutoIndex += "<a href=\"" + *it  + "\">" + *it + "</a><br>\n";
+            }
+        }
+
         AutoIndex += "</pre><hr></body>\n"
         "</html>";
 

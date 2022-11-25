@@ -182,7 +182,7 @@ std::string Respond::getValidFile(const std::string& relativePath)
             if (isDirectory(relativePath) == true)
             {
                 if (_location.getAutoIndex() == true)
-                    FileContent = Generator::generateAutoIndex(*this);
+                    FileContent = Generator::generateAutoIndex(*this, relativePath);
                 else
                     FileContent = Generator::generateDirectoryPage(*this);
             }
@@ -193,8 +193,9 @@ std::string Respond::getValidFile(const std::string& relativePath)
             buildRedir();
             break ;
         case e_NotFound:
-            if (_location.getAutoIndex() == true && LocationIndex == relativePath)
-                FileContent = Generator::generateAutoIndex(*this);
+            std::cout << relativePath << std::endl;
+            if (_location.getAutoIndex() == true && (LocationIndex == relativePath || isDirectory(relativePath)))
+                FileContent = Generator::generateAutoIndex(*this, relativePath);
             else
                 FileContent = Generator::generateDefaulPage(*this);
             break ;

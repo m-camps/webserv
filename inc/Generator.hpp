@@ -4,8 +4,6 @@
 
 #pragma once
 
-
-
 #include <iostream>
 #include <dirent.h> // DIR
 #include <sys/stat.h>
@@ -29,7 +27,7 @@ public:
     static std::string generateDirectoryPage(Respond&);
     static std::string generateDefaulPage(const Respond&);
     static std::string generateBoundry(Respond&);
-    static std::string generateAutoIndex(Respond&);
+    static std::string generateAutoIndex(Respond&, const std::string&);
     static std::string generateLocation(const std::string&);
 
 private:
