@@ -1,5 +1,5 @@
-# Project Name
-> WEBSERV 42 aims to create a fully functional web server written in C++98.
+# WEBSERV
+> Webserv aims to create a fully functional web server written in C++98.
 
 ## Table of Contents
 * [General Info](#general-information)
@@ -66,6 +66,6 @@ Or after make, provide your own custom .conf file.
 
 
 ## Contact
-Created by m-camps[https://github.com/m-camps],
-xvoorvaa[https://github.com/xvoorvaa],
+Created by m-camps [https://github.com/m-camps],
+xvoorvaa [https://github.com/xvoorvaa],
 alexdrumi [https://github.com/alexdrumi]
