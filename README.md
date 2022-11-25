@@ -1,5 +1,5 @@
 # Project Name
-> Webserv aims to create a fully functional webserver written in C++98.
+> WEBSERV 42 aims to create a fully functional web server written in C++98.
 
 ## Table of Contents
 * [General Info](#general-information)
@@ -9,7 +9,6 @@
 * [Setup](#setup)
 * [Usage](#usage)
 * [Contact](#contact)
-<!-- * [License](#license) -->
 
 
 ## General Information
@@ -31,7 +30,8 @@
 
 ## Screenshots
 ![Example screenshot](./data/www/screenshot.png)
-<!-- If you have screenshots you'd like to share, include them here. -->
+
+
 
 ## Setup
 Requirements are:
@@ -40,13 +40,13 @@ Requirements are:
 - Mozilla Firefox
 - Config file
 
+
 ## Usage
 `make && ./webserv data/conf/basic.conf`
 
 Or after make, provide your own custom .conf file.
 
 `make && ./webserv you_own_conf_file`
-
 
 
 ## Sources
@@ -64,12 +64,8 @@ Or after make, provide your own custom .conf file.
 - [Mozilla HTTP Forwarding](https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections)
 - [Very clear Poll() guide](https://beej.us/guide/bgnet/html/#poll)
 
-## Acknowledgements
-Give credit here.
-- This project was inspired by...
-- This project was based on [this tutorial](https://www.example.com).
-- Many thanks to...
-
 
 ## Contact
-Created by m-camps[https://github.com/m-camps], xvoorvaa[https://github.com/xvoorvaa], alexdrumi [https://github.com/alexdrumi]
+Created by m-camps[https://github.com/m-camps],
+xvoorvaa[https://github.com/xvoorvaa],
+alexdrumi [https://github.com/alexdrumi]
