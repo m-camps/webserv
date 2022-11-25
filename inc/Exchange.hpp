@@ -33,6 +33,11 @@ public:
     public:
         const char* what() const throw();
     };
+	class ClearException : public std::exception
+    {
+    public:
+        const char* what() const throw();
+    };
 
 private:
     Exchange(void);

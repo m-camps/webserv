@@ -22,7 +22,6 @@ HashMap		Request::parseRequest(const std::string& requestStr)
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-        throw (e);
 	}
 	return (_requestData);
 }
@@ -55,50 +54,37 @@ std::string Request::AppendRequest(const std::string& Request)
  */
 void Request::splitMethod(std::string line)
 {
-    try
-    {
-        size_t found;
-        std::string temp;
+	size_t found;
+	std::string temp;
 
-        found = line.find_first_of(' ');
-        if (found == std::string::npos)
-        {
-            addHashMapNode("HTTPMethod", "ERROR");
-            addHashMapNode("HTTPVersion", "ERROR");
-            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
-        }
+	found = line.find_first_of(' ');
+	if (found == std::string::npos)
+	{
+		throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+	}
 
-        temp = line.substr(0, found);
-        addHashMapNode("HTTPMethod", temp);
-        line.erase(0, found + 1);
-        temp.clear();
+	temp = line.substr(0, found);
+	addHashMapNode("HTTPMethod", temp);
+	line.erase(0, found + 1);
+	temp.clear();
 
-        found = line.find_last_of(' ');
-        if (found == std::string::npos)
-        {
-            addHashMapNode("HTTPMethod", "ERROR");
-            addHashMapNode("HTTPVersion", "ERROR");
-            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
-        }
+	found = line.find_last_of(' ');
+	if (found == std::string::npos)
+	{
+		throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+	}
 
-        temp = line.substr(found + 1, line.length() - found - 2);
-        addHashMapNode("HTTPVersion", temp);
-        line.erase(found);
-        temp.clear();
+	temp = line.substr(found + 1, line.length() - found - 2);
+	addHashMapNode("HTTPVersion", temp);
+	line.erase(found);
+	temp.clear();
 
-        found = line.find('/');
-        if (found == std::string::npos)
-        {
-            addHashMapNode("HTTPMethod", "ERROR");
-            addHashMapNode("HTTPVersion", "ERROR");
-            throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
-        }
-        addHashMapNode("Path", line);
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+	found = line.find('/');
+	if (found == std::string::npos)
+	{
+		throw (std::runtime_error("In splitMethod: The HTTPMethod is not complete"));
+	}
+	addHashMapNode("Path", line);
 }
 
 /*

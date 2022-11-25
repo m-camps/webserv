@@ -6,7 +6,7 @@
 /*   By: mcamps <mcamps@student.codam.nl>             +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2022/09/30 15:38:07 by mcamps        #+#    #+#                 */
-/*   Updated: 2022/11/23 16:41:48 by mcamps        ########   odam.nl         */
+/*   Updated: 2022/11/25 15:01:46 by mcamps        ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,11 @@ void Network::run()
 					closeConnection(cur.fd, i);
 					break ;
                 }
+				catch (const Exchange::ClearException &e)
+				{
+					std::cerr << e.what() << std::endl;
+					_io.find(cur.fd)->second = Client(_io.find(cur.fd)->second.servers);
+				}
                 catch (const std::exception& e)
                 {
                     std::cerr << e.what() << std::endl;
@@ -184,6 +189,7 @@ void	Network::acceptConnection(int socket_fd)
 
 void	Network::closeConnection(int fd, int i)
 {
+	std::cout << "We closed the connection due to a error" << std::endl;
 	_poll.erase(_poll.begin() + i);
 	_io.erase(fd);
 	if (close(fd) < 0)

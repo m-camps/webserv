@@ -19,6 +19,8 @@ Exchange::Exchange(Servers& servers, int32_t socketFd, const HashMap& requestDat
     Respond	response(server, location);
     response.buildResponse(requestData);
     sendToClient(response);
+	if (response.getStatusCode() ==	e_Badrequest)
+		throw(Exchange::ClearException());
 }
 
 /* //////////////////////////// */
@@ -118,4 +120,9 @@ void    Exchange::sendNormal(const std::string& str) const
 const char* Exchange::WriteException::what() const throw()
 {
     return ("An error in write. Closing client socket");
+}
+
+const char* Exchange::ClearException::what() const throw()
+{
+	return ("Buffer Cleared");
 }

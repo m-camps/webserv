@@ -52,6 +52,12 @@ public:
     /* Interface */
     std::string 	getEntryFromMap(const std::string&	entry);
 
+	class BadRequest : public std::exception
+    {
+    public:
+        const char* what() const throw();
+    };
+
 private:
     Respond(void);
     Respond(const Respond&);
