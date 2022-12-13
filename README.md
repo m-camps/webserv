@@ -72,6 +72,6 @@ Or after make, provide your own custom .conf file.
 
 
 ## Contact
-Created by m-camps [https://github.com/m-camps],
-xvoorvaa [https://github.com/xvoorvaa],
-alexdrumi [https://github.com/alexdrumi]
+Created by [m-camps](https://github.com/m-camps),
+[xvoorvaa](https://github.com/xvoorvaa),
+[alexdrumi](https://github.com/alexdrumi)
