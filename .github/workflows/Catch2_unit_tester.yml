@@ -1,0 +1,17 @@
+name: Catch2 Unit Tester (MacOs)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: make unit_tester
+      run: make unit_tester
