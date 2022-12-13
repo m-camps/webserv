@@ -43,7 +43,7 @@ Requirements are:
 
 
 ## Usage
-`make && ./webserv data/conf/basic.conf`
+`make && ./webserv data/conf/default.conf`
 
 Or after make, provide your own custom .conf file.
 
