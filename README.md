@@ -1,6 +1,11 @@
 # WEBSERV
 > Webserv aims to create a fully functional web server written in C++98.
 
+<br>
+
+[![C/C++ CI MacOS](https://github.com/xvoorvaa/webserv/actions/workflows/macos_comp.yml/badge.svg)](https://github.com/xvoorvaa/webserv/actions/workflows/macos_comp.yml)
+[![Catch2 Unit Tester (MacOs)](https://github.com/xvoorvaa/webserv/actions/workflows/Catch2_unit_tester.yml/badge.svg)](https://github.com/xvoorvaa/webserv/actions/workflows/Catch2_unit_tester.yml)
+
 ## Table of Contents
 * [General Info](#general-information)
 * [Technologies Used](#technologies-used)
@@ -43,7 +48,7 @@ Requirements are:
 
 
 ## Usage
-`make && ./webserv data/conf/basic.conf`
+`make && ./webserv data/conf/default.conf`
 
 Or after make, provide your own custom .conf file.
 
@@ -67,6 +72,6 @@ Or after make, provide your own custom .conf file.
 
 
 ## Contact
-Created by m-camps [https://github.com/m-camps],
-xvoorvaa [https://github.com/xvoorvaa],
-alexdrumi [https://github.com/alexdrumi]
+Created by [m-camps](https://github.com/m-camps),
+[xvoorvaa](https://github.com/xvoorvaa),
+[alexdrumi](https://github.com/alexdrumi)
